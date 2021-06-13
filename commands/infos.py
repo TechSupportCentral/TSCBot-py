@@ -9,4 +9,4 @@ class infos(commands.Cog):
         await ctx.send(f"Pong! {round(self.bot.latency * 1000)}ms")
 
 def setup(bot):
-    bot.add_cog(core(bot))
+    bot.add_cog(infos(bot))
