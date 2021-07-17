@@ -14,4 +14,9 @@ for filename in os.listdir('./commands'):
         bot.load_extension(f'commands.{filename[:-3]}')
         print('Cog '+filename[:-3]+' loaded')
     
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='TEG'))
+    print('Logged in as {}'.format(bot.user.name))
+
 bot.run(config['token'])
