@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
 import os
-from json import load
+import yaml
 from pathlib import Path
 
-with Path("config.json").open() as f:
-    config = load(f)
+with open('config.yaml', 'r') as config_file:
+    config = yaml.load(config_file, Loader=yaml.BaseLoader)
 
 bot = commands.Bot(command_prefix=config['prefix'])
 
