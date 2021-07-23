@@ -7,11 +7,11 @@ class infos(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def ping(self, ctx: commands.Context):
+    async def ping(self, ctx):
         await ctx.send(f"Pong! {round(self.bot.latency * 1000)}ms")
 
     @commands.command()
-    async def commands(self, ctx: commands.Context, arg=None):
+    async def commands(self, ctx, arg=None):
         with open('commands.yaml', 'r') as commands_file:
             commands = yaml.load(commands_file, Loader=yaml.BaseLoader)
 
@@ -23,7 +23,7 @@ class infos(commands.Cog):
                     embed.add_field(name=category + ':', value=commands[category + '_desc'], inline=True)
             await ctx.send(embed=embed)
         elif arg in commands:
-            embed = discord.Embed(title="Command List", description="Commands in the {} category:".format(arg), color=0x00a0a0)
+            embed = discord.Embed(title="Command List", description=f"Commands in the {arg} category:", color=0x00a0a0)
             embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
             for command in commands[arg]:
                 embed.add_field(name=command + ':', value=commands[arg].get(command), inline=False)
