@@ -1,7 +1,9 @@
+infos_desc: "Information about the bot"
 infos:
     ping: "Tests the bot latency"
     commands: "List of commands on the bot"
 
+techinfo_desc: "Tutorials and Links to tech questions"
 techinfo:
     amddrivers: "Link to AMD Driver website"
     nvidiadrivers: "Link to nVidia Driver website"
