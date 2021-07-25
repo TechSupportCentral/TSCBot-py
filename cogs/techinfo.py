@@ -6,12 +6,16 @@ class techinfo(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def amddrivers(self, ctx):
-        await ctx.send("https://www.amd.com/en/support")
-
-    @commands.command()
     async def cpuz(self, ctx):
         await ctx.send("https://www.cpuid.com/downloads/cpu-z/cpu-z_1.95-en.exe")
+
+    @commands.command()
+    async def drivers(self, ctx):
+        embed = discord.Embed(title="Drivers", description="Links to downloads for various drivers", color=0x00a0a0)
+        embed.add_field(name="AMD Drivers:", value="https://amd.com/en/support", inline=False)
+        embed.add_field(name="nVidia Drivers:", value="https://nvidia.com/Download/index.aspx", inline=False)
+        embed.add_field(name="Realtek Audio Drivers:", value="https://www.realtek.com/en/downloads", inline=False)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def hwmonitor(self, ctx):
@@ -22,20 +26,31 @@ class techinfo(commands.Cog):
         await ctx.send("https://www.magicaljellybean.com/downloads/KeyFinderInstaller.exe")
 
     @commands.command()
-    async def nvidiadrivers(self, ctx):
-        await ctx.send("https://www.nvidia.com/Download/index.aspx")
-
-    @commands.command()
     async def safemode(self, ctx):
         await ctx.send("https://support.microsoft.com/en-us/windows/start-your-pc-in-safe-mode-in-windows-10-92c27cff-db89-8644-1ce4-b3e5e56fe234")
 
     @commands.command()
-    async def security(self, ctx):
+    async def malwarebytes(self, ctx):
         await ctx.send("https://www.malwarebytes.com/mwb-download/thankyou/")
 
     @commands.command()
     async def windowsinstall(self, ctx):
-        await ctx.send("This tutorial will lead you how to do a fresh windows installation:  (All your data will be gone,  back it up and use `!key` in case you need to back up your Product Key too, please save it somewhere safe and don't show us or anyone the key!)\nhttps://youtu.be/bwJ_E-I9WRs\nTo figure out which key you need to use to boot to a usb, run the command `!bootkeys`.")
+        await ctx.send("This tutorial will lead you how to do a fresh windows installation: (All your data will be gone, back it up and use `!key` in case you need to back up your Product Key too, please save it somewhere safe and don't show us or anyone the key!)\nhttps://youtu.be/bwJ_E-I9WRs\nTo figure out which key you need to use to boot to a usb, run the command `!bootkeys`.")
+
+    @commands.command()
+    async def bootkeys(self, ctx):
+        embed = discord.Embed(title="", description="", color=0x00a0a0)
+        embed.add_field(name="Dell, Toshiba, Huawei, Lenovo:", value="F12", inline=True)
+        embed.add_field(name="Acer:", value="F12, F9, F2, Esc", inline=True)
+        embed.add_field(name="Apple:", value="Option / Alt", inline=True)
+        embed.add_field(name="Asus:", value="Esc", inline=True)
+        embed.add_field(name="HP:", value="F9", inline=True)
+        embed.add_field(name="Intel:", value="F10", inline=True)
+        embed.add_field(name="MSI:", value="F11", inline=True)
+        embed.add_field(name="Samsung:", value="Esc, F12, F2", inline=True)
+        embed.add_field(name="Sony:", value="Esc, F10, F11", inline=True)
+        embed.add_field(name="Other Common Ones:", value="F2, F10, F12, Esc, Del", inline=True)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def linuxusb(self, ctx):

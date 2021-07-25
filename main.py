@@ -9,9 +9,9 @@ with open('config.yaml', 'r') as config_file:
 
 bot = commands.Bot(command_prefix=config['prefix'])
 
-for filename in os.listdir('./commands'):
+for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
-        bot.load_extension(f'commands.{filename[:-3]}')
+        bot.load_extension(f'cogs.{filename[:-3]}')
         print('Cog '+filename[:-3]+' loaded')
     
 @bot.event

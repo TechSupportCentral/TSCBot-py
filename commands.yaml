@@ -1,16 +1,20 @@
 infos_desc: "Information about the bot"
 infos:
+    uptime: "How long the bot has been online"
     ping: "Tests the bot latency"
     commands: "List of commands on the bot"
+    spteam-requirements: "Requirements to join the support team"
+    mod-requirements: "Requirements to join the moderation team"
+    rules: "Server Rules"
 
 techinfo_desc: "Tutorials and Links to tech questions"
 techinfo:
-    amddrivers: "Link to AMD Driver website"
-    nvidiadrivers: "Link to nVidia Driver website"
+    drivers: "Links to download various drivers"
     cpuz: "Link to CPU-Z Download"
     hwmonitor: "Link to HWMonitor download"
     key: "Instructions to recover your Windows Product Key"
     safemode: "Instructions to get to safe mode on Windows 10"
     malwarebytes: "Link to Malwarebytes Antivirus Download"
     windowsinstall: "Instructions on how to install or reinstall Windows 10"
+    bootkeys: "List of keys used to get into the BIOS Boot Menu"
     linuxusb: "Instructions on how to create a bootable Linux USB"
