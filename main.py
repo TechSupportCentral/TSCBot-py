@@ -7,7 +7,9 @@ from pathlib import Path
 with open('config.yaml', 'r') as config_file:
     config = yaml.load(config_file, Loader=yaml.BaseLoader)
 
-bot = commands.Bot(command_prefix=config['prefix'])
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix=config['prefix'], intents=intents)
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
