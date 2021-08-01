@@ -1,2 +1,8 @@
 token: "insert token here"
 prefix: "!"
+
+role_ids:
+    moderator: 854429524304724002
+
+channel_ids:
+    staff_logs: 854429525147385889

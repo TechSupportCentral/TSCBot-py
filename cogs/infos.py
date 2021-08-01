@@ -104,7 +104,7 @@ class infos(commands.Cog):
             return
 
         member = guild.get_member(id)
-        embed=discord.Embed(title=member.name + "#" + member.discriminator, color=0x00a0a0)
+        embed=discord.Embed(title=member, color=0x00a0a0)
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name="User ID", value=id, inline=False)
         if member.name != member.display_name:

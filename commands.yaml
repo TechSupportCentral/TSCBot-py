@@ -6,6 +6,7 @@ infos:
     spteam-requirements: "Requirements to join the support team"
     mod-requirements: "Requirements to join the moderation team"
     rules: "Server Rules"
+    userinfo: "Various info about a certain user"
 
 techinfo_desc: "Tutorials and Links to tech questions"
 techinfo:
@@ -18,3 +19,7 @@ techinfo:
     windowsinstall: "Instructions on how to install or reinstall Windows 10"
     bootkeys: "List of keys used to get into the BIOS Boot Menu"
     linuxusb: "Instructions on how to create a bootable Linux USB"
+
+moderation_desc: "Commands run by moderators"
+moderation:
+    purge: "Deletes a certain amount of messages"
