@@ -2,9 +2,6 @@ from discord.ext import commands
 import discord
 
 class techinfo(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.command()
     async def cpuz(self, ctx):
         await ctx.send("https://www.cpuid.com/downloads/cpu-z/cpu-z_1.95-en.exe")
