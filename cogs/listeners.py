@@ -14,6 +14,8 @@ class listeners(commands.Cog):
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
     global channel_ids
     channel_ids = config['channel_ids']
+    global role_ids
+    role_ids = config['role_ids']
 
     @commands.Cog.listener("on_message")
     async def swearfilter(self, message):
@@ -93,6 +95,27 @@ class listeners(commands.Cog):
             embed.add_field(name="Edited Message:", value="Unable to detect message contents", inline=False)
         channel = self.bot.get_channel(int(channel_ids['message_edit']))
         await channel.send(embed=embed)
+
+    @commands.Cog.listener("on_message")
+    async def autoresponse(self, message):
+        support_channels = [int(channel_ids['vc_chat'])]
+        for channel in channel_ids:
+            if channel.endswith("support"):
+                support_channels.append(int(channel_ids[channel]))
+
+        help_triggers = ["issue", "able to help", "get some help", "need help"]
+        if any(trigger in message.content for trigger in help_triggers) and not message.channel.id in support_channels:
+            channel = self.bot.get_channel(message.channel.id)
+            await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
+
+        if "reinstall windows" in message.content:
+            channel = self.bot.get_channel(message.channel.id)
+            await channel.send("This tutorial will lead you how to do a fresh windows installation: (All your data will be gone, back it up and use `!key` in case you need to back up your Product Key too, please save it somewhere safe and don't show us or anyone the key!)\nhttps://youtu.be/bwJ_E-I9WRs\nTo figure out which key you need to use to boot to a usb, run the command `!bootkeys`.")
+
+        if "virus" in message.content:
+            if not message.author.bot:
+                channel = self.bot.get_channel(message.channel.id)
+                await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download/thankyou/")
 
 def setup(bot):
     bot.add_cog(listeners(bot))
