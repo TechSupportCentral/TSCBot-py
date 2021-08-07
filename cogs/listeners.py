@@ -30,7 +30,22 @@ class listeners(commands.Cog):
             if swear in message.content:
                 swore = swear
 
-        if swore != "":
+        if isinstance(message.channel, discord.channel.DMChannel):
+            if message.author.bot:
+                return
+            embed = discord.Embed(title="DM", color=discord.Color.red())
+            embed.set_thumbnail(url=message.author.avatar_url)
+            embed.add_field(name="Message Author", value=message.author, inline=True)
+            embed.add_field(name="User ID", value=message.author.id, inline=True)
+            if message.content:
+                content = message.content
+            else:
+                content = "Unable to detect message contents"
+            embed.add_field(name="Message:", value=content, inline=False)
+            channel = self.bot.get_channel(int(channel_ids['bot_dm']))
+            await channel.send(embed=embed)
+
+        elif swore != "":
             await message.delete()
             if swore == "@everyone":
                 dmbed=discord.Embed(title="@everyone ping", description="Please don't ping @everyone. If you need help, go to a support channel and ping @Support Team.")
@@ -89,9 +104,10 @@ class listeners(commands.Cog):
         embed.add_field(name="Message Author", value=message.author, inline=True)
         embed.add_field(name="User ID", value=message.author.id, inline=True)
         if message.content:
-            embed.add_field(name="Message Deleted:", value=message.content, inline=False)
+            content = message.content
         else:
-            embed.add_field(name="Message Deleted:", value="Unable to detect message contents", inline=False)
+            content = "Unable to detect message contents"
+        embed.add_field(name="Message Deleted:", value=content, inline=False)
         await channel.send(embed=embed)
 
     @commands.Cog.listener("on_message_edit")
@@ -104,14 +120,36 @@ class listeners(commands.Cog):
         embed.add_field(name="Message Author", value=before.author, inline=True)
         embed.add_field(name="User ID", value=before.author.id, inline=True)
         if before.content:
-            embed.add_field(name="Original Message:", value=before.content, inline=False)
+            beforecontent = before.content
         else:
-            embed.add_field(name="Original Message:", value="Unable to detect message contents", inline=False)
+            beforecontent = "Unable to detect message contents"
+        embed.add_field(name="Original Message:", value=beforecontent, inline=False)
         if after.content:
-            embed.add_field(name="Edited Message:", value=after.content, inline=False)
+            aftercontent = after.content
         else:
-            embed.add_field(name="Edited Message:", value="Unable to detect message contents", inline=False)
+            aftercontent = "Unable to detect message contents"
+        embed.add_field(name="Edited Message:", value=aftercontent, inline=False)
         channel = self.bot.get_channel(int(channel_ids['message_edit']))
+        await channel.send(embed=embed)
+
+    @commands.Cog.listener("on_member_update")
+    async def nicklog(self, before, after):
+        if before.nick == after.nick:
+            return
+        embed = discord.Embed(title="Nickname changed/added", color=0x00a0a0)
+        embed.set_author(name=before, icon_url=before.avatar_url)
+        if before.nick is None:
+            beforenick = before.name
+        else:
+            beforenick = before.nick
+        embed.add_field(name="Old Nickname:", value=beforenick, inline=True)
+        if after.nick is None:
+            afternick = after.name
+        else:
+            afternick = after.nick
+        embed.add_field(name="New Nickname:", value=afternick, inline=True)
+        embed.add_field(name="User ID:", value=before.id, inline=False)
+        channel = self.bot.get_channel(int(channel_ids['name_changed']))
         await channel.send(embed=embed)
 
 def setup(bot):

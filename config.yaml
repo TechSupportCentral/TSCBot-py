@@ -15,3 +15,5 @@ channel_ids:
     filter_log: 854429525147385890
     message_deleted: 854429525480046596
     message_edit: 854429525480046595
+    bot_dm: 854429525647687703
+    name_changed: 854429525480046594
