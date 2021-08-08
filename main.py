@@ -18,7 +18,7 @@ for filename in os.listdir('./cogs'):
     
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='TEG'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='TSC'))
     print('Logged in as {}'.format(bot.user.name))
 
 bot.run(config['token'])

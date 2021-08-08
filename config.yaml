@@ -11,6 +11,8 @@ channel_ids:
     software_support: 854429524657176599
     hardware_support: 854429524657176600
     vc_chat: 854429524657176601
+    general: 854429524798996485
+    ticket_create: 854429524798996480
     staff_logs: 854429525147385889
     filter_log: 854429525147385890
     message_deleted: 854429525480046596

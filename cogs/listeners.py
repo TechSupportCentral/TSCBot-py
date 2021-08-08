@@ -57,7 +57,7 @@ class listeners(commands.Cog):
                 dmbed=discord.Embed(title="Invite Link", description="Please don't send invite links to other servers, it is against rule 6 of our server.")
                 embed=discord.Embed(title="Invite Link sent by " + str(message.author), color=0x00a0a0)
             else:
-                dmbed=discord.Embed(title="Swear", description="TEG is a PG Friendly server, you cannot swear here.")
+                dmbed=discord.Embed(title="Swear", description="TSC is a PG Friendly server, you cannot swear here.")
                 dmbed.add_field(name="Swear Detected:", value=swore, inline=False)
                 embed=discord.Embed(title="Swear by " + str(message.author), color=0x00a0a0)
                 embed.add_field(name="Swear Detected:", value=swore, inline=False)

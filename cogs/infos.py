@@ -44,6 +44,7 @@ class infos(commands.Cog):
 
     @commands.command(name='spteam-requirements')
     async def spteam(self, ctx):
+        await ctx.message.delete()
         embed = discord.Embed(title="Support Team Requirements", color=discord.Color.green())
         embed.add_field(name="Corruption:", value="If a member of the staff team does something they shouldn't have, let the owners know.", inline=False)
         embed.add_field(name="Activity:", value="Support Team members need to be active at least once a week.", inline=False)
@@ -55,6 +56,7 @@ class infos(commands.Cog):
 
     @commands.command(name='mod-requirements')
     async def modteam(self, ctx):
+        await ctx.message.delete()
         embed = discord.Embed(title="Moderator Requirements", color=discord.Color.gold())
         embed.add_field(name="Corruption:", value="If a member of the staff team does something they shouldn't have, let the owners know.", inline=False)
         embed.add_field(name="Rules:", value="You need to read the rules and know when to warn, mute, kick, and ban.", inline=False)
@@ -65,16 +67,22 @@ class infos(commands.Cog):
 
     @commands.command()
     async def rules(self, ctx):
+        with open('config.yaml', 'r') as config_file:
+            config = yaml.load(config_file, Loader=yaml.BaseLoader)
+        channel_ids = config['channel_ids']
+        role_ids = config['role_ids']
+
+        await ctx.message.delete()
         embed = discord.Embed(title="Server Rules", color=discord.Color.green())
         embed.add_field(name="Rule 1:", value="Be respectful to our Support Team, they provide support voluntarily for free during their own time.", inline=False)
         embed.add_field(name="Rule 2:", value="Profanity is not allowed on this server. If you send a message with profanity it will be deleted.", inline=False)
         embed.add_field(name="Rule 3:", value="We do not tolerate any form of racism, sexism, discrimination, etc. This behavior will result in an immediate ban.", inline=False)
-        embed.add_field(name="Rule 4:", value="For faster and easier help, post your issue in a support channel and ping the <@&824064404340473896>. If you post your question in <#824042976371277888> and/or don't ping the Support Team, they will not notice it and it'll take longer to get support.", inline=False)
+        embed.add_field(name="Rule 4:", value=f"For faster and easier help, post your issue in a support channel and ping the <@&{role_ids['support_team']}>. If you post your question in <#{channel_ids['general']}> and/or don't ping the Support Team, they will not notice it and it'll take longer to get support.", inline=False)
         embed.add_field(name="Rule 5:", value="All users must follow Discord TOS. https://discord.com/terms", inline=False)
         embed.add_field(name="Rule 6:", value="No self promotion or advertising of any kind is allowed, especially in DMs.", inline=False)
         embed.add_field(name="Rule 7:", value="Do not leak or request any personal information. (i.e. IP Addresses, Full Names, Locations, etc.)", inline=False)
         embed.add_field(name="Rule 8:", value="If a Support Team member is helping someone, don't try to help at the same time. If you want to help more than please apply for Support Team via our staff application forms.", inline=False)
-        embed.add_field(name="Rule 9:", value="Even though the server says Germany, English is the language used for support and discussion.", inline=False)
+        embed.add_field(name="Rule 9:", value=f"English is the language used for support and discussion. Make a ticket in <#{channel_ids['ticket_create']}> if you require help in another language.", inline=False)
         embed.add_field(name="Rule 10:", value="We do not provide support for pirated, cracked, or hacked content of any kind. It is illegal and against our rules.", inline=False)
         await ctx.send(embed=embed)
 
