@@ -4,6 +4,7 @@ prefix: "!"
 role_ids:
     moderator: 854429524304724002
     support_team: 854429524304723999
+    owner: 854429524304724007
 
 channel_ids:
     general_support: 854429524657176597

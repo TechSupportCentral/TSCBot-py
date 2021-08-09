@@ -25,6 +25,9 @@ class infos(commands.Cog):
     async def _commands(self, ctx, arg=None):
         with open('commands.yaml', 'r') as commands_file:
             commands = yaml.load(commands_file, Loader=yaml.BaseLoader)
+        with open('config.yaml', 'r') as config_file:
+            config = yaml.load(config_file, Loader=yaml.BaseLoader)
+        role_ids = config['role_ids']
 
         if not arg:
             embed = discord.Embed(title="Command List", description="Commands come in categories. Here is a list of categories, run `!commands <category>` to see the commands in a certain category.", color=0x00a0a0)
@@ -34,6 +37,15 @@ class infos(commands.Cog):
                     embed.add_field(name=category + ':', value=commands[category + '_desc'], inline=True)
             await ctx.send(embed=embed)
         elif arg in commands:
+            guild = ctx.message.guild
+            mod_role = guild.get_role(int(role_ids['moderator']))
+            owner_role = guild.get_role(int(role_ids['owner']))
+            if arg == "moderation" and not mod_role in ctx.author.roles:
+                await ctx.send("The `moderation` category can only be viewed by moderators.")
+                return
+            elif arg == "administration" and not owner_role in ctx.author.roles:
+                await ctx.send("The `administration` category can only be viewed by admins.")
+                return
             embed = discord.Embed(title="Command List", description=f"Commands in the {arg} category:", color=0x00a0a0)
             embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
             for command in commands[arg]:
