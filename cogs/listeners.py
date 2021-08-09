@@ -132,25 +132,37 @@ class listeners(commands.Cog):
         channel = self.bot.get_channel(int(channel_ids['message_edit']))
         await channel.send(embed=embed)
 
-    @commands.Cog.listener("on_member_update")
-    async def nicklog(self, before, after):
-        if before.nick == after.nick:
-            return
-        embed = discord.Embed(title="Nickname changed/added", color=0x00a0a0)
-        embed.set_author(name=before, icon_url=before.avatar_url)
-        if before.nick is None:
-            beforenick = before.name
-        else:
-            beforenick = before.nick
-        embed.add_field(name="Old Nickname:", value=beforenick, inline=True)
-        if after.nick is None:
-            afternick = after.name
-        else:
-            afternick = after.nick
-        embed.add_field(name="New Nickname:", value=afternick, inline=True)
-        embed.add_field(name="User ID:", value=before.id, inline=False)
-        channel = self.bot.get_channel(int(channel_ids['name_changed']))
-        await channel.send(embed=embed)
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        if before.nick != after.nick:
+            embed = discord.Embed(title="Nickname changed/added", color=0x00a0a0)
+            embed.set_author(name=before, icon_url=before.avatar_url)
+            if before.nick is None:
+                beforenick = before.name
+            else:
+                beforenick = before.nick
+            embed.add_field(name="Old Nickname:", value=beforenick, inline=True)
+            if after.nick is None:
+                afternick = after.name
+            else:
+                afternick = after.nick
+            embed.add_field(name="New Nickname:", value=afternick, inline=True)
+            embed.add_field(name="User ID:", value=before.id, inline=False)
+            channel = self.bot.get_channel(int(channel_ids['name_changed']))
+            await channel.send(embed=embed)
+
+        if len(before.roles) < len(after.roles):
+            delta = [role for role in after.roles if role not in before.roles]
+            embed = discord.Embed(title="Role Added", description=delta[0].mention, color=discord.Color.green())
+            embed.set_author(name=before, icon_url=before.avatar_url)
+            channel = self.bot.get_channel(int(channel_ids['role_changed']))
+            await channel.send(embed=embed)
+        if len(before.roles) > len(after.roles):
+            delta = [role for role in before.roles if role not in after.roles]
+            embed = discord.Embed(title="Role Removed", description=delta[0].mention, color=discord.Color.red())
+            embed.set_author(name=before, icon_url=before.avatar_url)
+            channel = self.bot.get_channel(int(channel_ids['role_changed']))
+            await channel.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(listeners(bot))
