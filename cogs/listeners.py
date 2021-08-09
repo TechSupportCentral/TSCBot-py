@@ -93,8 +93,8 @@ class listeners(commands.Cog):
                 channel = self.bot.get_channel(message.channel.id)
                 await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download/thankyou/")
 
-    @commands.Cog.listener("on_message_delete")
-    async def deletelog(self, message):
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
         channel = self.bot.get_channel(int(channel_ids['message_deleted']))
         if message.channel == channel:
             return
@@ -110,8 +110,8 @@ class listeners(commands.Cog):
         embed.add_field(name="Message Deleted:", value=content, inline=False)
         await channel.send(embed=embed)
 
-    @commands.Cog.listener("on_message_edit")
-    async def editlog(self, before, after):
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
         if before.content == after.content:
             return
         embed = discord.Embed(title="Message Edited", color=0x00a0a0)
@@ -163,6 +163,48 @@ class listeners(commands.Cog):
             embed.set_author(name=before, icon_url=before.avatar_url)
             channel = self.bot.get_channel(int(channel_ids['role_changed']))
             await channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_create(self, channel):
+        embed = discord.Embed(title="Channel Created", color=discord.Color.green())
+        embed.add_field(name="Channel", value=channel.mention, inline=True)
+        embed.add_field(name="Channel Name", value=channel.name, inline=True)
+        logchannel = self.bot.get_channel(int(channel_ids['channel_created']))
+        await logchannel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel):
+        embed = discord.Embed(title="Channel Deleted", description=f"Channel name: `{channel.name}`", color=discord.Color.red())
+        logchannel = self.bot.get_channel(int(channel_ids['channel_deleted']))
+        await logchannel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role):
+        embed = discord.Embed(title="Role Deleted", description=f"Role name: `{role.name}`", color=discord.Color.red())
+        channel = self.bot.get_channel(int(channel_ids['role_deleted']))
+        await channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        embed1 = discord.Embed(title="Member Joined", description=f"{member} has joined Tech Support Central!", color=discord.Color.green())
+        embed1.set_thumbnail(url=member.avatar_url)
+        welcome = self.bot.get_channel(int(channel_ids['welcome']))
+        await welcome.send(embed=embed1)
+
+        embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
+        embed2.set_thumbnail(url=member.avatar_url)
+        embed2.add_field(name="User ID", value=member.id, inline=False)
+        embed2.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=True)
+        embed2.add_field(name="Joined Server:", value=member.joined_at.strftime("%-d %B %Y at %-H:%M"), inline=True)
+        joined = self.bot.get_channel(int(channel_ids['joined']))
+        await joined.send(embed=embed2)
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        embed = discord.Embed(title="Member Left", description=f"{member} has left Tech Support Central.", color=discord.Color.red())
+        embed.set_thumbnail(url=member.avatar_url)
+        channel = self.bot.get_channel(int(channel_ids['left']))
+        await channel.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(listeners(bot))
