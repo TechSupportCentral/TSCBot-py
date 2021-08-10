@@ -212,8 +212,8 @@ class listeners(commands.Cog):
                 if invite.code == code:
                     return invite
         afterinvites = await member.guild.invites()
-        for invite in invites:
-            if invite.uses < findinvite(afterinvites, invite.code).uses:
+        for invite in afterinvites:
+            if invite.uses > findinvite(invites, invite.code).uses:
 
                 embed3 = discord.Embed(title=member, color=discord.Color.green())
                 embed3.add_field(name="Invited by", value=invite.inviter, inline=False)
@@ -224,6 +224,32 @@ class listeners(commands.Cog):
 
                 invites = afterinvites
                 return
+
+    @commands.Cog.listener()
+    async def on_invite_create(self, invite):
+        global invites
+        invites = await invite.guild.invites()
+        embed = discord.Embed(title="Invite Created", color=discord.Color.green())
+        embed.add_field(name="Invite Creator", value=invite.inviter, inline=False)
+        embed.add_field(name="Invite Code", value=invite.code, inline=False)
+        embed.add_field(name="Invite Channel", value=invite.channel.mention, inline=False)
+        inviteschannel = self.bot.get_channel(int(channel_ids['invites']))
+        await inviteschannel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_invite_delete(self, invite):
+        global invites
+        invites = await invite.guild.invites()
+        embed = discord.Embed(title="Invite Deleted", color=discord.Color.red())
+        if invite.inviter is not None:
+            embed.add_field(name="Invite Creator", value=invite.inviter, inline=False)
+        embed.add_field(name="Invite Code", value=invite.code, inline=False)
+        if invite.channel is not None:
+            embed.add_field(name="Invite Channel", value=invite.channel.mention, inline=False)
+        if invite.uses is not None:
+            embed.add_field(name="Invite Uses", value=invite.uses, inline=False)
+        inviteschannel = self.bot.get_channel(int(channel_ids['invites']))
+        await inviteschannel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
