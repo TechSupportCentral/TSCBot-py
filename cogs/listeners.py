@@ -18,6 +18,12 @@ class listeners(commands.Cog):
     role_ids = config['role_ids']
 
     @commands.Cog.listener()
+    async def on_ready(self):
+        guild = self.bot.guilds[0]
+        global invites
+        invites = await guild.invites()
+
+    @commands.Cog.listener()
     async def on_message(self, message):
         support_channels = [int(channel_ids['vc_chat'])]
         for channel in channel_ids:
@@ -38,10 +44,9 @@ class listeners(commands.Cog):
             embed.add_field(name="Message Author", value=message.author, inline=True)
             embed.add_field(name="User ID", value=message.author.id, inline=True)
             if message.content:
-                content = message.content
+                embed.add_field(name="Message:", value=message.content, inline=False)
             else:
-                content = "Unable to detect message contents"
-            embed.add_field(name="Message:", value=content, inline=False)
+                embed.add_field(name="Message:", value="Unable to detect message contents", inline=False)
             channel = self.bot.get_channel(int(channel_ids['bot_dm']))
             await channel.send(embed=embed)
 
@@ -104,10 +109,9 @@ class listeners(commands.Cog):
         embed.add_field(name="Message Author", value=message.author, inline=True)
         embed.add_field(name="User ID", value=message.author.id, inline=True)
         if message.content:
-            content = message.content
+            embed.add_field(name="Message Deleted:", value=message.content, inline=False)
         else:
-            content = "Unable to detect message contents"
-        embed.add_field(name="Message Deleted:", value=content, inline=False)
+            embed.add_field(name="Message Deleted:", value="Unable to detect message contents", inline=False)
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
@@ -186,6 +190,10 @@ class listeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        global invites
+
+        await member.add_roles(member.guild.get_role(int(role_ids['Mrole'])))
+
         embed1 = discord.Embed(title="Member Joined", description=f"{member} has joined Tech Support Central!", color=discord.Color.green())
         embed1.set_thumbnail(url=member.avatar_url)
         welcome = self.bot.get_channel(int(channel_ids['welcome']))
@@ -198,6 +206,24 @@ class listeners(commands.Cog):
         embed2.add_field(name="Joined Server:", value=member.joined_at.strftime("%-d %B %Y at %-H:%M"), inline=True)
         joined = self.bot.get_channel(int(channel_ids['joined']))
         await joined.send(embed=embed2)
+
+        def findinvite(list, code):
+            for invite in list:
+                if invite.code == code:
+                    return invite
+        afterinvites = await member.guild.invites()
+        for invite in invites:
+            if invite.uses < findinvite(afterinvites, invite.code).uses:
+
+                embed3 = discord.Embed(title=member, color=discord.Color.green())
+                embed3.add_field(name="Invited by", value=invite.inviter, inline=False)
+                embed3.add_field(name="Invite code", value=invite.code, inline=False)
+                embed3.add_field(name="Invite uses", value=invite.uses, inline=False)
+                inviteschannel = self.bot.get_channel(int(channel_ids['invites']))
+                await inviteschannel.send(embed=embed3)
+
+                invites = afterinvites
+                return
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):

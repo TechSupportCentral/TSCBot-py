@@ -2,6 +2,7 @@ token: "insert token here"
 prefix: "!"
 
 role_ids:
+    Mrole: 854429523973636151
     moderator: 854429524304724002
     support_team: 854429524304723999
     owner: 854429524304724007
