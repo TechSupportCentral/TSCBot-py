@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import yaml
+from asyncio import sleep
 
 class listeners(commands.Cog):
     def __init__(self, bot):
@@ -37,18 +38,17 @@ class listeners(commands.Cog):
                 swore = swear
 
         if isinstance(message.channel, discord.channel.DMChannel):
-            if message.author.bot:
-                return
-            embed = discord.Embed(title="DM Received", color=discord.Color.red())
-            embed.set_thumbnail(url=message.author.avatar_url)
-            embed.add_field(name="Message Author", value=message.author, inline=True)
-            embed.add_field(name="User ID", value=message.author.id, inline=True)
-            if message.content:
-                embed.add_field(name="Message:", value=message.content, inline=False)
-            else:
-                embed.add_field(name="Message:", value="Unable to detect message contents", inline=False)
-            channel = self.bot.get_channel(int(channel_ids['bot_dm']))
-            await channel.send(embed=embed)
+            if not message.author.bot:
+                embed = discord.Embed(title="DM Received", color=discord.Color.red())
+                embed.set_thumbnail(url=message.author.avatar_url)
+                embed.add_field(name="Message Author", value=message.author, inline=True)
+                embed.add_field(name="User ID", value=message.author.id, inline=True)
+                if message.content:
+                    embed.add_field(name="Message:", value=message.content, inline=False)
+                else:
+                    embed.add_field(name="Message:", value="Unable to detect message contents", inline=False)
+                channel = self.bot.get_channel(int(channel_ids['bot_dm']))
+                await channel.send(embed=embed)
 
         elif swore != "":
             await message.delete()
@@ -100,6 +100,16 @@ class listeners(commands.Cog):
             if not message.author.bot:
                 channel = self.bot.get_channel(message.channel.id)
                 await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download/thankyou/")
+
+        elif message.author.id == 302050872383242240:
+            if ":thumbsup:" in message.embeds[0].description:
+                await message.channel.send("Thank you for bumping the server!")
+                await sleep(3600)
+                await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
+        elif "set bump" in message.content:
+            await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
+            await sleep(3600)
+            await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):

@@ -1,6 +1,5 @@
 * Tickets
 * Suggestions
-* Bump Reminders
 * Custom Commands
 * Reaction Roles
 * Moderation Commands
