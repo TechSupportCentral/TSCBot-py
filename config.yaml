@@ -1,12 +1,13 @@
 token: "insert token here"
+mongo: "insert MongoDB URI here"
 prefix: "!"
 
 role_ids:
-    Mrole: 854429523973636151
+    owner: 854429524304724007
     moderator: 854429524304724002
     trial_mod: 854429524304724000
     support_team: 854429524304723999
-    owner: 854429524304724007
+    Mrole: 854429523973636151
     bump_reminders: 854429523973636155
 
 channel_ids:
@@ -16,22 +17,27 @@ channel_ids:
     software_support: 854429524657176599
     hardware_support: 854429524657176600
     vc_chat: 854429524657176601
-    general: 854429524798996485
     ticket_create: 854429524798996480
+    suggestions_list: 854429524798996482
+    general: 854429524798996485
+    tickets_history: 854429524976861229
     modtalk: 854429525147385887
     staff_logs: 854429525147385889
     filter_log: 854429525147385890
-    joined: 854429525315944457
+    get_bump_pings: 854429525147385892
     left: 854429525315944456
+    joined: 854429525315944457
     invites: 854429525480046593
-    message_deleted: 854429525480046596
-    message_edit: 854429525480046595
-    bot_dm: 854429525647687703
     name_changed: 854429525480046594
+    message_edit: 854429525480046595
+    message_deleted: 854429525480046596
     role_changed: 854429525480046598
-    channel_created: 854429525480046602
     channel_deleted: 854429525480046601
+    channel_created: 854429525480046602
     role_deleted: 854429525647687700
+    user_banned: 854429525647687701
+    user_unbanned: 854429525647687702
+    bot_dm: 854429525647687703
 
 hierarchy:
   - owner

@@ -59,17 +59,17 @@ class listeners(commands.Cog):
             await message.delete()
             if swore == "@everyone":
                 dmbed=discord.Embed(title="@everyone ping", description="Please don't ping @everyone. If you need help, go to a support channel and ping @Support Team.")
-                embed=discord.Embed(title="@everyone ping by " + str(message.author), color=0x00a0a0)
+                embed=discord.Embed(title="@everyone ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
             if swore == "@here":
                 dmbed=discord.Embed(title="@here ping", description="Please don't ping @here. If you need help, go to a support channel and ping @Support Team.")
-                embed=discord.Embed(title="@here ping by " + str(message.author), color=0x00a0a0)
+                embed=discord.Embed(title="@here ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
             elif swore == "discord.gg" or swore == "discord.com/invite":
                 dmbed=discord.Embed(title="Invite Link", description="Please don't send invite links to other servers, it is against rule 6 of our server.")
-                embed=discord.Embed(title="Invite Link sent by " + str(message.author), color=0x00a0a0)
+                embed=discord.Embed(title="Invite Link sent by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
             else:
                 dmbed=discord.Embed(title="Swear", description="TSC is a PG Friendly server, you cannot swear here.")
                 dmbed.add_field(name="Swear Detected:", value=swore, inline=False)
-                embed=discord.Embed(title="Swear by " + str(message.author), color=0x00a0a0)
+                embed=discord.Embed(title="Swear by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
                 embed.add_field(name="Swear Detected:", value=swore, inline=False)
 
             if message.author.dm_channel is None:
@@ -129,7 +129,7 @@ class listeners(commands.Cog):
         channel = self.bot.get_channel(int(channel_ids['message_deleted']))
         if message.channel == channel:
             return
-        embed = discord.Embed(title="Message Deleted", color=discord.Color.red())
+        embed = discord.Embed(title="Message Deleted", description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
         embed.set_thumbnail(url=message.author.avatar_url)
         embed.add_field(name="In channel", value=message.channel.mention, inline=False)
         embed.add_field(name="Message Author", value=message.author, inline=True)
@@ -144,21 +144,19 @@ class listeners(commands.Cog):
     async def on_message_edit(self, before, after):
         if before.content == after.content:
             return
-        embed = discord.Embed(title="Message Edited", color=0x00a0a0)
+        embed = discord.Embed(title="Message Edited", description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
         embed.set_thumbnail(url=before.author.avatar_url)
         embed.add_field(name="In channel", value=before.channel.mention, inline=False)
         embed.add_field(name="Message Author", value=before.author, inline=True)
         embed.add_field(name="User ID", value=before.author.id, inline=True)
         if before.content:
-            beforecontent = before.content
+            embed.add_field(name="Original Message:", value=before.content, inline=False)
         else:
-            beforecontent = "Unable to detect message contents"
-        embed.add_field(name="Original Message:", value=beforecontent, inline=False)
+            embed.add_field(name="Original Message:", value="Unable to detect message contents", inline=False)
         if after.content:
-            aftercontent = after.content
+            embed.add_field(name="Edited Message:", value=after.content, inline=False)
         else:
-            aftercontent = "Unable to detect message contents"
-        embed.add_field(name="Edited Message:", value=aftercontent, inline=False)
+            embed.add_field(name="Edited Message:", value="Unable to detect message contents", inline=False)
         channel = self.bot.get_channel(int(channel_ids['message_edit']))
         await channel.send(embed=embed)
 
@@ -173,10 +171,9 @@ class listeners(commands.Cog):
                 beforenick = before.nick
             embed.add_field(name="Old Nickname:", value=beforenick, inline=True)
             if after.nick is None:
-                afternick = after.name
+                embed.add_field(name="New Nickname:", value=after.name, inline=True)
             else:
-                afternick = after.nick
-            embed.add_field(name="New Nickname:", value=afternick, inline=True)
+                embed.add_field(name="New Nickname:", value=after.nick, inline=True)
             embed.add_field(name="User ID:", value=before.id, inline=False)
             channel = self.bot.get_channel(int(channel_ids['name_changed']))
             await channel.send(embed=embed)

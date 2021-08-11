@@ -150,7 +150,7 @@ class infos(commands.Cog):
             alert = ' '.join(args)
         else:
             alert = "A description was not provided."
-        embed = discord.Embed(title="Moderator Alert", description=alert, color=discord.Color.red())
+        embed = discord.Embed(title="Moderator Alert", description=f"[Jump to message]({ctx.message.jump_url})\n{alert}", color=discord.Color.red())
         embed.add_field(name="Alert Author", value=ctx.message.author, inline=True)
         embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
         channel = self.bot.get_channel(int(channel_ids['modtalk']))
