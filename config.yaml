@@ -4,6 +4,7 @@ prefix: "!"
 role_ids:
     Mrole: 854429523973636151
     moderator: 854429524304724002
+    trial_mod: 854429524304724000
     support_team: 854429524304723999
     owner: 854429524304724007
 
@@ -16,6 +17,7 @@ channel_ids:
     vc_chat: 854429524657176601
     general: 854429524798996485
     ticket_create: 854429524798996480
+    modtalk: 854429525147385887
     staff_logs: 854429525147385889
     filter_log: 854429525147385890
     joined: 854429525315944457
@@ -29,3 +31,10 @@ channel_ids:
     channel_created: 854429525480046602
     channel_deleted: 854429525480046601
     role_deleted: 854429525647687700
+
+hierarchy:
+  - owner
+  - moderator
+  - trial_mod
+  - support_team
+  - Mrole
