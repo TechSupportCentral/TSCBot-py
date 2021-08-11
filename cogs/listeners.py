@@ -39,7 +39,7 @@ class listeners(commands.Cog):
         if isinstance(message.channel, discord.channel.DMChannel):
             if message.author.bot:
                 return
-            embed = discord.Embed(title="DM", color=discord.Color.red())
+            embed = discord.Embed(title="DM Received", color=discord.Color.red())
             embed.set_thumbnail(url=message.author.avatar_url)
             embed.add_field(name="Message Author", value=message.author, inline=True)
             embed.add_field(name="User ID", value=message.author.id, inline=True)
@@ -67,7 +67,10 @@ class listeners(commands.Cog):
                 embed=discord.Embed(title="Swear by " + str(message.author), color=0x00a0a0)
                 embed.add_field(name="Swear Detected:", value=swore, inline=False)
 
-            dm = await message.author.create_dm()
+            if message.author.dm_channel is None:
+                dm = await message.author.create_dm()
+            else:
+                dm = message.author.dm_channel
             dmbed.set_thumbnail(url=message.author.avatar_url)
             dmbed.add_field(name="Message Deleted:", value=message.content, inline=False)
             dm_failed = False
