@@ -7,6 +7,9 @@ class listeners(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    global bumptimer
+    bumptimer = False
+
     with open('swears.yaml', 'r') as swears_file:
         swearlist = yaml.load(swears_file, Loader=yaml.BaseLoader)
     global swears
@@ -26,6 +29,8 @@ class listeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        global bumptimer
+
         support_channels = [int(channel_ids['vc_chat'])]
         for channel in channel_ids:
             if channel.endswith("support"):
@@ -104,12 +109,20 @@ class listeners(commands.Cog):
         elif message.author.id == 302050872383242240:
             if ":thumbsup:" in message.embeds[0].description:
                 await message.channel.send("Thank you for bumping the server!")
-                await sleep(3600)
-                await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
+                if bumptimer == False:
+                    bumptimer = True
+                    await sleep(3600)
+                    bumptimer = False
+                    await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
         elif "set bump" in message.content:
-            await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
-            await sleep(3600)
-            await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
+            if bumptimer == False:
+                await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
+                bumptimer = True
+                await sleep(3600)
+                bumptimer = False
+                await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
+            else:
+                await message.channel.send("The bump timer is already set.")
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -215,8 +228,7 @@ class listeners(commands.Cog):
         embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
         embed2.set_thumbnail(url=member.avatar_url)
         embed2.add_field(name="User ID", value=member.id, inline=False)
-        embed2.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=True)
-        embed2.add_field(name="Joined Server:", value=member.joined_at.strftime("%-d %B %Y at %-H:%M"), inline=True)
+        embed2.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=False)
         joined = self.bot.get_channel(int(channel_ids['joined']))
         await joined.send(embed=embed2)
 
