@@ -1,7 +1,3 @@
-alert_desc: "Alert the moderators"
-alert:
-    alert: "Alert the moderators"
-
 infos_desc: "Information about the bot"
 infos:
     uptime: "How long the bot has been online"
@@ -33,3 +29,7 @@ administration:
     sendmessage: "Send the command argument as a message"
     announce: "Send the command argument as an annoucement embed"
     dm: "Send the command argument as a DM to a specific user"
+
+misc_desc: "Miscellaneous commands that don't fit in other categories"
+misc:
+    alert: "Alerts the moderators"

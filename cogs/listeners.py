@@ -144,7 +144,7 @@ class listeners(commands.Cog):
     async def on_message_edit(self, before, after):
         if before.content == after.content:
             return
-        embed = discord.Embed(title="Message Edited", description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
+        embed = discord.Embed(title="Message Edited", description=f"[Jump to message]({before.jump_url})", color=0x00a0a0)
         embed.set_thumbnail(url=before.author.avatar_url)
         embed.add_field(name="In channel", value=before.channel.mention, inline=False)
         embed.add_field(name="Message Author", value=before.author, inline=True)
