@@ -6,7 +6,6 @@ infos:
     spteam-requirements: "Requirements to join the support team"
     mod-requirements: "Requirements to join the moderation team"
     rules: "Server Rules"
-    userinfo: "Various info about a certain user"
 
 techinfo_desc: "Tutorials and Links to tech questions"
 techinfo:
@@ -22,6 +21,7 @@ techinfo:
 
 moderation_desc: "Commands run by moderators"
 moderation:
+    userinfo: "Various info about a certain user"
     purge: "Deletes a certain amount of messages"
 
 administration_desc: "Commands run by admins"
