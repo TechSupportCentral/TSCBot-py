@@ -29,7 +29,10 @@ administration:
     sendmessage: "Send the command argument as a message"
     announce: "Send the command argument as an annoucement embed"
     dm: "Send the command argument as a DM to a specific user"
+    accept-suggestion: "Accept a certain suggestion"
+    decline-suggestion: "Decline a certain suggestion"
 
 misc_desc: "Miscellaneous commands that don't fit in other categories"
 misc:
     alert: "Alerts the moderators"
+    suggest: "Make a suggestion on how to improve the server"
