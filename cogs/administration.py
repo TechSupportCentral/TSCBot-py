@@ -1,6 +1,8 @@
 from discord.ext import commands
 import discord
 import yaml
+from main import get_database
+mongodb = get_database()
 
 class administration(commands.Cog):
     def __init__(self, bot):
@@ -182,6 +184,71 @@ class administration(commands.Cog):
             await ctx.send("The suggestion was declined successfully but the the user was unable to be DMed.")
             return
 
+        await ctx.message.add_reaction("✅")
+
+    @commands.command(name="add-custom")
+    async def add_custom(self, ctx, name=None, *args):
+        guild = ctx.message.guild
+        owner_role = guild.get_role(int(role_ids['owner']))
+        if not owner_role in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not name:
+            await ctx.send("Please provide a name for the new custom command.")
+            return
+        if not args:
+            await ctx.send("Please provide the response for when the command is run.")
+            return
+
+        collection = mongodb['custom-commands']
+        for command in collection.find():
+            if command.get('name') == name:
+                await ctx.send(f"The custom command `{name}` already exists.")
+                return
+        collection.insert_one({"name": name, "value": ' '.join(args)})
+
+        embed = discord.Embed(title="Custom Command Added", color=discord.Color.green())
+        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        embed.add_field(name="Added by", value=ctx.message.author, inline=True)
+        embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
+        embed.add_field(name="Command Name", value=name, inline=False)
+        embed.add_field(name="Command Response", value=' '.join(args), inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        await channel.send(embed=embed)
+        await ctx.message.add_reaction("✅")
+
+    @commands.command(name="remove-custom")
+    async def remove_custom(self, ctx, arg=None):
+        guild = ctx.message.guild
+        owner_role = guild.get_role(int(role_ids['owner']))
+        if not owner_role in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not arg:
+            await ctx.send("Please provide the name of the custom command to remove.")
+            return
+
+        collection = mongodb['custom-commands']
+        found = False
+        for command in collection.find():
+            if command.get('name') == arg:
+                found = True
+                value = command.get('value')
+        if found == False:
+            await ctx.send(f"The custom command `{arg}` was not found.")
+            return
+        collection.delete_one({"name": arg})
+
+        embed = discord.Embed(title="Custom Command Removed", color=discord.Color.red())
+        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        embed.add_field(name="Removed by", value=ctx.message.author, inline=True)
+        embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
+        embed.add_field(name="Command Name", value=arg, inline=False)
+        embed.add_field(name="Command Response", value=value, inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
 
 def setup(bot):

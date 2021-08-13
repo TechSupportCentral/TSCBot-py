@@ -2,6 +2,8 @@ from discord.ext import commands
 import discord
 import yaml
 import datetime, time
+from main import get_database
+mongodb = get_database()
 
 class infos(commands.Cog):
     def __init__(self, bot):
@@ -96,6 +98,14 @@ class infos(commands.Cog):
         embed.add_field(name="Rule 8:", value="If a Support Team member is helping someone, don't try to help at the same time. If you want to help more than please apply for Support Team via our staff application forms.", inline=False)
         embed.add_field(name="Rule 9:", value=f"English is the language used for support and discussion. Make a ticket in <#{channel_ids['ticket_create']}> if you require help in another language.", inline=False)
         embed.add_field(name="Rule 10:", value="We do not provide support for pirated, cracked, or hacked content of any kind. It is illegal and against our rules.", inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.command(name="custom-list")
+    async def custom_list(self, ctx):
+        collection = mongodb['custom-commands']
+        embed = discord.Embed(title="Custom Commands", color=0x00a0a0)
+        for command in collection.find():
+            embed.add_field(name=command.get('name'), value=command.get('value'), inline=False)
         await ctx.send(embed=embed)
 
 def setup(bot):

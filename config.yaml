@@ -1,5 +1,6 @@
 token: "insert token here"
-mongo: "insert MongoDB URI here"
+mongo_uri: "insert MongoDB URI here"
+mongo_db: "TSCBot-test"
 prefix: "!"
 
 role_ids:
