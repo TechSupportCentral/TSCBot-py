@@ -48,7 +48,8 @@ class moderation(commands.Cog):
     async def userinfo(self, ctx, arg=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
-        if not mod_role in ctx.message.author.roles:
+        trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
+        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
@@ -91,10 +92,56 @@ class moderation(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
+    async def warnings(self, ctx, arg=None):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
+        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not arg:
+            await ctx.send("Please mention a user to check the warnings of.")
+            return
+
+        elif "<@" in arg:
+            id = arg
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif arg.isdigit():
+            id = int(arg)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        if guild.get_member(id) is not None:
+            description = f"**User:** {guild.get_member(id)}\n"
+
+        collection = mongodb['moderation']
+        found = False
+        number = 0
+        for warning in collection.find():
+            if warning.get('user') == str(id):
+                found = True
+                number = number + 1
+                description = description + f"\n`{number}`:\n**Type:** {warning.get('type')}\n**Reason:** {warning.get('reason')}\n**Moderator:** {guild.get_member(int(warning.get('moderator')))}\n**Message ID:** {warning.get('_id')}\n"
+        embed = discord.Embed(title="Warnings", description=description, color=0x00a0a0)
+        if found == False:
+            await ctx.send("This user has no warnings.")
+            return
+        await ctx.send(embed=embed)
+
+    @commands.command()
     async def warn(self, ctx, user=None, *args):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
-        if not mod_role in ctx.message.author.roles:
+        trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
+        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
