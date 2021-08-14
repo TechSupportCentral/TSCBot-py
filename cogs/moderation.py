@@ -253,5 +253,134 @@ class moderation(commands.Cog):
             return
         await ctx.message.add_reaction("✅")
 
+    @commands.command()
+    async def kick(self, ctx, user=None, *args):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        if mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not user:
+            await ctx.send("Please mention a user to kick.")
+            return
+
+        elif "<@" in user:
+            id = user
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif user.isdigit():
+            id = int(user)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        if guild.get_member(id) is None:
+            await ctx.send("User is not in the server.")
+            return
+        member = guild.get_member(id)
+
+        if not args:
+            args = ['No', 'reason', 'provided.']
+
+        embed = discord.Embed(title="Kick", color=discord.Color.red())
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="User kicked", value=member, inline=True)
+        embed.add_field(name="User ID", value=str(id), inline=True)
+        embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
+        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        message = await channel.send(embed=embed)
+
+        collection = mongodb['moderation']
+        collection.insert_one({"_id": str(message.id), "type": "kick", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+
+        dmbed = discord.Embed(title="You have been kicked.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        if member.dm_channel is None:
+            dm = await member.create_dm()
+        else:
+            dm = member.dm_channel
+        dm_failed = False
+        try:
+            await dm.send(embed=dmbed)
+        except:
+            dm_failed = True
+
+        if dm_failed == False:
+            await ctx.message.add_reaction("✅")
+        else:
+            await ctx.send("The member was kicked successfully, but a DM was unable to be sent.")
+        await guild.kick(member, reason=' '.join(args))
+
+    @commands.command()
+    async def ban(self, ctx, user=None, *args):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        if mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not user:
+            await ctx.send("Please mention a user to ban.")
+            return
+
+        elif "<@" in user:
+            id = user
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif user.isdigit():
+            id = int(user)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        member = await self.bot.fetch_user(id)
+        if not member:
+            await ctx.send("Not a valid discord user.")
+            return
+
+        if not args:
+            args = ['No', 'reason', 'provided.']
+
+        embed = discord.Embed(title="Ban", color=discord.Color.red())
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="User banned", value=member, inline=True)
+        embed.add_field(name="User ID", value=str(id), inline=True)
+        embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
+        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        message = await channel.send(embed=embed)
+
+        collection = mongodb['moderation']
+        collection.insert_one({"_id": str(message.id), "type": "ban", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+
+        dmbed = discord.Embed(title="You have been banned.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        if member.dm_channel is None:
+            dm = await member.create_dm()
+        else:
+            dm = member.dm_channel
+        dm_failed = False
+        try:
+            await dm.send(embed=dmbed)
+        except:
+            dm_failed = True
+
+        if dm_failed == False:
+            await ctx.message.add_reaction("✅")
+        else:
+            await ctx.send("The member was banned successfully, but a DM was unable to be sent.")
+
+        await guild.ban(discord.Object(id=id), reason=' '.join(args))
+
 def setup(bot):
     bot.add_cog(moderation(bot))
