@@ -382,5 +382,55 @@ class moderation(commands.Cog):
 
         await guild.ban(discord.Object(id=id), reason=' '.join(args))
 
+    @commands.command()
+    async def unban(self, ctx, user=None, *args):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        if mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not user:
+            await ctx.send("Please mention a user to unban.")
+            return
+
+        elif "<@" in user:
+            id = user
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif user.isdigit():
+            id = int(user)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        member = await self.bot.fetch_user(id)
+        if not member:
+            await ctx.send("Not a valid discord user.")
+            return
+
+        if not args:
+            args = ['No', 'reason', 'provided.']
+
+        embed = discord.Embed(title="Ban Removed", color=discord.Color.green())
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="User unbanned", value=member, inline=True)
+        embed.add_field(name="User ID", value=str(id), inline=True)
+        embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
+        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        message = await channel.send(embed=embed)
+
+        collection = mongodb['moderation']
+        collection.insert_one({"_id": str(message.id), "type": "unban", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+
+        await guild.unban(discord.Object(id=id), reason=' '.join(args))
+        await ctx.message.add_reaction("✅")
+
 def setup(bot):
     bot.add_cog(moderation(bot))
