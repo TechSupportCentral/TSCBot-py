@@ -1,6 +1,8 @@
 from discord.ext import commands
 import discord
 import yaml
+from main import get_database
+mongodb = get_database()
 
 class moderation(commands.Cog):
     def __init__(self, bot):
@@ -87,6 +89,122 @@ class moderation(commands.Cog):
         roles = ", ".join(mention)
         embed.add_field(name="Roles", value=roles, inline=False)
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def warn(self, ctx, user=None, *args):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        if not mod_role in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not user:
+            await ctx.send("Please mention a user to warn.")
+            return
+
+        elif "<@" in user:
+            id = user
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif user.isdigit():
+            id = int(user)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        if guild.get_member(id) is None:
+            await ctx.send("User is not in the server.")
+            return
+        member = guild.get_member(id)
+
+        if not args:
+            args = ['No', 'reason', 'provided.']
+
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        message = await channel.send(".")
+        embed = discord.Embed(title="Warning", description=f"Use `!unwarn {message.id} <reason>` to remove this warning.", color=discord.Color.red())
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="User warned", value=member, inline=True)
+        embed.add_field(name="User ID", value=str(id), inline=True)
+        embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
+        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        await message.edit(content="", embed=embed)
+
+        collection = mongodb['moderation']
+        collection.insert_one({"_id": str(message.id), "type": "warn", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+
+        dmbed = discord.Embed(title="You have been warned.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        if member.dm_channel is None:
+            dm = await member.create_dm()
+        else:
+            dm = member.dm_channel
+        try:
+            await dm.send(embed=dmbed)
+        except:
+            await ctx.send("The member was warned successfully, but a DM was unable to be sent.")
+            return
+        await ctx.message.add_reaction("✅")
+
+    @commands.command()
+    async def unwarn(self, ctx, id=None, *args):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
+        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not id:
+            await ctx.send("Please mention the ID of a warn message to remove.")
+            return
+
+        elif not id.isdigit():
+            await ctx.send("Warns have to be in the form of a Message ID.")
+            return
+
+        collection = mongodb['moderation']
+        found = False
+        for warn in collection.find():
+            if warn.get('_id') == id:
+                found = True
+                user = warn.get('user')
+                reason = warn.get('reason')
+        if found == False:
+            await ctx.send("The warn was not found.")
+            return
+        collection.delete_one({"_id": id})
+
+        if not args:
+            args = ['No', 'reason', 'provided.']
+
+        member = guild.get_member(int(user))
+        embed = discord.Embed(title="Warning Removed", color=discord.Color.green())
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="User unwarned", value=member, inline=True)
+        embed.add_field(name="User ID", value=user, inline=True)
+        embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
+        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        await channel.send(embed=embed)
+
+        dmbed = discord.Embed(title="Your warning has been removed.", color=discord.Color.green())
+        dmbed.add_field(name="Original reason for warn", value=reason, inline=False)
+        dmbed.add_field(name="Reason for removal", value=' '.join(args), inline=False)
+        if member.dm_channel is None:
+            dm = await member.create_dm()
+        else:
+            dm = member.dm_channel
+        try:
+            await dm.send(embed=dmbed)
+        except:
+            await ctx.send("The warn was removed successfully, but a DM was unable to be sent to the original warned user.")
+            return
+        await ctx.message.add_reaction("✅")
 
 def setup(bot):
     bot.add_cog(moderation(bot))
