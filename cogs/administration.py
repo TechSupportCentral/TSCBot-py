@@ -78,7 +78,7 @@ class administration(commands.Cog):
             dm = await member.create_dm()
         else:
             dm = member.dm_channel
-        dmbed = discord.Embed(title="Message from the owner of TSC", description=' '.join(args), color=0x00a0a0)
+        dmbed = discord.Embed(title="Message from the owners of TSC", description=' '.join(args), color=0x00a0a0)
         try:
             await dm.send(embed=dmbed)
         except:
@@ -124,7 +124,7 @@ class administration(commands.Cog):
         embed.add_field(name="Status: Accepted", value=' '.join(args))
         await message.edit(embed=embed)
 
-        dmbed = discord.Embed(title="Your suggestion was accepted by the owner.", description=message.embeds[0].description, color=discord.Color.green())
+        dmbed = discord.Embed(title="Your suggestion was accepted by the owners.", description=message.embeds[0].description, color=discord.Color.green())
         dmbed.add_field(name="Reason:", value=' '.join(args))
 
         member = guild.get_member_named(message.embeds[0].author.name)
@@ -170,7 +170,7 @@ class administration(commands.Cog):
         embed.add_field(name="Status: Declined", value=' '.join(args))
         await message.edit(embed=embed)
 
-        dmbed = discord.Embed(title="Your suggestion was declined by the owner.", description=message.embeds[0].description, color=discord.Color.red())
+        dmbed = discord.Embed(title="Your suggestion was declined by the owners.", description=message.embeds[0].description, color=discord.Color.red())
         dmbed.add_field(name="Reason:", value=' '.join(args))
 
         member = guild.get_member_named(message.embeds[0].author.name)
