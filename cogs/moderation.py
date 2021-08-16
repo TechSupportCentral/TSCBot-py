@@ -1,6 +1,9 @@
 from discord.ext import commands
 import discord
 import yaml
+from asyncio import sleep
+from datetime import datetime
+import re
 from main import get_database
 mongodb = get_database()
 
@@ -431,6 +434,187 @@ class moderation(commands.Cog):
 
         await guild.unban(discord.Object(id=id), reason=' '.join(args))
         await ctx.message.add_reaction("✅")
+
+    @commands.command()
+    async def mute(self, ctx, user=None, time=None, *args):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
+        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not user:
+            await ctx.send("Please mention a user to mute.")
+            return
+
+        elif "<@" in user:
+            id = user
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif user.isdigit():
+            id = int(user)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        if guild.get_member(id) is None:
+            await ctx.send("User is not in the server.")
+            return
+        member = guild.get_member(id)
+
+        if not time:
+            time = "12:00:00"
+        elif not re.match(r"\d\d:\d\d:\d\d", time):
+            await ctx.send("Please mention the time to mute in the form of `hh:mm:ss`.")
+            return
+        timeobject = datetime.strptime(time, '%H:%M:%S')
+        seconds = timeobject.second + timeobject.minute*60 + timeobject.hour*3600
+        fancytime = ""
+        if timeobject.hour != 0:
+            fancytime = f"{timeobject.hour} hours"
+        if timeobject.minute != 0:
+            if fancytime != "":
+                fancytime = fancytime + ", "
+            fancytime = fancytime + f"{timeobject.minute} minutes"
+        if timeobject.second != 0:
+            if fancytime != "":
+                fancytime = fancytime + ", "
+            fancytime = fancytime + f"{timeobject.second} seconds"
+
+        if not args:
+            args = ['No', 'reason', 'provided.']
+
+        muted_role = guild.get_role(int(role_ids['muted']))
+        if muted_role in member.roles:
+            await ctx.send(f"{member} is already muted.")
+            return
+
+        embed = discord.Embed(title="Mute", color=discord.Color.red())
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="User muted", value=member, inline=True)
+        embed.add_field(name="User ID", value=str(id), inline=True)
+        embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
+        embed.add_field(name="Time muted", value=fancytime, inline=False)
+        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        message = await channel.send(embed=embed)
+
+        collection = mongodb['moderation']
+        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(id), "moderator": str(ctx.message.author.id), "time": time, "reason": ' '.join(args)})
+
+        dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        if member.dm_channel is None:
+            dm = await member.create_dm()
+        else:
+            dm = member.dm_channel
+        dm_failed = False
+        try:
+            await dm.send(embed=dmbed)
+        except:
+            dm_failed = True
+
+        if dm_failed == True:
+            await ctx.send(f"{member} was muted for {fancytime}. A DM was unable to be sent.")
+        else:
+            await ctx.send(f"{member} was muted for {fancytime}.")
+
+        await member.add_roles(muted_role)
+        await sleep(seconds)
+        if not muted_role in member.roles:
+            return
+
+        dmbed2 = discord.Embed(title="You have been automatically unmuted.", color=discord.Color.green())
+        dm2_failed = False
+        try:
+            await dm.send(embed=dmbed2)
+        except:
+            dm_failed = True
+
+        embed2 = discord.Embed(title="Mute Removed", color=discord.Color.green())
+        embed2.set_thumbnail(url=member.avatar_url)
+        embed2.add_field(name="User unmuted", value=member, inline=True)
+        embed2.add_field(name="User ID", value=str(id), inline=True)
+        embed2.add_field(name="Reason", value="Automatic unmute", inline=False)
+        if dm2_failed == True:
+            embed2.set_footer(text="was unable to DM user")
+        await channel.send(embed=embed2)
+        await member.remove_roles(muted_role)
+
+    @commands.command()
+    async def unmute(self, ctx, user=None, *args):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
+        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not user:
+            await ctx.send("Please mention a user to unmute.")
+            return
+
+        elif "<@" in user:
+            id = user
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif user.isdigit():
+            id = int(user)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        if guild.get_member(id) is None:
+            await ctx.send("User is not in the server.")
+            return
+        member = guild.get_member(id)
+
+        if not args:
+            args = ['No', 'reason', 'provided.']
+
+        muted_role = guild.get_role(int(role_ids['muted']))
+        if not muted_role in member.roles:
+            await ctx.send(f"{member} is not muted.")
+            return
+
+        embed = discord.Embed(title="Mute Removed", color=discord.Color.green())
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="User unmuted", value=member, inline=True)
+        embed.add_field(name="User ID", value=str(id), inline=True)
+        embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
+        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        message = await channel.send(embed=embed)
+
+        collection = mongodb['moderation']
+        collection.insert_one({"_id": str(message.id), "type": "unmute", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+
+        dmbed = discord.Embed(title="You have been unmuted.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.green())
+        if member.dm_channel is None:
+            dm = await member.create_dm()
+        else:
+            dm = member.dm_channel
+        dm_failed = False
+        try:
+            await dm.send(embed=dmbed)
+        except:
+            dm_failed = True
+
+        if dm_failed == True:
+            await ctx.send("The member was warned successfully, but a DM was unable to be sent.")
+        else:
+            await ctx.message.add_reaction("✅")
+        await member.remove_roles(muted_role)
 
 def setup(bot):
     bot.add_cog(moderation(bot))

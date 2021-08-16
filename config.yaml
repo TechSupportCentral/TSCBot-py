@@ -10,6 +10,7 @@ role_ids:
     support_team: 854429524304723999
     Mrole: 854429523973636151
     bump_reminders: 854429523973636155
+    muted: 854429524304724003
 
 channel_ids:
     welcome: 854429524477476864
