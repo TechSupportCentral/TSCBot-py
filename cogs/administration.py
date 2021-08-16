@@ -251,5 +251,67 @@ class administration(commands.Cog):
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
 
+    @commands.command(name="add-swear")
+    async def add_swear(self, ctx, arg=None):
+        guild = ctx.message.guild
+        owner_role = guild.get_role(int(role_ids['owner']))
+        if not owner_role in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not arg:
+            await ctx.send("Please provide the name of the new swear.")
+            return
+
+        collection = mongodb['swears']
+        for swear in collection.find():
+            if swear.get('swear') == arg:
+                await ctx.send(f"The swear `{arg}` already exists.")
+                return
+        collection.insert_one({"swear": arg})
+        await ctx.send(f"Swear `{arg}` successfully added.")
+        message = await ctx.send("reload swears")
+        await message.delete()
+
+    @commands.command(name="remove-swear")
+    async def remove_swear(self, ctx, arg=None):
+        guild = ctx.message.guild
+        owner_role = guild.get_role(int(role_ids['owner']))
+        if not owner_role in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not arg:
+            await ctx.send("Please provide the name of the swear to remove.")
+            return
+
+        collection = mongodb['swears']
+        found = False
+        for swear in collection.find():
+            if swear.get('swear') == arg:
+                found = True
+        if found == False:
+            await ctx.send(f"The swear `{arg}` was not found.")
+            return
+        collection.delete_one({"swear": arg})
+        await ctx.send(f"Swear `{arg}` successfully removed.")
+        message = await ctx.send("reload swears")
+        await message.delete()
+
+    @commands.command()
+    async def swearlist(self, ctx):
+        guild = ctx.message.guild
+        owner_role = guild.get_role(int(role_ids['owner']))
+        if not owner_role in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        collection = mongodb['swears']
+        description = ""
+        for swear in collection.find():
+            description = description + f"\n{swear.get('swear')}"
+        embed = discord.Embed(title="Swearlist", description=description, color=0x00a0a0)
+        await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(administration(bot))

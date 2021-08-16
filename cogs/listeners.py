@@ -2,6 +2,8 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
+from main import get_database
+mongodb = get_database()
 
 class listeners(commands.Cog):
     def __init__(self, bot):
@@ -10,10 +12,12 @@ class listeners(commands.Cog):
     global bumptimer
     bumptimer = False
 
-    with open('swears.yaml', 'r') as swears_file:
-        swearlist = yaml.load(swears_file, Loader=yaml.BaseLoader)
     global swears
-    swears = swearlist['swears']
+    swears = []
+    swearcol = mongodb['swears']
+    for swear in swearcol.find():
+        swears.append(swear.get('swear'))
+
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
     global channel_ids
@@ -30,6 +34,14 @@ class listeners(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         global bumptimer
+        global swears
+
+        async def reload_swears():
+            global swears
+            swears = []
+            swearcol = mongodb['swears']
+            for swear in swearcol.find():
+                swears.append(swear.get('swear'))
 
         support_channels = [int(channel_ids['vc_chat'])]
         for channel in channel_ids:
@@ -58,18 +70,18 @@ class listeners(commands.Cog):
         elif swore != "":
             await message.delete()
             if swore == "@everyone":
-                dmbed=discord.Embed(title="@everyone ping", description="Please don't ping @everyone. If you need help, go to a support channel and ping @Support Team.")
-                embed=discord.Embed(title="@everyone ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
+                dmbed=discord.Embed(title="@everyone ping", description="Please don't ping @everyone. If you need help, go to a support channel and ping @Support Team.", color=discord.Color.red())
+                embed=discord.Embed(title="@everyone ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
             if swore == "@here":
-                dmbed=discord.Embed(title="@here ping", description="Please don't ping @here. If you need help, go to a support channel and ping @Support Team.")
-                embed=discord.Embed(title="@here ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
+                dmbed=discord.Embed(title="@here ping", description="Please don't ping @here. If you need help, go to a support channel and ping @Support Team.", color=discord.Color.red())
+                embed=discord.Embed(title="@here ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
             elif swore == "discord.gg" or swore == "discord.com/invite":
-                dmbed=discord.Embed(title="Invite Link", description="Please don't send invite links to other servers, it is against rule 6 of our server.")
-                embed=discord.Embed(title="Invite Link sent by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
+                dmbed=discord.Embed(title="Invite Link", description="Please don't send invite links to other servers, it is against rule 6 of our server.", color=discord.Color.red())
+                embed=discord.Embed(title="Invite Link sent by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
             else:
-                dmbed=discord.Embed(title="Swear", description="TSC is a PG Friendly server, you cannot swear here.")
+                dmbed=discord.Embed(title="Swear", description="TSC is a PG Friendly server, you cannot swear here.", color=discord.Color.red())
                 dmbed.add_field(name="Swear Detected:", value=swore, inline=False)
-                embed=discord.Embed(title="Swear by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=0x00a0a0)
+                embed=discord.Embed(title="Swear by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
                 embed.add_field(name="Swear Detected:", value=swore, inline=False)
 
             if message.author.dm_channel is None:
@@ -123,6 +135,9 @@ class listeners(commands.Cog):
                 await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
             else:
                 await message.channel.send("The bump timer is already set.")
+
+        elif "reload swears" in message.content:
+            await reload_swears()
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):

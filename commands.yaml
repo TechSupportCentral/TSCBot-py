@@ -32,6 +32,13 @@ moderation_desc: "Commands run by moderators"
 moderation:
     userinfo: "Various info about a certain user"
     purge: "Deletes a certain amount of messages"
+    warn: "Gives a user a warning"
+    unwarn: "Removes a specific warning"
+    mute: "Mutes a user"
+    unmute: "Unmutes a user"
+    kick: "Kicks a user from the server"
+    ban: "Bans a user from the server"
+    unban: "Unbans a user from the server"
 
 administration_desc: "Commands run by admins"
 administration:
@@ -42,3 +49,6 @@ administration:
     decline-suggestion: "Decline a certain suggestion"
     add-custom: "Add a new custom command"
     remove-custom: "Remove a custom command"
+    add-swear: "Adds a swear to the swearlist"
+    remove-swear: "Removes a swear from the swearlist"
+    swearlist: "List of current swears"
