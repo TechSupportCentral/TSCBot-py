@@ -172,9 +172,7 @@ class moderation(commands.Cog):
             return
         member = guild.get_member(id)
 
-        userhighestrole = member.roles[-1]
-        modhighestrole = ctx.message.author.roles[-1]
-        if userhighestrole.position >= modhighestrole.position:
+        if member.top_role.position >= ctx.message.author.top_role.position:
             await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot warn.")
             return
         if member.bot:
@@ -298,9 +296,7 @@ class moderation(commands.Cog):
             return
         member = guild.get_member(id)
 
-        userhighestrole = member.roles[-1]
-        modhighestrole = ctx.message.author.roles[-1]
-        if userhighestrole.position >= modhighestrole.position:
+        if member.top_role.position >= ctx.message.author.top_role.position:
             await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot kick.")
             return
         if member.bot and owner_role not in ctx.message.author.roles:
@@ -377,9 +373,7 @@ class moderation(commands.Cog):
             return
 
         if guild.get_member(id) is not None:
-            userhighestrole = member.roles[-1]
-            modhighestrole = ctx.message.author.roles[-1]
-            if userhighestrole.position >= modhighestrole.position:
+            if member.top_role.position >= ctx.message.author.top_role.position:
                 await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot ban.")
                 return
             if member.bot and owner_role not in ctx.message.author.roles:
@@ -502,9 +496,7 @@ class moderation(commands.Cog):
             return
         member = guild.get_member(id)
 
-        userhighestrole = member.roles[-1]
-        modhighestrole = ctx.message.author.roles[-1]
-        if userhighestrole.position >= modhighestrole.position:
+        if member.top_role.position >= ctx.message.author.top_role.position:
             await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot mute.")
             return
         if member.bot:
