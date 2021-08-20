@@ -40,10 +40,3 @@ channel_ids:
     user_banned: 854429525647687701
     user_unbanned: 854429525647687702
     bot_dm: 854429525647687703
-
-hierarchy:
-  - owner
-  - moderator
-  - trial_mod
-  - support_team
-  - Mrole

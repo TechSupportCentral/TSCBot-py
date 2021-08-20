@@ -52,7 +52,7 @@ class moderation(commands.Cog):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
-        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+        if mod_role not in ctx.message.author.roles and trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
@@ -99,7 +99,7 @@ class moderation(commands.Cog):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
-        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+        if mod_role not in ctx.message.author.roles and trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
@@ -144,7 +144,7 @@ class moderation(commands.Cog):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
-        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+        if mod_role not in ctx.message.author.roles and trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
@@ -171,6 +171,15 @@ class moderation(commands.Cog):
             await ctx.send("User is not in the server.")
             return
         member = guild.get_member(id)
+
+        userhighestrole = member.roles[-1]
+        modhighestrole = ctx.message.author.roles[-1]
+        if userhighestrole.position >= modhighestrole.position:
+            await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot warn.")
+            return
+        if member.bot:
+            await ctx.send("You cannot warn bots.")
+            return
 
         if not args:
             args = ['No', 'reason', 'provided.']
@@ -205,7 +214,7 @@ class moderation(commands.Cog):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
-        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+        if mod_role not in ctx.message.author.roles and trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
@@ -260,6 +269,7 @@ class moderation(commands.Cog):
     async def kick(self, ctx, user=None, *args):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
+        owner_role = guild.get_role(int(role_ids['owner']))
         if mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
@@ -287,6 +297,15 @@ class moderation(commands.Cog):
             await ctx.send("User is not in the server.")
             return
         member = guild.get_member(id)
+
+        userhighestrole = member.roles[-1]
+        modhighestrole = ctx.message.author.roles[-1]
+        if userhighestrole.position >= modhighestrole.position:
+            await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot kick.")
+            return
+        if member.bot and owner_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to kick bots.")
+            return
 
         if not args:
             args = ['No', 'reason', 'provided.']
@@ -324,6 +343,7 @@ class moderation(commands.Cog):
     async def ban(self, ctx, user=None, *args):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
+        owner_role = guild.get_role(int(role_ids['owner']))
         if mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
@@ -347,10 +367,24 @@ class moderation(commands.Cog):
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
 
-        member = await self.bot.fetch_user(id)
+        if guild.get_member(id) is None:
+            member = await self.bot.fetch_user(id)
+        else:
+            member = guild.get_member(id)
+
         if not member:
             await ctx.send("Not a valid discord user.")
             return
+
+        if guild.get_member(id) is not None:
+            userhighestrole = member.roles[-1]
+            modhighestrole = ctx.message.author.roles[-1]
+            if userhighestrole.position >= modhighestrole.position:
+                await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot ban.")
+                return
+            if member.bot and owner_role not in ctx.message.author.roles:
+                await ctx.send("You do not have permission to ban bots.")
+                return
 
         if not args:
             args = ['No', 'reason', 'provided.']
@@ -440,7 +474,7 @@ class moderation(commands.Cog):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
-        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+        if mod_role not in ctx.message.author.roles and trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
@@ -467,6 +501,15 @@ class moderation(commands.Cog):
             await ctx.send("User is not in the server.")
             return
         member = guild.get_member(id)
+
+        userhighestrole = member.roles[-1]
+        modhighestrole = ctx.message.author.roles[-1]
+        if userhighestrole.position >= modhighestrole.position:
+            await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot mute.")
+            return
+        if member.bot:
+            await ctx.send("You cannot mute bots.")
+            return
 
         if not time:
             time = "12:00:00"
@@ -551,7 +594,7 @@ class moderation(commands.Cog):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
-        if mod_role not in ctx.message.author.roles or trial_mod_role not in ctx.message.author.roles:
+        if mod_role not in ctx.message.author.roles and trial_mod_role not in ctx.message.author.roles:
             await ctx.send("You do not have permission to run this command.")
             return
 
