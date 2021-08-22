@@ -122,7 +122,9 @@ class moderation(commands.Cog):
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
 
-        if guild.get_member(id) is not None:
+        if guild.get_member(id) is None:
+            description = ""
+        else:
             description = f"**User:** {guild.get_member(id)}\n"
 
         collection = mongodb['moderation']
