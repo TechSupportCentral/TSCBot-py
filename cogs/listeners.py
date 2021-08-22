@@ -143,14 +143,14 @@ class listeners(commands.Cog):
                 await message.channel.send("Thank you for bumping the server!")
                 if bumptimer == False:
                     bumptimer = True
-                    await sleep(3600)
+                    await sleep(7200)
                     bumptimer = False
                     await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
         elif "set bump" in message.content:
             if bumptimer == False:
                 await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
                 bumptimer = True
-                await sleep(3600)
+                await sleep(7200)
                 bumptimer = False
                 await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
             else:
