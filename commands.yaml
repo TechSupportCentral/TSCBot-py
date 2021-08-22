@@ -6,6 +6,7 @@ infos:
     spteam-requirements: "Requirements to join the support team"
     mod-requirements: "Requirements to join the moderation team"
     rules: "Server Rules"
+    custom-list: "List of custom commands"
 
 techinfo_desc: "Tutorials and Links to tech questions"
 techinfo:
@@ -32,6 +33,7 @@ moderation_desc: "Commands run by moderators"
 moderation:
     userinfo: "Various info about a certain user"
     purge: "Deletes a certain amount of messages"
+    warnings: "Checks a user's punishments"
     warn: "Gives a user a warning"
     unwarn: "Removes a specific warning"
     mute: "Mutes a user"
@@ -52,3 +54,4 @@ administration:
     add-swear: "Adds a swear to the swearlist"
     remove-swear: "Removes a swear from the swearlist"
     swearlist: "List of current swears"
+    add-reaction-role: "Creates a reaction role message"

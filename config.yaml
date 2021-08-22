@@ -1,42 +1,70 @@
 token: "insert token here"
 mongo_uri: "insert MongoDB URI here"
-mongo_db: "TSCBot-test"
+mongo_db: "TSCBot"
 prefix: "!"
 
 role_ids:
-    owner: 854429524304724007
-    moderator: 854429524304724002
-    trial_mod: 854429524304724000
-    support_team: 854429524304723999
-    Mrole: 854429523973636151
-    bump_reminders: 854429523973636155
-    muted: 854429524304724003
+    owner: 824063311829925898
+    moderator: 824056092899934218
+    trial_mod: 824067621841666099
+    support_team: 824064404340473896
+    Mrole: 876618998261891073
+    bump_reminders: 825049916413444196
+    muted: 824589460850606090
 
 channel_ids:
-    welcome: 854429524477476864
-    general_support: 854429524657176597
-    gaming_support: 854429524657176598
-    software_support: 854429524657176599
-    hardware_support: 854429524657176600
-    vc_chat: 854429524657176601
-    ticket_create: 854429524798996480
-    suggestions_list: 854429524798996483
-    general: 854429524798996485
+    welcome: 824060103119470622
+    general_support: 824059680905101333
+    gaming_support: 824059755935957023
+    software_support: 824059831513907200
+    hardware_support: 824059920826499093
+    vc_chat: 824061207924965416
+    general: 824042976371277888
+    games: 824059985998381138
+    setups: 824737989850169355
+    memes: 824738477291601980
+    music: 824067063941300224
+    funbots: 832535838289297408
+    bump: 824185956549787659
+    suggestions: 824926277868978186
+    suggestions_list: 824677631181062196
+    ticket_create: 824684376398233670
     tickets_history: 854429524976861229
-    modtalk: 854429525147385887
-    staff_logs: 854429525147385889
-    filter_log: 854429525147385890
-    get_bump_pings: 854429525147385892
-    left: 854429525315944456
-    joined: 854429525315944457
-    invites: 854429525480046593
-    name_changed: 854429525480046594
-    message_edit: 854429525480046595
-    message_deleted: 854429525480046596
-    role_changed: 854429525480046598
-    channel_deleted: 854429525480046601
-    channel_created: 854429525480046602
-    role_deleted: 854429525647687700
-    user_banned: 854429525647687701
-    user_unbanned: 854429525647687702
-    bot_dm: 854429525647687703
+    modtalk: 824057837491453982
+    staff_logs: 824194262279127060
+    filter_log: 835519322909573190
+    custom_list: 825768112744824854
+    reaction_roles: 828029618438275132
+    left: 824321468279947275
+    joined: 824319260540010557
+    invites: 833815923457654844
+    name_changed: 825773983000690698
+    message_edit: 825774068313358346
+    message_deleted: 825774127661973545
+    role_changed: 825785679220703243
+    channel_deleted: 825786991450259466
+    channel_created: 825787041664073739
+    role_deleted: 825787981435502612
+    bot_dm: 853984661360869386
+
+support_channels:
+  - general_support
+  - gaming_support
+  - software_support
+  - hardware_support
+  - vc_chat
+
+public_channels:
+  - general_support
+  - gaming_support
+  - software_support
+  - hardware_support
+  - vc_chat
+  - general
+  - games
+  - setups
+  - memes
+  - music
+  - funbots
+  - bump
+  - suggestions

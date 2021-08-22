@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import yaml
+from emoji import emojize
 from asyncio import sleep
 from main import get_database
 mongodb = get_database()
@@ -18,10 +19,24 @@ class listeners(commands.Cog):
     for swear in swearcol.find():
         swears.append(swear.get('swear'))
 
+    customcol = mongodb['custom-commands']
+    global customs
+    customs = customcol.find({},{"_id": 0})
+
+    reactcol = mongodb['reaction-roles']
+    global reacts
+    reacts = reactcol.find()
+
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
+    global prefix
+    prefix = config['prefix']
     global channel_ids
     channel_ids = config['channel_ids']
+    global support_channels
+    support_channels = config['support_channels']
+    global public_channels
+    public_channels = config['public_channels']
     global role_ids
     role_ids = config['role_ids']
 
@@ -35,23 +50,25 @@ class listeners(commands.Cog):
     async def on_message(self, message):
         global bumptimer
         global swears
+        global customs
+        global reacts
 
-        async def reload_swears():
-            global swears
-            swears = []
-            swearcol = mongodb['swears']
-            for swear in swearcol.find():
-                swears.append(swear.get('swear'))
-
-        support_channels = [int(channel_ids['vc_chat'])]
-        for channel in channel_ids:
-            if channel.endswith("support"):
-                support_channels.append(int(channel_ids[channel]))
+        support_channels = []
+        for channel in support_channels:
+            support_channels.append(int(channel_ids[channel]))
+        public_channels = []
+        for channel in public_channels:
+            public_channels.append(int(channel_ids[channel]))
         help_triggers = ["issue", "able to help", "get some help", "need help"]
+
+        custom = ""
+        for command in customs:
+            if message.content == prefix + command.get('name'):
+                custom = command.get('value')
 
         swore = ""
         for swear in swears:
-            if swear in message.content:
+            if swear in message.content and message.channel.id in public_channels:
                 swore = swear
 
         if isinstance(message.channel, discord.channel.DMChannel):
@@ -105,6 +122,9 @@ class listeners(commands.Cog):
             channel = self.bot.get_channel(int(channel_ids['filter_log']))
             await channel.send(embed=embed)
 
+        elif custom != "":
+            await message.channel.send(custom)
+
         elif any(trigger in message.content for trigger in help_triggers) and not message.channel.id in support_channels:
             channel = self.bot.get_channel(message.channel.id)
             await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
@@ -137,11 +157,39 @@ class listeners(commands.Cog):
                 await message.channel.send("The bump timer is already set.")
 
         elif "reload swears" in message.content:
-            await reload_swears()
+            await message.delete()
+            swears = []
+            swearcol = mongodb['swears']
+            for swear in swearcol.find():
+                swears.append(swear.get('swear'))
+
+        elif "reload custom commands" in message.content:
+            await message.delete()
+            customcol = mongodb['custom-commands']
+            customs = customcol.find({},{"_id": 0})
+
+            channel = self.bot.get_channel(int(channel_ids['custom_list']))
+            await channel.purge(limit=1)
+            embed = discord.Embed(title="Custom Commands", color=0x00a0a0)
+            for command in customs:
+                embed.add_field(name=command.get('name'), value=command.get('value'), inline=False)
+            await channel.send(embed=embed)
+
+        elif "reload reaction roles" in message.content:
+            await message.delete()
+            reactcol = mongodb['reaction-roles']
+            reacts = reactcol.find()
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
+        global reacts
         channel = self.bot.get_channel(int(channel_ids['message_deleted']))
+        if message.id in reacts:
+            reactcol = mongodb['reaction-roles']
+            reactcol.delete_one({"_id": str(message.id)})
+            reacts = reactcol.find()
+        if message.content.startswith("reload"):
+            return
         if message.channel == channel:
             return
         embed = discord.Embed(title="Message Deleted", description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
@@ -296,6 +344,62 @@ class listeners(commands.Cog):
         embed.set_thumbnail(url=member.avatar_url)
         channel = self.bot.get_channel(int(channel_ids['left']))
         await channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        guild = self.bot.get_guild(payload.guild_id)
+        user = guild.get_member(payload.user_id)
+        role = ""
+        for message in reacts:
+#            if payload.message_id == int(message.get('_id')) and payload.emoji == emojize(message.get('emoji')):
+            if payload.message_id == int(message.get('_id')):
+                role = message.get('role')
+
+        if role != "":
+            role = guild.get_role(int(role))
+
+            dmessage = f"Added the `{role.name}` role."
+            try:
+                await user.add_roles(role)
+            except:
+                dmessage = f"Failed to add the `{role.name}` role. Open a ticket and inform the owners."
+
+            if user.dm_channel is None:
+                dm = await user.create_dm()
+            else:
+                dm = user.dm_channel
+            try:
+                await dm.send(dmessage)
+            except:
+                return
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        guild = self.bot.get_guild(payload.guild_id)
+        user = guild.get_member(payload.user_id)
+        role = ""
+        for message in reacts:
+#            if payload.message_id == int(message.get('_id')) and str(payload.emoji) == emojize(message.get('emoji')):
+            if payload.message_id == int(message.get('_id')):
+                role = message.get('role')
+
+        if role != "":
+            role = guild.get_role(int(role))
+
+            dmessage = f"Removed the `{role.name}` role."
+            try:
+                await user.remove_roles(role)
+            except:
+                dmessage = f"Failed to remove the `{role.name}` role. Open a ticket and inform the owners."
+
+            if user.dm_channel is None:
+                dm = await user.create_dm()
+            else:
+                dm = user.dm_channel
+            try:
+                await dm.send(dmessage)
+            except:
+                return
 
 def setup(bot):
     bot.add_cog(listeners(bot))

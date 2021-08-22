@@ -40,7 +40,7 @@ class moderation(commands.Cog):
             return
 
         await ctx.channel.purge(limit=arg)
-        embed=discord.Embed(title=str(arg) + " Messages Deleted", color=0x00a0a0)
+        embed=discord.Embed(title=str(arg) + " Messages Deleted", color=discord.Color.red())
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
         embed.add_field(name="Deleted by", value=ctx.message.author, inline=True)
         embed.add_field(name="In channel", value=ctx.message.channel.mention, inline=True)
