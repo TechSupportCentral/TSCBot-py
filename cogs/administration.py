@@ -91,6 +91,7 @@ class administration(commands.Cog):
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name="Sent to", value=member, inline=True)
         embed.add_field(name="User ID", value=member.id, inline=True)
+        embed.add_field(name="Sent by", value=ctx.message.author, inline=False)
         embed.add_field(name="Message:", value=' '.join(args), inline=False)
         channel = self.bot.get_channel(int(channel_ids['bot_dm']))
         await channel.send(embed=embed)
