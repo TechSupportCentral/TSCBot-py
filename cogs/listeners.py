@@ -125,7 +125,7 @@ class listeners(commands.Cog):
         elif custom != "":
             await message.channel.send(custom)
 
-        elif any(trigger in message.content for trigger in help_triggers) and not message.channel.id in support_channels and not message.channel.id in public_channels:
+        elif any(trigger in message.content for trigger in help_triggers) and not message.channel.id in support_channels and message.channel.id in public_channels:
             channel = self.bot.get_channel(message.channel.id)
             await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
 
