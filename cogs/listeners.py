@@ -33,10 +33,10 @@ class listeners(commands.Cog):
     prefix = config['prefix']
     global channel_ids
     channel_ids = config['channel_ids']
-    global support_channels
-    support_channels = config['support_channels']
-    global public_channels
-    public_channels = config['public_channels']
+    global support_channel_names
+    support_channel_names = config['support_channels']
+    global public_channel_names
+    public_channel_names = config['public_channels']
     global role_ids
     role_ids = config['role_ids']
 
@@ -54,10 +54,10 @@ class listeners(commands.Cog):
         global reacts
 
         support_channels = []
-        for channel in support_channels:
+        for channel in support_channel_names:
             support_channels.append(int(channel_ids[channel]))
         public_channels = []
-        for channel in public_channels:
+        for channel in public_channel_names:
             public_channels.append(int(channel_ids[channel]))
         help_triggers = ["issue", "able to help", "get some help", "need help"]
 

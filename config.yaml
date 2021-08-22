@@ -48,23 +48,23 @@ channel_ids:
     bot_dm: 853984661360869386
 
 support_channels:
-  - general_support
-  - gaming_support
-  - software_support
-  - hardware_support
-  - vc_chat
+  - "general_support"
+  - "gaming_support"
+  - "software_support"
+  - "hardware_support"
+  - "vc_chat"
 
 public_channels:
-  - general_support
-  - gaming_support
-  - software_support
-  - hardware_support
-  - vc_chat
-  - general
-  - games
-  - setups
-  - memes
-  - music
-  - funbots
-  - bump
-  - suggestions
+  - "general_support"
+  - "gaming_support"
+  - "software_support"
+  - "hardware_support"
+  - "vc_chat"
+  - "general"
+  - "games"
+  - "setups"
+  - "memes"
+  - "music"
+  - "funbots"
+  - "bump"
+  - "suggestions"
