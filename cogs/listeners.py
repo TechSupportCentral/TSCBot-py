@@ -133,7 +133,7 @@ class listeners(commands.Cog):
             channel = self.bot.get_channel(message.channel.id)
             await channel.send("This tutorial will lead you how to do a fresh windows installation: (All your data will be gone, back it up and use `!key` in case you need to back up your Product Key too, please save it somewhere safe and don't show us or anyone the key!)\nhttps://youtu.be/bwJ_E-I9WRs\nTo figure out which key you need to use to boot to a usb, run the command `!bootkeys`.")
 
-        elif "virus" in message.content:
+        elif " virus" in message.content:
             if not message.author.bot:
                 channel = self.bot.get_channel(message.channel.id)
                 await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download/thankyou/")
