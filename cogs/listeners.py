@@ -284,33 +284,31 @@ class listeners(commands.Cog):
 
         embed1 = discord.Embed(title="Member Joined", description=f"{member} has joined Tech Support Central!", color=discord.Color.green())
         embed1.set_thumbnail(url=member.avatar_url)
-        welcome = self.bot.get_channel(int(channel_ids['welcome']))
-        await welcome.send(embed=embed1)
-
-        embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
-        embed2.set_thumbnail(url=member.avatar_url)
-        embed2.add_field(name="User ID", value=member.id, inline=False)
-        embed2.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=False)
-        joined = self.bot.get_channel(int(channel_ids['joined']))
-        await joined.send(embed=embed2)
+        channel1 = self.bot.get_channel(int(channel_ids['welcome']))
+        await channel1.send(embed=embed1)
 
         def findinvite(list, code):
             for invite in list:
                 if invite.code == code:
                     return invite
         afterinvites = await member.guild.invites()
+        invite_used = None
         for invite in afterinvites:
             if invite.uses > findinvite(invites, invite.code).uses:
-
-                embed3 = discord.Embed(title=member, color=discord.Color.green())
-                embed3.add_field(name="Invited by", value=invite.inviter, inline=False)
-                embed3.add_field(name="Invite code", value=invite.code, inline=False)
-                embed3.add_field(name="Invite uses", value=invite.uses, inline=False)
-                inviteschannel = self.bot.get_channel(int(channel_ids['invites']))
-                await inviteschannel.send(embed=embed3)
-
+                invite_used = invite
                 invites = afterinvites
                 return
+
+        embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
+        embed2.set_thumbnail(url=member.avatar_url)
+        embed2.add_field(name="User ID", value=member.id, inline=False)
+        embed2.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=False)
+        if invite_used is not None:
+                embed2.add_field(name="Invite code", value=invite.code, inline=False)
+                embed2.add_field(name="Invite maker", value=invite.inviter, inline=True)
+                embed2.add_field(name="Invite uses", value=invite.uses, inline=True)
+        channel2 = self.bot.get_channel(int(channel_ids['member_changed']))
+        await channel2.send(embed=embed2)
 
     @commands.Cog.listener()
     async def on_invite_create(self, invite):
@@ -342,7 +340,8 @@ class listeners(commands.Cog):
     async def on_member_remove(self, member):
         embed = discord.Embed(title="Member Left", description=f"{member} has left Tech Support Central.", color=discord.Color.red())
         embed.set_thumbnail(url=member.avatar_url)
-        channel = self.bot.get_channel(int(channel_ids['left']))
+        embed.set_footer(text=f"User ID: {member.id}")
+        channel = self.bot.get_channel(int(channel_ids['member_changed']))
         await channel.send(embed=embed)
 
     @commands.Cog.listener()

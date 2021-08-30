@@ -6,6 +6,10 @@ class techinfo(commands.Cog):
     async def cpuz(self, ctx):
         await ctx.send("https://www.cpuid.com/downloads/cpu-z/cpu-z_1.95-en.exe")
 
+    @commands.command(aliases=["nvidiadrivers", "amddrivers", "realtekdrivers"])
+    async def olddrivers(self, ctx):
+        await ctx.send("If you're looking for driver links, run the `!drivers` command.")
+
     @commands.command()
     async def drivers(self, ctx):
         embed = discord.Embed(title="Drivers", description="Links to downloads for various drivers", color=0x00a0a0)
