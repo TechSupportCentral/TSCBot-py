@@ -125,15 +125,15 @@ class listeners(commands.Cog):
         elif custom != "":
             await message.channel.send(custom)
 
-        elif any(trigger in message.content for trigger in help_triggers) and not message.channel.id in support_channels and message.channel.id in public_channels:
+        elif any(trigger in message.content.lower for trigger in help_triggers) and not message.channel.id in support_channels and message.channel.id in public_channels:
             channel = self.bot.get_channel(message.channel.id)
             await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
 
-        elif "reinstall windows" in message.content:
+        elif "reinstall windows" in message.content.lower:
             channel = self.bot.get_channel(message.channel.id)
             await channel.send("This tutorial will lead you how to do a fresh windows installation: (All your data will be gone, back it up and use `!key` in case you need to back up your Product Key too, please save it somewhere safe and don't show us or anyone the key!)\nhttps://youtu.be/bwJ_E-I9WRs\nTo figure out which key you need to use to boot to a usb, run the command `!bootkeys`.")
 
-        elif " virus" in message.content:
+        elif " virus" in message.content.lower:
             if not message.author.bot:
                 channel = self.bot.get_channel(message.channel.id)
                 await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download/thankyou/")
