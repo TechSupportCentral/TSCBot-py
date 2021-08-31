@@ -299,6 +299,7 @@ class listeners(commands.Cog):
             if invite.uses > findinvite(invites, invite.code).uses:
                 invite_used = invite
                 invites = afterinvites
+                break
 
         embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
         embed2.set_thumbnail(url=member.avatar_url)
