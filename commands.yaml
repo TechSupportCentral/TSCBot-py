@@ -1,5 +1,5 @@
-infos_desc: "Information about the bot"
-infos:
+info_desc: "Information about the bot"
+info:
     uptime: "How long the bot has been online"
     ping: "Tests the bot latency"
     commands: "List of commands on the bot"

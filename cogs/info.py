@@ -5,7 +5,7 @@ import datetime, time
 from main import get_database
 mongodb = get_database()
 
-class infos(commands.Cog):
+class info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -109,4 +109,4 @@ class infos(commands.Cog):
         await ctx.send(embed=embed)
 
 def setup(bot):
-    bot.add_cog(infos(bot))
+    bot.add_cog(info(bot))
