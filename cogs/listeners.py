@@ -140,7 +140,8 @@ class listeners(commands.Cog):
 
         elif message.author.id == 302050872383242240:
             if ":thumbsup:" in message.embeds[0].description:
-                await message.channel.send("Thank you for bumping the server!\nVote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884")
+                embed = discord.Embed(title="Thank you for bumping the server!", description="Vote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884")
+                await message.channel.send(embed=embed)
                 if bumptimer == False:
                     bumptimer = True
                     await sleep(7200)
