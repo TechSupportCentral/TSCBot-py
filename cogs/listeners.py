@@ -140,7 +140,7 @@ class listeners(commands.Cog):
 
         elif message.author.id == 302050872383242240:
             if ":thumbsup:" in message.embeds[0].description:
-                await message.channel.send("Thank you for bumping the server!")
+                await message.channel.send("Thank you for bumping the server!\nVote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884")
                 if bumptimer == False:
                     bumptimer = True
                     await sleep(7200)
@@ -299,16 +299,18 @@ class listeners(commands.Cog):
             if invite.uses > findinvite(invites, invite.code).uses:
                 invite_used = invite
                 invites = afterinvites
-                break
 
         embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
         embed2.set_thumbnail(url=member.avatar_url)
         embed2.add_field(name="User ID", value=member.id, inline=False)
         embed2.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=False)
         if invite_used is not None:
-                embed2.add_field(name="Invite code", value=invite.code, inline=False)
-                embed2.add_field(name="Invite maker", value=invite.inviter, inline=True)
-                embed2.add_field(name="Invite uses", value=invite.uses, inline=True)
+                embed2.add_field(name="Invite code", value=invite_used.code, inline=False)
+                if invite.code == "2vwUBmhM8U":
+                    embed2.add_field(name="Invite maker", value="top.gg", inline=True)
+                else:
+                    embed2.add_field(name="Invite maker", value=invite_used.inviter, inline=True)
+                embed2.add_field(name="Invite uses", value=invite_used.uses, inline=True)
         channel2 = self.bot.get_channel(int(channel_ids['member_changed']))
         await channel2.send(embed=embed2)
 
