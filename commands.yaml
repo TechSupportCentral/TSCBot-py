@@ -54,4 +54,4 @@ administration:
     add-swear: "Adds a swear to the swearlist"
     remove-swear: "Removes a swear from the swearlist"
     swearlist: "List of current swears"
-    add-reaction-role: "Creates a reaction role message"
+#    add-reaction-role: "Creates a reaction role message"

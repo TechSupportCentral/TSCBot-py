@@ -100,13 +100,5 @@ class info(commands.Cog):
         embed.add_field(name="Rule 10:", value="We do not provide support for pirated, cracked, or hacked content of any kind. It is illegal and against our rules.", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(name="custom-list")
-    async def custom_list(self, ctx):
-        collection = mongodb['custom-commands']
-        embed = discord.Embed(title="Custom Commands", color=0x00a0a0)
-        for command in collection.find():
-            embed.add_field(name=command.get('name'), value=command.get('value'), inline=False)
-        await ctx.send(embed=embed)
-
 def setup(bot):
     bot.add_cog(info(bot))

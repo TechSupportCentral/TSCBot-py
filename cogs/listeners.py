@@ -19,10 +19,6 @@ class listeners(commands.Cog):
     for swear in swearcol.find():
         swears.append(swear.get('swear'))
 
-#    customcol = mongodb['custom-commands']
-#    global customs
-#    customs = customcol.find({},{"_id": 0})
-
 #    reactcol = mongodb['reaction-roles']
 #    global reacts
 #    reacts = reactcol.find()
@@ -50,7 +46,6 @@ class listeners(commands.Cog):
     async def on_message(self, message):
         global bumptimer
         global swears
-#        global customs
 #        global reacts
 
         support_channels = []
@@ -60,11 +55,6 @@ class listeners(commands.Cog):
         for channel in public_channel_names:
             public_channels.append(int(channel_ids[channel]))
         help_triggers = ["issue", "able to help", "get some help", "need help"]
-
-#        custom = ""
-#        for command in customs:
-#            if message.content == prefix + command.get('name'):
-#                custom = command.get('value')
 
         swore = ""
         for swear in swears:
@@ -122,9 +112,6 @@ class listeners(commands.Cog):
             channel = self.bot.get_channel(int(channel_ids['filter_log']))
             await channel.send(embed=embed)
 
-#        elif custom != "":
-#            await message.channel.send(custom)
-
         elif any(trigger in message.content.lower() for trigger in help_triggers) and not message.channel.id in support_channels and message.channel.id in public_channels:
             channel = self.bot.get_channel(message.channel.id)
             await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
@@ -164,18 +151,6 @@ class listeners(commands.Cog):
             for swear in swearcol.find():
                 swears.append(swear.get('swear'))
 
-#        elif "reload custom commands" in message.content:
-#            await message.delete()
-#            customcol = mongodb['custom-commands']
-#            customs = customcol.find({},{"_id": 0})
-#
-#            channel = self.bot.get_channel(int(channel_ids['custom_list']))
-#            await channel.purge(limit=1)
-#            embed = discord.Embed(title="Custom Commands", color=0x00a0a0)
-#            for command in customs:
-#                embed.add_field(name=command.get('name'), value=command.get('value'), inline=False)
-#            await channel.send(embed=embed)
-#
 #        elif "reload reaction roles" in message.content:
 #            await message.delete()
 #            reactcol = mongodb['reaction-roles']
