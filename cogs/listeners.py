@@ -127,7 +127,7 @@ class listeners(commands.Cog):
 
         elif message.author.id == 302050872383242240:
             if ":thumbsup:" in message.embeds[0].description:
-                embed = discord.Embed(title="Thank you for bumping the server!", description="Vote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884")
+                embed = discord.Embed(title="Thank you for bumping the server!", description="Vote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884", color=0x00a0a0)
                 await message.channel.send(embed=embed)
                 if bumptimer == False:
                     bumptimer = True
@@ -140,7 +140,8 @@ class listeners(commands.Cog):
                 bumptimer = True
                 await sleep(7200)
                 bumptimer = False
-                await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
+                embed = discord.Embed(title="Thank you for bumping the server!", description="Vote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884", color=0x00a0a0)
+                await message.channel.send(embed=embed)
             else:
                 await message.channel.send("The bump timer is already set.")
 
@@ -167,7 +168,7 @@ class listeners(commands.Cog):
 #            reactcol = mongodb['reaction-roles']
 #            reactcol.delete_one({"_id": str(message.id)})
 #            reacts = reactcol.find()
-        if message.content.startswith("reload") or message.channel == channel or message.author.bot or message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
+        if message.content.startswith("reload") or message.author.bot or message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
             return
         embed = discord.Embed(title="Message Deleted", description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
         embed.set_thumbnail(url=message.author.avatar_url)
@@ -182,9 +183,7 @@ class listeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        if before.content == after.content:
-            return
-        if before.author.bot:
+        if before.content == after.content or before.author.bot or before.guild.get_role(int(role_ids['owner'])) in before.author.roles::
             return
         embed = discord.Embed(title="Message Edited", description=f"[Jump to message]({before.jump_url})", color=0x00a0a0)
         embed.set_thumbnail(url=before.author.avatar_url)
