@@ -11,18 +11,12 @@ class administration(commands.Cog):
 
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
-    global role_ids
-    role_ids = config['role_ids']
     global channel_ids
     channel_ids = config['channel_ids']
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def sendmessage(self, ctx, *args):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
         elif not args:
             await ctx.send("Please specify a message to send.")
             return
@@ -30,12 +24,8 @@ class administration(commands.Cog):
         await ctx.send(' '.join(args))
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def announce(self, ctx, *args):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
         elif not args:
             await ctx.send("Please specify the announcement message.")
             return
@@ -44,12 +34,8 @@ class administration(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def dm(self, ctx, user=None, *args):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
         elif not user:
             await ctx.send("Please specify a user to DM.")
             return
@@ -97,13 +83,8 @@ class administration(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.command(name="accept-suggestion")
+    @commands.has_permissions(administrator=True)
     async def accept_suggestion(self, ctx, id=None, *args):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
-
         if not id:
             await ctx.send("Feed me some arguments please")
             return
@@ -129,7 +110,7 @@ class administration(commands.Cog):
         dmbed = discord.Embed(title="Your suggestion was accepted by the owners.", description=message.embeds[0].description, color=discord.Color.green())
         dmbed.add_field(name="Reason:", value=' '.join(args))
 
-        member = guild.get_member_named(message.embeds[0].author.name)
+        member = ctx.message.guild.get_member_named(message.embeds[0].author.name)
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:
@@ -143,13 +124,8 @@ class administration(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command(name="decline-suggestion")
+    @commands.has_permissions(administrator=True)
     async def decline_suggestion(self, ctx, id=None, *args):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
-
         if not id:
             await ctx.send("Feed me some arguments please")
             return
@@ -175,7 +151,7 @@ class administration(commands.Cog):
         dmbed = discord.Embed(title="Your suggestion was declined by the owners.", description=message.embeds[0].description, color=discord.Color.red())
         dmbed.add_field(name="Reason:", value=' '.join(args))
 
-        member = guild.get_member_named(message.embeds[0].author.name)
+        member = ctx.message.guild.get_member_named(message.embeds[0].author.name)
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:
@@ -256,13 +232,8 @@ class administration(commands.Cog):
 #        await ctx.send("reload custom commands")
 
     @commands.command(name="add-swear")
+    @commands.has_permissions(administrator=True)
     async def add_swear(self, ctx, arg=None):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
-
         if not arg:
             await ctx.send("Please provide the name of the new swear.")
             return
@@ -277,13 +248,8 @@ class administration(commands.Cog):
         await ctx.send("reload swears")
 
     @commands.command(name="remove-swear")
+    @commands.has_permissions(administrator=True)
     async def remove_swear(self, ctx, arg=None):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
-
         if not arg:
             await ctx.send("Please provide the name of the swear to remove.")
             return
@@ -301,13 +267,8 @@ class administration(commands.Cog):
         await ctx.send("reload swears")
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def swearlist(self, ctx):
-        guild = ctx.message.guild
-        owner_role = guild.get_role(int(role_ids['owner']))
-        if not owner_role in ctx.message.author.roles:
-            await ctx.send("You do not have permission to run this command.")
-            return
-
         collection = mongodb['swears']
         description = ""
         for swear in collection.find():
@@ -317,12 +278,6 @@ class administration(commands.Cog):
 
 #    @commands.command(name="add-reaction-role")
 #    async def add_reaction_role(self, ctx, role=None, reaction=None, *args):
-#        guild = ctx.message.guild
-#        owner_role = guild.get_role(int(role_ids['owner']))
-#        if not owner_role in ctx.message.author.roles:
-#            await ctx.send("You do not have permission to run this command.")
-#            return
-#
 #        if not role:
 #            await ctx.send("Please provide the ID of the role to add.")
 #            return
@@ -333,7 +288,7 @@ class administration(commands.Cog):
 #            await ctx.send("Please provide the contents of the reaction role message.")
 #            return
 #
-#        if not guild.get_role(int(role)):
+#        if not ctx.message.guild.get_role(int(role)):
 #            await ctx.send("Not a valid role.")
 #            return
 #
