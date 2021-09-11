@@ -68,7 +68,7 @@ class listeners(commands.Cog):
 
         swore = ""
         for swear in swears:
-            if swear in message.content.lower() and message.channel.id in public_channels and not guild.get_role(int(role_ids['owner'])) in message.author.roles:
+            if swear in message.content.lower() and message.channel.id in public_channels and not message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
                 swore = swear
 
         if isinstance(message.channel, discord.channel.DMChannel):
@@ -192,7 +192,7 @@ class listeners(commands.Cog):
 #            reactcol = mongodb['reaction-roles']
 #            reactcol.delete_one({"_id": str(message.id)})
 #            reacts = reactcol.find()
-        if message.content.startswith("reload") or message.channel == channel or message.author.bot or guild.get_role(int(role_ids['owner'])) in message.author.roles:
+        if message.content.startswith("reload") or message.channel == channel or message.author.bot or message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
             return
         embed = discord.Embed(title="Message Deleted", description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
         embed.set_thumbnail(url=message.author.avatar_url)
