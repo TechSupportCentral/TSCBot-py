@@ -76,7 +76,7 @@ class custom_commands(commands.Cog):
         embed2 = discord.Embed(title="Custom Commands", color=0x00a0a0)
         for command in self._custom_commands:
             embed2.add_field(name=command, value=self._custom_commands[command], inline=False)
-        await channel2.send(embed=embed)
+        await channel2.send(embed=embed2)
 
     @commands.command(name="remove-custom")
     @commands.has_permissions(administrator=True)
@@ -114,7 +114,7 @@ class custom_commands(commands.Cog):
         embed2 = discord.Embed(title="Custom Commands", color=0x00a0a0)
         for command in self._custom_commands:
             embed2.add_field(name=command, value=self._custom_commands[command], inline=False)
-        await channel2.send(embed=embed)
+        await channel2.send(embed=embed2)
 
     @commands.command(name="custom-list")
     async def custom_list(self, ctx):
