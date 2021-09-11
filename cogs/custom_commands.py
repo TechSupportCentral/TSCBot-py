@@ -11,28 +11,42 @@ class custom_commands(commands.Cog):
     global collection
     collection = mongodb['custom-commands']
     _custom_commands = {}
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        for command in collection.find():
-            self._custom_commands[command.get('name')] = command.get('value')
-
-            @commands.command(name=command.get('name'))
-            async def cmd(self, ctx):
-                await ctx.send(command.get('value'))
-
-            cmd.cog = self
-            self.__cog_commands__ = self.__cog_commands__ + (cmd,)
-            self.bot.add_command(cmd)
 
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
     global channel_ids
     channel_ids = config['channel_ids']
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        async def add_command(self, name, value):
+            self._custom_commands[name] = value
+
+            @commands.command(name=name)
+            async def cmd(self, ctx):
+                await ctx.send(value)
+
+            cmd.cog = self
+            self.__cog_commands__ = self.__cog_commands__ + (cmd,)
+            self.bot.add_command(cmd)
+
+        for command in collection.find():
+            await add_command(self, command.get('name'), command.get('value'))
+
     @commands.command(name="add-custom")
     @commands.has_permissions(administrator=True)
     async def add_custom(self, ctx, name=None, *args):
+        async def add_command(self, name, value):
+            self._custom_commands[name] = value
+
+            @commands.command(name=name)
+            async def cmd(self, ctx):
+                await ctx.send(value)
+
+            cmd.cog = self
+            self.__cog_commands__ = self.__cog_commands__ + (cmd,)
+            self.bot.add_command(cmd)
+
         if not name:
             await ctx.send("Please provide a name for the new custom command.")
             return
@@ -45,15 +59,7 @@ class custom_commands(commands.Cog):
             return
 
         collection.insert_one({"name": name, "value": ' '.join(args)})
-        self._custom_commands[name] = ' '.join(args)
-
-        @commands.command(name=name)
-        async def cmd(self, ctx):
-            await ctx.send(' '.join(args))
-
-        cmd.cog = self
-        __cog_commands__ = __cog_commands__ + (cmd,)
-        ctx.bot.add_command(cmd)
+        await add_command(self, name, ' '.join(args))
 
         embed = discord.Embed(title="Custom Command Added", color=discord.Color.green())
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
@@ -79,12 +85,13 @@ class custom_commands(commands.Cog):
             await ctx.send("Please provide the name of the custom command to remove.")
             return
 
-        if ctx.bot.get_command(arg):
-            await ctx.send("You cannot remove a built-in command.")
-            return
-        elif not self._custom_commands.get(arg):
-            await ctx.send(f"The command `{arg}` does not exist.")
-            return
+        if not self._custom_commands.get(arg):
+            if ctx.bot.get_command(arg):
+                await ctx.send("You cannot remove a built-in command.")
+                return
+            else:
+                await ctx.send(f"The command `{arg}` does not exist.")
+                return
         else:
             value = self._custom_commands[arg]
 
