@@ -15,7 +15,7 @@ class techinfo(commands.Cog):
         embed = discord.Embed(title="Drivers", description="Links to downloads for various drivers", color=0x00a0a0)
         embed.add_field(name="AMD Drivers:", value="https://amd.com/en/support", inline=False)
         embed.add_field(name="nVidia Drivers:", value="https://nvidia.com/Download/index.aspx", inline=False)
-        embed.add_field(name="Intel Driver & Support Assistant:", value: "https://dsadata.intel.com/installer", inline=False)
+        embed.add_field(name="Intel Driver & Support Assistant:", value="https://dsadata.intel.com/installer", inline=False)
         embed.add_field(name="Realtek Audio Drivers:", value="https://www.realtek.com/en/downloads", inline=False)
         await ctx.send(embed=embed)
 
