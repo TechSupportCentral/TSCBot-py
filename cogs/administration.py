@@ -17,7 +17,7 @@ class administration(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def sendmessage(self, ctx, *args):
-        elif not args:
+        if not args:
             await ctx.send("Please specify a message to send.")
             return
         await ctx.message.delete()
@@ -26,7 +26,7 @@ class administration(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def announce(self, ctx, *args):
-        elif not args:
+        if not args:
             await ctx.send("Please specify the announcement message.")
             return
         await ctx.message.delete()
@@ -36,7 +36,7 @@ class administration(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def dm(self, ctx, user=None, *args):
-        elif not user:
+        if not user:
             await ctx.send("Please specify a user to DM.")
             return
         elif not args:
