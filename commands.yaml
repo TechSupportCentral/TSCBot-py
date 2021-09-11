@@ -25,8 +25,8 @@ misc:
     alert: "Alerts the moderators"
     suggest: "Make a suggestion on how to improve the server"
 
-custom_commands_desc: "Set of custom commands added by the owner without programming the bot"
-custom_commands:
+custom-commands_desc: "Set of custom commands added by the owner without programming the bot"
+custom-commands:
     custom-list: "Get a list of custom commands"
     add-custom: "For admins: Add a new custom command"
     remove-custom: "For admins: Remove a custom command"

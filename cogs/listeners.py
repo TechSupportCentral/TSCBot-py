@@ -183,7 +183,7 @@ class listeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        if before.content == after.content or before.author.bot or before.guild.get_role(int(role_ids['owner'])) in before.author.roles::
+        if before.content == after.content or before.author.bot or before.guild.get_role(int(role_ids['owner'])) in before.author.roles:
             return
         embed = discord.Embed(title="Message Edited", description=f"[Jump to message]({before.jump_url})", color=0x00a0a0)
         embed.set_thumbnail(url=before.author.avatar_url)
