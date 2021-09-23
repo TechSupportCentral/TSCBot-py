@@ -206,14 +206,8 @@ class listeners(commands.Cog):
         if before.nick != after.nick:
             embed = discord.Embed(title="Nickname changed/added", color=0x00a0a0)
             embed.set_author(name=before, icon_url=before.avatar_url)
-            if before.nick is None:
-                embed.add_field(name="Old Nickname:", value=f"{before.name} (No nickname)", inline=True)
-            else:
-                embed.add_field(name="Old Nickname:", value=before.nick, inline=True)
-            if after.nick is None:
-                embed.add_field(name="New Nickname:", value=f"{before.name} (No nickname)", inline=True)
-            else:
-                embed.add_field(name="New Nickname:", value=after.nick, inline=True)
+            embed.add_field(name="Old Nickname:", value=before.nick, inline=True)
+            embed.add_field(name="New Nickname:", value=after.nick, inline=True)
             embed.add_field(name="User ID:", value=before.id, inline=False)
             channel = self.bot.get_channel(int(channel_ids['name_changed']))
             await channel.send(embed=embed)
