@@ -38,5 +38,9 @@ class misc(commands.Cog):
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
 
+    @commands.command()
+    async def d(self, ctx):
+        return
+
 def setup(bot):
     bot.add_cog(misc(bot))
