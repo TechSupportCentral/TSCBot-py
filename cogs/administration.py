@@ -209,35 +209,35 @@ class administration(commands.Cog):
         embed = discord.Embed(title="Swearlist", description=description, color=0x00a0a0)
         await ctx.send(embed=embed)
 
-#    @commands.command(name="add-reaction-role")
-#    async def add_reaction_role(self, ctx, role=None, reaction=None, *args):
-#        if not role:
-#            await ctx.send("Please provide the ID of the role to add.")
-#            return
-#        if not reaction:
-#            await ctx.send("Please provide the emoji to use as a reaction.")
-#            return
-#        if not args:
-#            await ctx.send("Please provide the contents of the reaction role message.")
-#            return
-#
-#        if not ctx.message.guild.get_role(int(role)):
-#            await ctx.send("Not a valid role.")
-#            return
-#
-#        if emoji.emoji_count(reaction) != 1:
-#            await ctx.send("Not a valid emoji.")
-#            return
-#
-#        channel = self.bot.get_channel(int(channel_ids['reaction_roles']))
-#        message = await channel.send(' '.join(args))
-#        await message.add_reaction(reaction)
-#
-#        collection = mongodb['reaction-roles']
-#        collection.insert_one({"_id": str(message.id), "role": role, "emoji": emoji.demojize(reaction)})
-#
-#        await ctx.message.add_reaction("✅")
-#        await ctx.send("reload reaction roles")
+    @commands.command(name="add-reaction-role")
+    async def add_reaction_role(self, ctx, role=None, reaction=None, *args):
+        if not role:
+            await ctx.send("Please provide the ID of the role to add.")
+            return
+        if not reaction:
+            await ctx.send("Please provide the emoji to use as a reaction.")
+            return
+        if not args:
+            await ctx.send("Please provide the contents of the reaction role message.")
+            return
+
+        if not ctx.message.guild.get_role(int(role)):
+            await ctx.send("Not a valid role.")
+            return
+
+        if emoji.emoji_count(reaction) != 1:
+            await ctx.send("Not a valid emoji.")
+            return
+
+        channel = self.bot.get_channel(int(channel_ids['reaction_roles']))
+        message = await channel.send(' '.join(args))
+        await message.add_reaction(reaction)
+
+        collection = mongodb['reaction-roles']
+        collection.insert_one({"_id": str(message.id), "role": role, "emoji": reaction})
+
+        await ctx.message.add_reaction("✅")
+        await ctx.send("reload reaction roles")
 
 def setup(bot):
     bot.add_cog(administration(bot))
