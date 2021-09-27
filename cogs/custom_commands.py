@@ -35,7 +35,7 @@ class custom_commands(commands.Cog):
 
     @commands.command(name="add-custom")
     @commands.has_permissions(administrator=True)
-    async def add_custom(self, ctx, name=None, *args):
+    async def add_custom(self, ctx, name=None, *, value):
         async def add_command(self, name, value):
             self._custom_commands[name] = value
 
@@ -50,7 +50,7 @@ class custom_commands(commands.Cog):
         if not name:
             await ctx.send("Please provide a name for the new custom command.")
             return
-        if not args:
+        if not value:
             await ctx.send("Please provide the response for when the command is run.")
             return
 
@@ -58,15 +58,15 @@ class custom_commands(commands.Cog):
             await ctx.send(f"The command `{name}` already exists.")
             return
 
-        collection.insert_one({"name": name, "value": ' '.join(args)})
-        await add_command(self, name, ' '.join(args))
+        collection.insert_one({"name": name, "value": value})
+        await add_command(self, name, value)
 
         embed = discord.Embed(title="Custom Command Added", color=discord.Color.green())
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
         embed.add_field(name="Added by", value=ctx.message.author, inline=True)
         embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
         embed.add_field(name="Command Name", value=name, inline=False)
-        embed.add_field(name="Command Response", value=' '.join(args), inline=False)
+        embed.add_field(name="Command Response", value=value, inline=False)
         channel = ctx.bot.get_channel(int(channel_ids['staff_logs']))
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")

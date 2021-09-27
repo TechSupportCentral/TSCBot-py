@@ -142,7 +142,7 @@ class moderation(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def warn(self, ctx, user=None, *args):
+    async def warn(self, ctx, user=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -181,8 +181,8 @@ class moderation(commands.Cog):
             await ctx.send("You cannot warn bots.")
             return
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         channel = self.bot.get_channel(int(channel_ids['staff_logs']))
         message = await channel.send(".")
@@ -191,13 +191,13 @@ class moderation(commands.Cog):
         embed.add_field(name="User warned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
-        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
         await message.edit(content="", embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "warn", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+        collection.insert_one({"_id": str(message.id), "type": "warn", "user": str(id), "moderator": str(ctx.message.author.id), "reason": reason})
 
-        dmbed = discord.Embed(title="You have been warned.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        dmbed = discord.Embed(title="You have been warned.", description=f"**Reason:** {reason}", color=discord.Color.red())
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:
@@ -210,7 +210,7 @@ class moderation(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command()
-    async def unwarn(self, ctx, id=None, *args):
+    async def unwarn(self, ctx, id=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -232,14 +232,14 @@ class moderation(commands.Cog):
             if warn.get('_id') == id:
                 found = True
                 user = warn.get('user')
-                reason = warn.get('reason')
+                og_reason = warn.get('reason')
         if found == False:
             await ctx.send("The warn was not found.")
             return
         collection.delete_one({"_id": id})
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         member = guild.get_member(int(user))
         embed = discord.Embed(title="Warning Removed", color=discord.Color.green())
@@ -247,13 +247,13 @@ class moderation(commands.Cog):
         embed.add_field(name="User unwarned", value=member, inline=True)
         embed.add_field(name="User ID", value=user, inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
-        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_logs']))
         await channel.send(embed=embed)
 
         dmbed = discord.Embed(title="Your warning has been removed.", color=discord.Color.green())
-        dmbed.add_field(name="Original reason for warn", value=reason, inline=False)
-        dmbed.add_field(name="Reason for removal", value=' '.join(args), inline=False)
+        dmbed.add_field(name="Original reason for warn", value=og_reason, inline=False)
+        dmbed.add_field(name="Reason for removal", value=reason, inline=False)
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:
@@ -266,7 +266,7 @@ class moderation(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command()
-    async def kick(self, ctx, user=None, *args):
+    async def kick(self, ctx, user=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         owner_role = guild.get_role(int(role_ids['owner']))
@@ -305,22 +305,22 @@ class moderation(commands.Cog):
             await ctx.send("You do not have permission to kick bots.")
             return
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         embed = discord.Embed(title="Kick", color=discord.Color.red())
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name="User kicked", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
-        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_logs']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "kick", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+        collection.insert_one({"_id": str(message.id), "type": "kick", "user": str(id), "moderator": str(ctx.message.author.id), "reason": reason})
 
-        dmbed = discord.Embed(title="You have been kicked.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        dmbed = discord.Embed(title="You have been kicked.", description=f"**Reason:** {reason}", color=discord.Color.red())
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:
@@ -335,10 +335,10 @@ class moderation(commands.Cog):
             await ctx.message.add_reaction("✅")
         else:
             await ctx.send("The member was kicked successfully, but a DM was unable to be sent.")
-        await guild.kick(member, reason=' '.join(args))
+        await guild.kick(member, reason=reason)
 
     @commands.command()
-    async def ban(self, ctx, user=None, *args):
+    async def ban(self, ctx, user=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         owner_role = guild.get_role(int(role_ids['owner']))
@@ -382,22 +382,22 @@ class moderation(commands.Cog):
                 await ctx.send("You do not have permission to ban bots.")
                 return
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         embed = discord.Embed(title="Ban", color=discord.Color.red())
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name="User banned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
-        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_logs']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "ban", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+        collection.insert_one({"_id": str(message.id), "type": "ban", "user": str(id), "moderator": str(ctx.message.author.id), "reason": reason})
 
-        dmbed = discord.Embed(title="You have been banned.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        dmbed = discord.Embed(title="You have been banned.", description=f"**Reason:** {reason}", color=discord.Color.red())
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:
@@ -413,10 +413,10 @@ class moderation(commands.Cog):
         else:
             await ctx.send("The member was banned successfully, but a DM was unable to be sent.")
 
-        await guild.ban(discord.Object(id=id), reason=' '.join(args))
+        await guild.ban(discord.Object(id=id), reason=reason)
 
     @commands.command()
-    async def unban(self, ctx, user=None, *args):
+    async def unban(self, ctx, user=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         if mod_role not in ctx.message.author.roles:
@@ -447,26 +447,26 @@ class moderation(commands.Cog):
             await ctx.send("Not a valid discord user.")
             return
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         embed = discord.Embed(title="Ban Removed", color=discord.Color.green())
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name="User unbanned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
-        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_logs']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "unban", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+        collection.insert_one({"_id": str(message.id), "type": "unban", "user": str(id), "moderator": str(ctx.message.author.id), "reason": reason})
 
-        await guild.unban(discord.Object(id=id), reason=' '.join(args))
+        await guild.unban(discord.Object(id=id), reason=reason)
         await ctx.message.add_reaction("✅")
 
     @commands.command()
-    async def mute(self, ctx, user=None, time=None, *args):
+    async def mute(self, ctx, user=None, time=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -524,8 +524,8 @@ class moderation(commands.Cog):
                 fancytime = fancytime + ", "
             fancytime = fancytime + f"{timeobject.second} seconds"
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         muted_role = guild.get_role(int(role_ids['muted']))
         if muted_role in member.roles:
@@ -538,14 +538,14 @@ class moderation(commands.Cog):
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
         embed.add_field(name="Time muted", value=fancytime, inline=False)
-        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_logs']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(id), "moderator": str(ctx.message.author.id), "time": time, "reason": ' '.join(args)})
+        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(id), "moderator": str(ctx.message.author.id), "time": time, "reason": reason})
 
-        dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.red())
+        dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description=f"**Reason:** {reason}", color=discord.Color.red())
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:
@@ -584,7 +584,7 @@ class moderation(commands.Cog):
         await member.remove_roles(muted_role)
 
     @commands.command()
-    async def unmute(self, ctx, user=None, *args):
+    async def unmute(self, ctx, user=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -616,8 +616,8 @@ class moderation(commands.Cog):
             return
         member = guild.get_member(id)
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         muted_role = guild.get_role(int(role_ids['muted']))
         if not muted_role in member.roles:
@@ -629,14 +629,14 @@ class moderation(commands.Cog):
         embed.add_field(name="User unmuted", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
-        embed.add_field(name="Reason", value=' '.join(args), inline=False)
+        embed.add_field(name="Reason", value=reason, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_logs']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "unmute", "user": str(id), "moderator": str(ctx.message.author.id), "reason": ' '.join(args)})
+        collection.insert_one({"_id": str(message.id), "type": "unmute", "user": str(id), "moderator": str(ctx.message.author.id), "reason": reason})
 
-        dmbed = discord.Embed(title="You have been unmuted.", description=f"**Reason:** {' '.join(args)}", color=discord.Color.green())
+        dmbed = discord.Embed(title="You have been unmuted.", description=f"**Reason:** {reason}", color=discord.Color.green())
         if member.dm_channel is None:
             dm = await member.create_dm()
         else:

@@ -16,30 +16,30 @@ class administration(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def sendmessage(self, ctx, *args):
-        if not args:
+    async def sendmessage(self, ctx, *, message):
+        if not message:
             await ctx.send("Please specify a message to send.")
             return
         await ctx.message.delete()
-        await ctx.send(' '.join(args))
+        await ctx.send(message)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def announce(self, ctx, *args):
-        if not args:
+    async def announce(self, ctx, *, message):
+        if not message:
             await ctx.send("Please specify the announcement message.")
             return
         await ctx.message.delete()
-        embed=discord.Embed(title="Announcement", description=' '.join(args), color=0x00a0a0)
+        embed=discord.Embed(title="Announcement", description=message, color=0x00a0a0)
         await ctx.send(embed=embed)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def dm(self, ctx, user=None, *args):
+    async def dm(self, ctx, user=None, *, message):
         if not user:
             await ctx.send("Please specify a user to DM.")
             return
-        elif not args:
+        elif not message:
             await ctx.send("Please specify a DM to send.")
             return
 
@@ -65,7 +65,7 @@ class administration(commands.Cog):
             dm = await member.create_dm()
         else:
             dm = member.dm_channel
-        dmbed = discord.Embed(title="Message from the owners of TSC", description=' '.join(args), color=0x00a0a0)
+        dmbed = discord.Embed(title="Message from the owners of TSC", description=message, color=0x00a0a0)
         try:
             await dm.send(embed=dmbed)
         except:
@@ -78,13 +78,13 @@ class administration(commands.Cog):
         embed.add_field(name="Sent to", value=member, inline=True)
         embed.add_field(name="User ID", value=member.id, inline=True)
         embed.add_field(name="Sent by", value=ctx.message.author, inline=False)
-        embed.add_field(name="Message:", value=' '.join(args), inline=False)
+        embed.add_field(name="Message:", value=message, inline=False)
         channel = self.bot.get_channel(int(channel_ids['bot_dm']))
         await channel.send(embed=embed)
 
     @commands.command(name="accept-suggestion")
     @commands.has_permissions(administrator=True)
-    async def accept_suggestion(self, ctx, id=None, *args):
+    async def accept_suggestion(self, ctx, id=None, *, reason):
         if not id:
             await ctx.send("Feed me some arguments please")
             return
@@ -98,17 +98,17 @@ class administration(commands.Cog):
             await ctx.send("Not a valid message ID.")
             return
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         message = await channel.fetch_message(id)
         embed = discord.Embed(description=message.embeds[0].description, color=discord.Color.green())
         embed.set_author(name=message.embeds[0].author.name, icon_url=message.embeds[0].author.icon_url)
-        embed.add_field(name="Status: Accepted", value=' '.join(args))
+        embed.add_field(name="Status: Accepted", value=reason)
         await message.edit(embed=embed)
 
         dmbed = discord.Embed(title="Your suggestion was accepted by the owners.", description=message.embeds[0].description, color=discord.Color.green())
-        dmbed.add_field(name="Reason:", value=' '.join(args))
+        dmbed.add_field(name="Reason:", value=reason)
 
         member = ctx.message.guild.get_member_named(message.embeds[0].author.name)
         if member.dm_channel is None:
@@ -125,7 +125,7 @@ class administration(commands.Cog):
 
     @commands.command(name="decline-suggestion")
     @commands.has_permissions(administrator=True)
-    async def decline_suggestion(self, ctx, id=None, *args):
+    async def decline_suggestion(self, ctx, id=None, *, reason):
         if not id:
             await ctx.send("Feed me some arguments please")
             return
@@ -139,17 +139,17 @@ class administration(commands.Cog):
             await ctx.send("Not a valid message ID.")
             return
 
-        if not args:
-            args = ['No', 'reason', 'provided.']
+        if not reason:
+            reason = "No reason provided."
 
         message = await channel.fetch_message(id)
         embed = discord.Embed(description=message.embeds[0].description, color=discord.Color.red())
         embed.set_author(name=message.embeds[0].author.name, icon_url=message.embeds[0].author.icon_url)
-        embed.add_field(name="Status: Declined", value=' '.join(args))
+        embed.add_field(name="Status: Declined", value=reason)
         await message.edit(embed=embed)
 
         dmbed = discord.Embed(title="Your suggestion was declined by the owners.", description=message.embeds[0].description, color=discord.Color.red())
-        dmbed.add_field(name="Reason:", value=' '.join(args))
+        dmbed.add_field(name="Reason:", value=reason)
 
         member = ctx.message.guild.get_member_named(message.embeds[0].author.name)
         if member.dm_channel is None:
@@ -210,14 +210,14 @@ class administration(commands.Cog):
         await ctx.send(embed=embed)
 
 #    @commands.command(name="add-reaction-role")
-#    async def add_reaction_role(self, ctx, role=None, reaction=None, *args):
+#    async def add_reaction_role(self, ctx, role=None, reaction=None, *, message):
 #        if not role:
 #            await ctx.send("Please provide the ID of the role to add.")
 #            return
 #        if not reaction:
 #            await ctx.send("Please provide the emoji to use as a reaction.")
 #            return
-#        if not args:
+#        if not message:
 #            await ctx.send("Please provide the contents of the reaction role message.")
 #            return
 #
@@ -230,7 +230,7 @@ class administration(commands.Cog):
 #            return
 #
 #        channel = self.bot.get_channel(int(channel_ids['reaction_roles']))
-#        message = await channel.send(' '.join(args))
+#        message = await channel.send(message)
 #        await message.add_reaction(reaction)
 #
 #        collection = mongodb['reaction-roles']

@@ -14,9 +14,9 @@ class misc(commands.Cog):
     role_ids = config['role_ids']
 
     @commands.command()
-    async def alert(self, ctx, *args):
-        if args:
-            alert = ' '.join(args)
+    async def alert(self, ctx, *, description):
+        if description:
+            alert = description
         else:
             alert = "A description was not provided."
         embed = discord.Embed(title="Moderator Alert", description=f"[Jump to message]({ctx.message.jump_url})\n{alert}", color=discord.Color.red())
@@ -27,11 +27,11 @@ class misc(commands.Cog):
         await ctx.send("The moderators have been alerted.")
 
     @commands.command()
-    async def suggest(self, ctx, *args):
-        if not args:
+    async def suggest(self, ctx, *, suggestion):
+        if not suggestion:
             await ctx.send("Please provide a suggestion.")
             return
-        embed = discord.Embed(description=f"**Suggestion:** {' '.join(args)}", color=discord.Color.lighter_grey())
+        embed = discord.Embed(description=f"**Suggestion:** {suggestion}", color=discord.Color.lighter_grey())
         embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         embed.add_field(name="Status", value="Pending")
         channel = self.bot.get_channel(int(channel_ids['suggestions_list']))
