@@ -53,11 +53,12 @@ class listeners(commands.Cog):
         public_channels = []
         for channel in public_channel_names:
             public_channels.append(int(channel_ids[channel]))
+        staff_roles = [message.guild.get_role(int(role_ids['owner'])), message.guild.get_role(int(role_ids['moderator'])), message.guild.get_role(int(role_ids['trial_mod'])), message.guild.get_role(int(role_ids['support-team']))]
         help_triggers = ["issue", "able to help", "get some help", "need help"]
 
         swore = ""
         for swear in swears:
-            if swear in message.content.lower() and message.channel.id in public_channels and not message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
+            if swear in message.content.lower() and not any(role in message.author.roles for role in staff_roles):
                 swore = swear
 
         if isinstance(message.channel, discord.channel.DMChannel):
