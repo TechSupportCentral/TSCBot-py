@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
+from pypartpicker import Scraper, get_list_links
 from main import get_database
 mongodb = get_database()
 
@@ -144,6 +145,19 @@ class listeners(commands.Cog):
                 await message.channel.send(embed=embed)
             else:
                 await message.channel.send("The bump timer is already set.")
+
+        elif len(get_list_links(message.content)) >= 1:
+            pcpp = Scraper()
+            link = get_list_links(message.content)[0]
+            list = pcpp.fetch_list(link)
+
+            description = ""
+            for part in list.parts:
+                description = description + f"**{part.type}:** {part.name} **({part.price})**\n"
+            description = description + f"\n**Estimated Wattage:** {list.wattage}\n**Price:** {list.total}"
+
+            embed = discord.Embed(title="PCPartPicker List", url=link, description=description, color=0x00a0a0)
+            await message.channel.send(embed=embed)
 
         elif "reload swears" in message.content:
             await message.delete()
