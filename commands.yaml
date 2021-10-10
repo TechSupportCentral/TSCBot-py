@@ -43,6 +43,7 @@ moderation:
     kick: "Kicks a user from the server"
     ban: "Bans a user from the server"
     unban: "Unbans a user from the server"
+    reason: "Updates the reason for a warning"
 
 administration_desc: "Commands run by admins"
 administration:

@@ -266,6 +266,71 @@ class moderation(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command()
+    async def reason(self, ctx, id=None, *, reason):
+        guild = ctx.message.guild
+        mod_role = guild.get_role(int(role_ids['moderator']))
+        trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
+        if mod_role not in ctx.message.author.roles and trial_mod_role not in ctx.message.author.roles:
+            await ctx.send("You do not have permission to run this command.")
+            return
+
+        if not id:
+            await ctx.send("Please mention the message ID of a warning to update the reason of.")
+            return
+
+        elif not id.isdigit():
+            await ctx.send("Warnings have to be in the form of a Message ID.")
+            return
+
+        collection = mongodb['moderation']
+        found = False
+        for warn in collection.find():
+            if warn.get('_id') == id:
+                found = True
+                user = warn.get('user')
+                moderator = warn.get('moderator')
+                og_reason = warn.get('reason')
+        if found == False:
+            await ctx.send("The warning was not found.")
+            return
+        if ctx.message.author.id != int(moderator) and guild.get_role(int(role_ids['owner'])) not in ctx.message.author.roles:
+            await ctx.send("This is not your warning to change.")
+            return
+
+        if not reason:
+            reason = "No reason provided."
+
+        collection.update_one({"_id": id}, {"$set": {"reason": reason}})
+
+        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        message = await channel.fetch_message(int(id))
+        og_embed = message.embeds[0]
+        embed = discord.Embed(title=og_embed.title, description=og_embed.description, color=og_embed.color)
+        embed.set_thumbnail(url=og_embed.thumbnail.url)
+        for field in og_embed.fields:
+            if field.name == "Reason":
+                embed.add_field(name="Reason", value=reason, inline=field.inline)
+            else:
+                embed.add_field(name=field.name, value=field.value, inline=field.inline)
+        embed.set_footer(text=og_embed.footer.text)
+        await message.edit(embed=embed)
+
+        member = guild.get_member(int(user))
+        dmbed = discord.Embed(title="Your warning has been updated.", color=0x00a0a0)
+        dmbed.add_field(name="Original reason", value=og_reason, inline=False)
+        dmbed.add_field(name="New reason", value=reason, inline=False)
+        if member.dm_channel is None:
+            dm = await member.create_dm()
+        else:
+            dm = member.dm_channel
+        try:
+            await dm.send(embed=dmbed)
+        except:
+            await ctx.send("The reason was updated successfully, but a DM was unable to be sent to the warned user.")
+            return
+        await ctx.message.add_reaction("✅")
+
+    @commands.command()
     async def kick(self, ctx, user=None, *, reason):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
