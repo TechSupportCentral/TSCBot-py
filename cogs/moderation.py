@@ -473,12 +473,11 @@ class moderation(commands.Cog):
         except:
             dm_failed = True
 
+        await guild.ban(discord.Object(id=id), delete_message_days=0, reason=reason)
         if dm_failed == False:
             await ctx.message.add_reaction("✅")
         else:
             await ctx.send("The member was banned successfully, but a DM was unable to be sent.")
-
-        await guild.ban(discord.Object(id=id), reason=reason)
 
     @commands.command()
     async def unban(self, ctx, user=None, *, reason):
