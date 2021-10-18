@@ -228,7 +228,20 @@ class listeners(commands.Cog):
 
         if len(before.roles) < len(after.roles):
             delta = [role for role in after.roles if role not in before.roles]
-            embed = discord.Embed(title="Role Added", description=delta[0].mention, color=discord.Color.green())
+            role = delta[0]
+            guild = role.guild
+
+            if role.id == int(role_ids['support_team']):
+                aembed = discord.Embed(title="New Support Team Member", description=f"Welcome {before.mention} to the Support Team!", color=role.color)
+                aembed.set_thumbnail(url=before.avatar_url)
+                achannel = self.bot.get_channel(int(channel_ids['new-staff']))
+                await achannel.send(embed=aembed)
+            if role.id == int(role_ids['trial_mod']) or role.id == int(role_ids['moderator']):
+                aembed = discord.Embed(title=f"New {role.name}", description=f"Welcome {before.mention} to the Moderation Team!", color=role.color)
+                aembed.set_thumbnail(url=before.avatar_url)
+                achannel = self.bot.get_channel(int(channel_ids['new-staff']))
+                await achannel.send(embed=aembed)
+            embed = discord.Embed(title="Role Added", description=role.mention, color=discord.Color.green())
             embed.set_author(name=before, icon_url=before.avatar_url)
             channel = self.bot.get_channel(int(channel_ids['role_changed']))
             await channel.send(embed=embed)
