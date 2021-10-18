@@ -1,4 +1,5 @@
 token: "insert token here"
+pcpp_cookie: "insert PCPartPicker cookie here"
 mongo_uri: "insert MongoDB URI here"
 mongo_db: "TSCBot"
 prefix: "!"

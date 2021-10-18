@@ -27,6 +27,8 @@ class listeners(commands.Cog):
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
     global prefix
     prefix = config['prefix']
+    global pcpp_cookie
+    pcpp_cookie = config['pcpp_cookie']
     global channel_ids
     channel_ids = config['channel_ids']
     global support_channel_names
@@ -147,7 +149,7 @@ class listeners(commands.Cog):
                 await message.channel.send("The bump timer is already set.")
 
         elif len(get_list_links(message.content)) >= 1:
-            pcpp = Scraper()
+            pcpp = Scraper(headers={"cookie": pcpp_cookie})
             link = get_list_links(message.content)[0]
             list = pcpp.fetch_list(link)
 
