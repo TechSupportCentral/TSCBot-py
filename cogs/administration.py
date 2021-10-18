@@ -239,5 +239,40 @@ class administration(commands.Cog):
 #        await ctx.message.add_reaction("✅")
 #        await ctx.send("reload reaction roles")
 
+    @commands.command()
+    async def softban(self, ctx, user=None):
+        guild = ctx.message.guild
+        if not user:
+            await ctx.send("Please mention a user to softban.")
+            return
+
+        elif "<@" in user:
+            id = user
+            id = id.replace("<", "")
+            id = id.replace(">", "")
+            id = id.replace("@", "")
+            id = id.replace("!", "")
+            id = int(id)
+
+        elif user.isdigit():
+            id = int(user)
+
+        else:
+            await ctx.send("Users have to be in the form of an ID or a mention.")
+            return
+
+        if guild.get_member(id) is None:
+            member = await self.bot.fetch_user(id)
+        else:
+            member = guild.get_member(id)
+
+        if not member:
+            await ctx.send("Not a valid discord user.")
+            return
+
+        await guild.ban(discord.Object(id=id), delete_message_days=7, reason="softban")
+        await ctx.message.add_reaction("✅")
+        await guild.unban(discord.Object(id=id), reason="softban")
+
 def setup(bot):
     bot.add_cog(administration(bot))

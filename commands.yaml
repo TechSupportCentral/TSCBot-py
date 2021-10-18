@@ -57,4 +57,5 @@ administration:
     add-swear: "Adds a swear to the swearlist"
     remove-swear: "Removes a swear from the swearlist"
     swearlist: "List of current swears"
+    softban: "Bans a user to delete all their messages, then unbans them"
 #    add-reaction-role: "Creates a reaction role message"
