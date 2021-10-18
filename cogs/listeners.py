@@ -233,11 +233,13 @@ class listeners(commands.Cog):
 
             if role.id == int(role_ids['support_team']):
                 aembed = discord.Embed(title="New Support Team Member", description=f"Welcome {before.mention} to the Support Team!", color=role.color)
+                aembed.set_author(name=before)
                 aembed.set_thumbnail(url=before.avatar_url)
                 achannel = self.bot.get_channel(int(channel_ids['new-staff']))
                 await achannel.send(embed=aembed)
             if role.id == int(role_ids['trial_mod']) or role.id == int(role_ids['moderator']):
                 aembed = discord.Embed(title=f"New {role.name}", description=f"Welcome {before.mention} to the Moderation Team!", color=role.color)
+                aembed.set_author(name=before)
                 aembed.set_thumbnail(url=before.avatar_url)
                 achannel = self.bot.get_channel(int(channel_ids['new-staff']))
                 await achannel.send(embed=aembed)
