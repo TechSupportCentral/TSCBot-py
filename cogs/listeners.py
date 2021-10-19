@@ -56,7 +56,7 @@ class listeners(commands.Cog):
         public_channels = []
         for channel in public_channel_names:
             public_channels.append(int(channel_ids[channel]))
-        staff_roles = [self.bot.guilds[0].get_role(int(role_ids['owner'])), self.bot.guilds[0].get_role(int(role_ids['moderator'])), self.bot.guilds[0].get_role(int(role_ids['trial_mod'])), self.bot.guilds[0].get_role(int(role_ids['support_team']))]
+        staff_roles = [self.bot.guilds[0].get_role(int(role_ids['owner'])), self.bot.guilds[0].get_role(int(role_ids['moderator'])), self.bot.guilds[0].get_role(int(role_ids['trial_mod'])), self.bot.guilds[0].get_role(int(role_ids['support_team'])), self.bot.guilds[0].get_role(int(role_ids['partner']))]
         help_triggers = ["issue", "able to help", "get some help", "need help"]
 
         swore = ""
