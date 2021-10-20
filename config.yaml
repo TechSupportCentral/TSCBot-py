@@ -17,9 +17,9 @@ role_ids:
 channel_ids:
     welcome: 824060103119470622
     general_support: 824059680905101333
-    gaming_support: 824059755935957023
     software_support: 824059831513907200
     hardware_support: 824059920826499093
+    mobile_support: 824059755935957023
     vc_chat: 824061207924965416
     general: 824042976371277888
     games: 824059985998381138
@@ -51,9 +51,9 @@ channel_ids:
 
 support_channels:
   - "general_support"
-  - "gaming_support"
   - "software_support"
   - "hardware_support"
+  - "mobile_support"
   - "vc_chat"
 
 public_channels:
