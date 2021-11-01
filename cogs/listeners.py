@@ -61,7 +61,7 @@ class listeners(commands.Cog):
 
         swore = ""
         for swear in swears:
-            if swear in message.content.lower() and not any(role in message.author.roles for role in staff_roles):
+            if swear in message.content.lower() and not any(role in message.author.roles for role in staff_roles) and not message.channel.name.startswith("ticket"):
                 swore = swear
 
         if isinstance(message.channel, discord.channel.DMChannel):
