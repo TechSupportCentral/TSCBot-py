@@ -26,8 +26,7 @@ channel_ids:
     setups: 824737989850169355
     memes: 824738477291601980
     music: 824067063941300224
-    funbots: 832535838289297408
-    bump: 824185956549787659
+    bot_commands: 832535838289297408
     suggestions: 824926277868978186
     suggestions_list: 824677631181062196
     ticket_create: 824684376398233670
@@ -58,15 +57,15 @@ support_channels:
 
 public_channels:
   - "general_support"
-  - "gaming_support"
   - "software_support"
   - "hardware_support"
+  - "mobile_support"
   - "vc_chat"
   - "general"
   - "games"
   - "setups"
   - "memes"
   - "music"
-  - "funbots"
-  - "bump"
+  - "bot_commands"
   - "suggestions"
+  - "ticket_create"
