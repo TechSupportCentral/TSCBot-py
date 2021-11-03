@@ -44,6 +44,8 @@ class misc(commands.Cog):
 
     @commands.Cog.listener(name="on_message")
     async def matrix_moderation(self, message):
+        if message.author.discriminator != "0000" or message.channel.id != int(channel_ids['modtalk']):
+            return
 
         async def userinfo(self, message):
             guild = message.guild
