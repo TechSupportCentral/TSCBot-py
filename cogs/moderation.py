@@ -635,7 +635,7 @@ class moderation(commands.Cog):
         try:
             await dm.send(embed=dmbed2)
         except:
-            dm_failed = True
+            dm2_failed = True
 
         embed2 = discord.Embed(title="Mute Removed", color=discord.Color.green())
         embed2.set_thumbnail(url=member.avatar_url)
