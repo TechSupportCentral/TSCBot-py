@@ -372,6 +372,7 @@ class misc(commands.Cog):
             collection.insert_one({"_id": str(warn_message.id), "type": "ban", "user": str(id), "moderator": f"{message.author} (matrix)", "reason": reason})
 
             dmbed = discord.Embed(title="You have been banned.", description=f"**Reason:** {reason}", color=discord.Color.red())
+            dmbed.set_footer(text="You can appeal your ban at https://www.techsupportcentral.cf/appeal.php")
             if member.dm_channel is None:
                 dm = await member.create_dm()
             else:
