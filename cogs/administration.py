@@ -25,13 +25,23 @@ class administration(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def announce(self, ctx, *, message):
+    async def announce(self, ctx, pingtype=None, *, message):
         if not message:
             await ctx.send("Please specify the announcement message.")
             return
+        if pingtype == "everyone":
+            content = "@everyone"
+        elif pingtype == "here":
+            content = "@here"
+        elif pingtype == "none":
+            content = ""
+        else:
+            await ctx.send("Please specify whether or not you'd like your message to include a ping.\nPossible Values: `everyone`, `here`, `none`\nExample Usage: `!announce everyone hello there`")
+            return
+
         await ctx.message.delete()
         embed=discord.Embed(title="Announcement", description=message, color=0x00a0a0)
-        await ctx.send(embed=embed)
+        await ctx.send(content=content, embed=embed)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
