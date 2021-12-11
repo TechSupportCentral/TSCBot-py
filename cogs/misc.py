@@ -176,7 +176,7 @@ class misc(commands.Cog):
 
             channel = self.bot.get_channel(int(channel_ids['staff_logs']))
             warn_message = await channel.send(".")
-            embed = discord.Embed(title="Warning", description=f"Use `!unwarn {warn_message.id} <reason>` to remove this warning.", color=discord.Color.red())
+            embed = discord.Embed(title="Warning", description=f"Use `!unwarn {warn_message.id} <reason>` to remove this warning. Note: This is not the user's ID, rather the ID of this message.", color=discord.Color.red())
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User warned", value=member, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
