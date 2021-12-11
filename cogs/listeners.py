@@ -316,6 +316,9 @@ class listeners(commands.Cog):
     async def on_invite_create(self, invite):
         global invites
         invites = await invite.guild.invites()
+
+        if invite.inviter == None:
+            return
         embed = discord.Embed(title="Invite Created", color=discord.Color.green())
         embed.add_field(name="Invite Creator", value=invite.inviter, inline=False)
         embed.add_field(name="Invite Code", value=invite.code, inline=False)
