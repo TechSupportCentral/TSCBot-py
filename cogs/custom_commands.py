@@ -35,7 +35,7 @@ class custom_commands(commands.Cog):
 
     @commands.command(name="add-custom")
     @commands.has_permissions(administrator=True)
-    async def add_custom(self, ctx, name=None, *, value):
+    async def add_custom(self, ctx, name=None, *, value=None):
         async def add_command(self, name, value):
             self._custom_commands[name] = value
 

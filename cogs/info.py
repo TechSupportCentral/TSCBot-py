@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 import yaml
-import datetime, time
+from datetime import datetime
 from main import get_database
 mongodb = get_database()
 
@@ -12,12 +12,34 @@ class info(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         global starttime
-        starttime = time.time()
+        starttime = datetime.now()
 
     @commands.command()
     async def uptime(self, ctx):
-        uptime = str(datetime.timedelta(seconds=int(round(time.time()-starttime))))
-        await ctx.send(f'The bot has been online for {uptime}.')
+        intervals = (
+            ('days', 86400),
+            ('hours', 3600),
+            ('minutes', 60),
+            ('seconds', 1),
+        )
+
+        seconds = int(datetime.now().strftime("%s")) - int(starttime.strftime("%s"))
+        result = []
+        for name, count in intervals:
+            value = seconds // count
+            if value:
+                seconds -= value * count
+                if value == 1:
+                    name = name.rstrip('s')
+                result.append("{} {}".format(value, name))
+        if len(result) > 1:
+            result[-1] = "and " + result[-1]
+        if len(result) < 3:
+            uptime = ' '.join(result[:3])
+        else:
+            uptime = ', '.join(result[:3])
+
+        await ctx.send(f'I have been online for {uptime}.')
 
     @commands.command()
     async def ping(self, ctx):

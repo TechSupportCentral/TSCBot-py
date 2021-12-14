@@ -16,7 +16,7 @@ class administration(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def sendmessage(self, ctx, *, message):
+    async def sendmessage(self, ctx, *, message=None):
         if not message:
             await ctx.send("Please specify a message to send.")
             return
@@ -25,7 +25,7 @@ class administration(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def announce(self, ctx, pingtype=None, *, message):
+    async def announce(self, ctx, pingtype=None, *, message=None):
         if not message:
             await ctx.send("Please specify the announcement message.")
             return
@@ -45,7 +45,7 @@ class administration(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def dm(self, ctx, user=None, *, message):
+    async def dm(self, ctx, user=None, *, message=None):
         if not user:
             await ctx.send("Please specify a user to DM.")
             return
@@ -94,7 +94,7 @@ class administration(commands.Cog):
 
     @commands.command(name="accept-suggestion")
     @commands.has_permissions(administrator=True)
-    async def accept_suggestion(self, ctx, id=None, *, reason):
+    async def accept_suggestion(self, ctx, id=None, *, reason=None):
         if not id:
             await ctx.send("Feed me some arguments please")
             return
@@ -135,7 +135,7 @@ class administration(commands.Cog):
 
     @commands.command(name="decline-suggestion")
     @commands.has_permissions(administrator=True)
-    async def decline_suggestion(self, ctx, id=None, *, reason):
+    async def decline_suggestion(self, ctx, id=None, *, reason=None):
         if not id:
             await ctx.send("Feed me some arguments please")
             return
@@ -220,7 +220,7 @@ class administration(commands.Cog):
         await ctx.send(embed=embed)
 
 #    @commands.command(name="add-reaction-role")
-#    async def add_reaction_role(self, ctx, role=None, reaction=None, *, message):
+#    async def add_reaction_role(self, ctx, role=None, reaction=None, *, message=None):
 #        if not role:
 #            await ctx.send("Please provide the ID of the role to add.")
 #            return

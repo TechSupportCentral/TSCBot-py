@@ -7,6 +7,29 @@ import re
 from main import get_database
 mongodb = get_database()
 
+async def seconds_to_fancytime(seconds, granularity):
+    result = []
+    intervals = (
+        ('days', 86400),
+        ('hours', 3600),
+        ('minutes', 60),
+        ('seconds', 1),
+    )
+
+    for name, count in intervals:
+        value = seconds // count
+        if value:
+            seconds -= value * count
+            if value == 1:
+                name = name.rstrip('s')
+            result.append("{} {}".format(value, name))
+    if len(result) > 1:
+        result[-1] = "and " + result[-1]
+    if len(result) < 3:
+        return ' '.join(result[:granularity])
+    else:
+        return ', '.join(result[:granularity])
+
 class misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -19,7 +42,7 @@ class misc(commands.Cog):
     role_ids = config['role_ids']
 
     @commands.command()
-    async def alert(self, ctx, *, description):
+    async def alert(self, ctx, *, description=None):
         if description:
             alert = description
         else:
@@ -32,7 +55,7 @@ class misc(commands.Cog):
         await ctx.send("The moderators have been alerted.")
 
     @commands.command()
-    async def suggest(self, ctx, *, suggestion):
+    async def suggest(self, ctx, *, suggestion=None):
         if not suggestion:
             await ctx.send("Please provide a suggestion.")
             return
@@ -42,6 +65,32 @@ class misc(commands.Cog):
         channel = self.bot.get_channel(int(channel_ids['suggestions_list']))
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
+
+    @commands.command()
+    async def remindme(self, ctx, time=None, *, reminder=None):
+        if not time:
+            await ctx.send("Please specify the time you would like to be reminded in.")
+            return
+        if not reminder:
+            reminder = "No description provided."
+        gran = 0
+        for char in time:
+            gran += char.isalpha()
+        if gran > 4:
+            await ctx.send("The time you mentioned for me to remind you in is not in the correct format.\nIt should look something like `1d2h3m4s` (1 day, 2 hours, 3 minutes, and 4 seconds).")
+            return
+        cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', time).groups(), [0, 0, 0, 0])]
+        seconds = cooltime[0]*86400 + cooltime[1]*3600 + cooltime[2]*60 + cooltime[3]
+        fancytime = await seconds_to_fancytime(seconds, gran)
+
+        await ctx.send(f"I will remind you in {fancytime}.")
+        await sleep(seconds)
+        embed = discord.Embed(title=f"Reminder from {fancytime} ago:", description=f"{reminder}\n\n[link to original message]({ctx.message.jump_url})", color=0x00a0a0)
+        if ctx.message.author.dm_channel is None:
+            dm = await ctx.message.author.create_dm()
+        else:
+            dm = ctx.message.author.dm_channel
+        await dm.send(embed=embed)
 
     @commands.command()
     async def d(self, ctx):
@@ -180,12 +229,12 @@ class misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User warned", value=member, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
-            embed.add_field(name="Moderator", value=f"{message.author} (via matrix)", inline=False)
+            embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
             await warn_message.edit(content="", embed=embed)
 
             collection = mongodb['moderation']
-            collection.insert_one({"_id": str(warn_message.id), "type": "warn", "user": str(id), "moderator": f"{message.author} (matrix)", "reason": reason})
+            collection.insert_one({"_id": str(warn_message.id), "type": "warn", "user": str(id), "moderator": f"{message.author.name} (matrix)", "reason": reason})
 
             dmbed = discord.Embed(title="You have been warned.", description=f"**Reason:** {reason}", color=discord.Color.red())
             if member.dm_channel is None:
@@ -233,7 +282,7 @@ class misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User unwarned", value=member, inline=True)
             embed.add_field(name="User ID", value=user, inline=True)
-            embed.add_field(name="Moderator", value=f"{message.author} (via matrix)", inline=False)
+            embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
             channel = self.bot.get_channel(int(channel_ids['staff_logs']))
             await channel.send(embed=embed)
@@ -293,13 +342,13 @@ class misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User kicked", value=member, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
-            embed.add_field(name="Moderator", value=f"{message.author} (via matrix)", inline=False)
+            embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
             channel = self.bot.get_channel(int(channel_ids['staff_logs']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
-            collection.insert_one({"_id": str(warn_message.id), "type": "kick", "user": str(id), "moderator": f"{message.author} (matrix)", "reason": reason})
+            collection.insert_one({"_id": str(warn_message.id), "type": "kick", "user": str(id), "moderator": f"{message.author.name} (matrix)", "reason": reason})
 
             dmbed = discord.Embed(title="You have been kicked.", description=f"**Reason:** {reason}", color=discord.Color.red())
             if member.dm_channel is None:
@@ -363,13 +412,13 @@ class misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User banned", value=member, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
-            embed.add_field(name="Moderator", value=f"{message.author} (via matrix)", inline=False)
+            embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
             channel = self.bot.get_channel(int(channel_ids['staff_logs']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
-            collection.insert_one({"_id": str(warn_message.id), "type": "ban", "user": str(id), "moderator": f"{message.author} (matrix)", "reason": reason})
+            collection.insert_one({"_id": str(warn_message.id), "type": "ban", "user": str(id), "moderator": f"{message.author.name} (matrix)", "reason": reason})
 
             dmbed = discord.Embed(title="You have been banned.", description=f"**Reason:** {reason}", color=discord.Color.red())
             dmbed.set_footer(text="You can appeal your ban at https://www.techsupportcentral.cf/appeal.php")
@@ -426,13 +475,13 @@ class misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User unbanned", value=member, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
-            embed.add_field(name="Moderator", value=f"{message.author} (via matrix)", inline=False)
+            embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
             channel = self.bot.get_channel(int(channel_ids['staff_logs']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
-            collection.insert_one({"_id": str(warn_message.id), "type": "unban", "user": str(id), "moderator": f"{message.author} (matrix)", "reason": reason})
+            collection.insert_one({"_id": str(warn_message.id), "type": "unban", "user": str(id), "moderator": f"{message.author.name} (matrix)", "reason": reason})
 
             await guild.unban(discord.Object(id=id), reason=reason)
             await message.add_reaction("✅")
@@ -448,7 +497,7 @@ class misc(commands.Cog):
             if len(args) >= 3:
                 time = args[2]
             else:
-                time = "12:00:00"
+                time = "12h"
             if len(args) >= 4:
                 reason = args[3:].join(" ")
             else:
@@ -478,22 +527,15 @@ class misc(commands.Cog):
                 await message.channel.send("You cannot mute bots.")
                 return
 
-            elif not re.match(r"\d\d:\d\d:\d\d", time):
-                await message.channel.send("Please mention the time to mute in the form of `hh:mm:ss`.")
+            gran = 0
+            for char in time:
+                gran += char.isalpha()
+            if gran > 4:
+                await message.channel.send("Please mention the time to mute in a format like `1d2h3m4s` (1 day, 2 hours, 3 minutes, 4 seconds).")
                 return
-            timeobject = datetime.strptime(time, '%H:%M:%S')
-            seconds = timeobject.second + timeobject.minute*60 + timeobject.hour*3600
-            fancytime = ""
-            if timeobject.hour != 0:
-                fancytime = f"{timeobject.hour} hours"
-            if timeobject.minute != 0:
-                if fancytime != "":
-                        fancytime = fancytime + ", "
-                fancytime = fancytime + f"{timeobject.minute} minutes"
-            if timeobject.second != 0:
-                if fancytime != "":
-                        fancytime = fancytime + ", "
-                fancytime = fancytime + f"{timeobject.second} seconds"
+            cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', time).groups(), [0, 0, 0, 0])]
+            seconds = cooltime[0]*86400 + cooltime[1]*3600 + cooltime[2]*60 + cooltime[3]
+            fancytime = await seconds_to_fancytime(seconds, gran)
 
             muted_role = guild.get_role(int(role_ids['muted']))
             if muted_role in member.roles:
@@ -504,14 +546,14 @@ class misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User muted", value=member, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
-            embed.add_field(name="Moderator", value=f"{message.author} (via matrix)", inline=False)
+            embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Time muted", value=fancytime, inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
             channel = self.bot.get_channel(int(channel_ids['staff_logs']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
-            collection.insert_one({"_id": str(warn_message.id), "type": "mute", "user": str(id), "moderator": f"{message.author} (matrix)", "time": time, "reason": reason})
+            collection.insert_one({"_id": str(warn_message.id), "type": "mute", "user": str(id), "moderator": f"{message.author.name} (matrix)", "time": str(seconds), "reason": reason})
 
             dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description=f"**Reason:** {reason}", color=discord.Color.red())
             if member.dm_channel is None:
@@ -528,6 +570,7 @@ class misc(commands.Cog):
                 await message.channel.send(f"{member} was muted for {fancytime}. A DM was unable to be sent.")
             else:
                 await message.channel.send(f"{member} was muted for {fancytime}.")
+                await message.add_reaction("✅")
 
             await member.add_roles(muted_role)
             await sleep(seconds)
@@ -593,13 +636,13 @@ class misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar_url)
             embed.add_field(name="User unmuted", value=member, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
-            embed.add_field(name="Moderator", value=f"{message.author} (via matrix)", inline=False)
+            embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
             channel = self.bot.get_channel(int(channel_ids['staff_logs']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
-            collection.insert_one({"_id": str(warn_message.id), "type": "unmute", "user": str(id), "moderator": f"{message.author} (matrix)", "reason": reason})
+            collection.insert_one({"_id": str(warn_message.id), "type": "unmute", "user": str(id), "moderator": f"{message.author.name} (matrix)", "reason": reason})
 
             dmbed = discord.Embed(title="You have been unmuted.", description=f"**Reason:** {reason}", color=discord.Color.green())
             if member.dm_channel is None:

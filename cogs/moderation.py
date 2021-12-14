@@ -7,6 +7,29 @@ import re
 from main import get_database
 mongodb = get_database()
 
+async def seconds_to_fancytime(seconds, granularity):
+    result = []
+    intervals = (
+        ('days', 86400),
+        ('hours', 3600),
+        ('minutes', 60),
+        ('seconds', 1),
+    )
+
+    for name, count in intervals:
+        value = seconds // count
+        if value:
+            seconds -= value * count
+            if value == 1:
+                name = name.rstrip('s')
+            result.append("{} {}".format(value, name))
+    if len(result) > 1:
+        result[-1] = "and " + result[-1]
+    if len(result) < 3:
+        return ' '.join(result[:granularity])
+    else:
+        return ', '.join(result[:granularity])
+
 class moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -84,8 +107,24 @@ class moderation(commands.Cog):
         embed.add_field(name="User ID", value=id, inline=False)
         if member.name != member.display_name:
             embed.add_field(name="Nickname", value=member.display_name, inline=False)
-        embed.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=True)
-        embed.add_field(name="Joined Server:", value=member.joined_at.strftime("%-d %B %Y at %-H:%M"), inline=True)
+
+        created = member.created_at.strftime("%s")
+        joined = member.joined_at.strftime("%s")
+        created_delta = int(datetime.now().strftime("%s")) - int(created)
+        joined_delta = int(datetime.now().strftime("%s")) - int(joined)
+        if created_delta < 604800:
+            created_fancy = await seconds_to_fancytime(created_delta, 2)
+        else:
+            created_fancy = await seconds_to_fancytime(created_delta, 1)
+        if joined_delta < 604800:
+            joined_fancy = await seconds_to_fancytime(joined_delta, 2)
+        else:
+            joined_fancy = await seconds_to_fancytime(joined_delta, 1)
+        embed.add_field(name="Account Created:", value=f"<t:{created}> ({created_fancy} ago)", inline=True)
+        embed.add_field(name="Joined Server:", value=f"<t:{joined}> ({joined_fancy} ago)", inline=True)
+        if int(joined) - int(created) < 604800:
+            embed.add_field(name="Difference between creation and join:", value=await seconds_to_fancytime(int(joined) - int(created), 2), inline=False)
+
         mention = []
         for role in member.roles:
             if role.name != "@everyone":
@@ -142,7 +181,7 @@ class moderation(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def warn(self, ctx, user=None, *, reason):
+    async def warn(self, ctx, user=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -210,7 +249,7 @@ class moderation(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command()
-    async def unwarn(self, ctx, id=None, *, reason):
+    async def unwarn(self, ctx, id=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -266,7 +305,7 @@ class moderation(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command()
-    async def reason(self, ctx, id=None, *, reason):
+    async def reason(self, ctx, id=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -331,7 +370,7 @@ class moderation(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command()
-    async def kick(self, ctx, user=None, *, reason):
+    async def kick(self, ctx, user=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         owner_role = guild.get_role(int(role_ids['owner']))
@@ -403,7 +442,7 @@ class moderation(commands.Cog):
         await guild.kick(member, reason=reason)
 
     @commands.command()
-    async def ban(self, ctx, user=None, *, reason):
+    async def ban(self, ctx, user=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         owner_role = guild.get_role(int(role_ids['owner']))
@@ -481,7 +520,7 @@ class moderation(commands.Cog):
             await ctx.send("The member was banned successfully, but a DM was unable to be sent.")
 
     @commands.command()
-    async def unban(self, ctx, user=None, *, reason):
+    async def unban(self, ctx, user=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         if mod_role not in ctx.message.author.roles:
@@ -531,7 +570,7 @@ class moderation(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command()
-    async def mute(self, ctx, user=None, time=None, *, reason):
+    async def mute(self, ctx, user=None, time=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
@@ -571,23 +610,16 @@ class moderation(commands.Cog):
             return
 
         if not time:
-            time = "12:00:00"
-        elif not re.match(r"\d\d:\d\d:\d\d", time):
-            await ctx.send("Please mention the time to mute in the form of `hh:mm:ss`.")
+            time = "12h"
+        gran = 0
+        for char in time:
+            gran += char.isalpha()
+        if gran > 4:
+            await ctx.send("Please mention the time to mute in a format like `1d2h3m4s` (1 day, 2 hours, 3 minutes, 4 seconds).")
             return
-        timeobject = datetime.strptime(time, '%H:%M:%S')
-        seconds = timeobject.second + timeobject.minute*60 + timeobject.hour*3600
-        fancytime = ""
-        if timeobject.hour != 0:
-            fancytime = f"{timeobject.hour} hours"
-        if timeobject.minute != 0:
-            if fancytime != "":
-                fancytime = fancytime + ", "
-            fancytime = fancytime + f"{timeobject.minute} minutes"
-        if timeobject.second != 0:
-            if fancytime != "":
-                fancytime = fancytime + ", "
-            fancytime = fancytime + f"{timeobject.second} seconds"
+        cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', time).groups(), [0, 0, 0, 0])]
+        seconds = cooltime[0]*86400 + cooltime[1]*3600 + cooltime[2]*60 + cooltime[3]
+        fancytime = await seconds_to_fancytime(seconds, gran)
 
         if not reason:
             reason = "No reason provided."
@@ -608,7 +640,7 @@ class moderation(commands.Cog):
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(id), "moderator": str(ctx.message.author.id), "time": time, "reason": reason})
+        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(id), "moderator": str(ctx.message.author.id), "time": str(seconds), "reason": reason})
 
         dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description=f"**Reason:** {reason}", color=discord.Color.red())
         if member.dm_channel is None:
@@ -625,6 +657,7 @@ class moderation(commands.Cog):
             await ctx.send(f"{member} was muted for {fancytime}. A DM was unable to be sent.")
         else:
             await ctx.send(f"{member} was muted for {fancytime}.")
+            await ctx.message.add_reaction("✅")
 
         await member.add_roles(muted_role)
         await sleep(seconds)
@@ -649,7 +682,7 @@ class moderation(commands.Cog):
         await member.remove_roles(muted_role)
 
     @commands.command()
-    async def unmute(self, ctx, user=None, *, reason):
+    async def unmute(self, ctx, user=None, *, reason=None):
         guild = ctx.message.guild
         mod_role = guild.get_role(int(role_ids['moderator']))
         trial_mod_role = guild.get_role(int(role_ids['trial_mod']))
