@@ -6,7 +6,6 @@ info:
     spteam-requirements: "Requirements to join the support team"
     mod-requirements: "Requirements to join the moderation team"
     rules: "Server Rules"
-    custom-list: "List of custom commands"
 
 techinfo_desc: "Tutorials and Links to tech questions"
 techinfo:
@@ -24,6 +23,7 @@ misc_desc: "Miscellaneous commands that don't fit in other categories"
 misc:
     alert: "Alerts the moderators"
     suggest: "Make a suggestion on how to improve the server"
+    remindme: "Remind yourself of an event or a message"
 
 custom-commands_desc: "Set of custom commands added by the owner without programming the bot"
 custom-commands:
@@ -52,8 +52,6 @@ administration:
     dm: "Send the command argument as a DM to a specific user"
     accept-suggestion: "Accept a certain suggestion"
     decline-suggestion: "Decline a certain suggestion"
-    add-custom: "Add a new custom command"
-    remove-custom: "Remove a custom command"
     add-swear: "Adds a swear to the swearlist"
     remove-swear: "Removes a swear from the swearlist"
     swearlist: "List of current swears"
