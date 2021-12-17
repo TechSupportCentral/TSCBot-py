@@ -56,7 +56,7 @@ class listeners(commands.Cog):
         public_channels = []
         for channel in public_channel_names:
             public_channels.append(int(channel_ids[channel]))
-        staff_roles = [self.bot.guilds[0].get_role(int(role_ids['owner'])), self.bot.guilds[0].get_role(int(role_ids['moderator'])), self.bot.guilds[0].get_role(int(role_ids['trial_mod'])), self.bot.guilds[0].get_role(int(role_ids['support_team'])), self.bot.guilds[0].get_role(int(role_ids['partner']))]
+        staff_roles = [self.bot.guilds[0].get_role(int(role_ids['owner'])), self.bot.guilds[0].get_role(int(role_ids['tsc'])), self.bot.guilds[0].get_role(int(role_ids['moderator'])), self.bot.guilds[0].get_role(int(role_ids['trial_mod'])), self.bot.guilds[0].get_role(int(role_ids['support_team'])), self.bot.guilds[0].get_role(int(role_ids['partner']))]
         help_triggers = ["issue", "able to help", "get some help", "need help"]
 
         swore = ""
@@ -280,7 +280,7 @@ class listeners(commands.Cog):
     async def on_member_join(self, member):
         global invites
 
-        await member.add_roles(member.guild.get_role(int(role_ids['Mrole'])))
+        await member.add_roles(member.guild.get_role(int(role_ids['og'])))
 
         embed1 = discord.Embed(title="Member Joined", description=f"{member} has joined Tech Support Central!", color=discord.Color.green())
         embed1.set_thumbnail(url=member.avatar_url)

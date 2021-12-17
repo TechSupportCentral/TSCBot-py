@@ -223,7 +223,7 @@ class misc(commands.Cog):
                 await message.channel.send("You cannot warn bots.")
                 return
 
-            channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+            channel = self.bot.get_channel(int(channel_ids['modlog']))
             warn_message = await channel.send(".")
             embed = discord.Embed(title="Warning", description=f"Use `!unwarn {warn_message.id} <reason>` to remove this warning. Note: This is not the user's ID, rather the ID of this message.", color=discord.Color.red())
             embed.set_thumbnail(url=member.avatar_url)
@@ -284,7 +284,7 @@ class misc(commands.Cog):
             embed.add_field(name="User ID", value=user, inline=True)
             embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
-            channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+            channel = self.bot.get_channel(int(channel_ids['modlog']))
             await channel.send(embed=embed)
 
             dmbed = discord.Embed(title="Your warning has been removed.", color=discord.Color.green())
@@ -344,7 +344,7 @@ class misc(commands.Cog):
             embed.add_field(name="User ID", value=str(id), inline=True)
             embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
-            channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+            channel = self.bot.get_channel(int(channel_ids['modlog']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
@@ -414,7 +414,7 @@ class misc(commands.Cog):
             embed.add_field(name="User ID", value=str(id), inline=True)
             embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
-            channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+            channel = self.bot.get_channel(int(channel_ids['modlog']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
@@ -477,7 +477,7 @@ class misc(commands.Cog):
             embed.add_field(name="User ID", value=str(id), inline=True)
             embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
-            channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+            channel = self.bot.get_channel(int(channel_ids['modlog']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
@@ -549,7 +549,7 @@ class misc(commands.Cog):
             embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Time muted", value=fancytime, inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
-            channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+            channel = self.bot.get_channel(int(channel_ids['modlog']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']
@@ -638,7 +638,7 @@ class misc(commands.Cog):
             embed.add_field(name="User ID", value=str(id), inline=True)
             embed.add_field(name="Moderator", value=f"{message.author.name} (via matrix)", inline=False)
             embed.add_field(name="Reason", value=reason, inline=False)
-            channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+            channel = self.bot.get_channel(int(channel_ids['modlog']))
             warn_message = await channel.send(embed=embed)
 
             collection = mongodb['moderation']

@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import yaml
+import subprocess
 #from emoji import emoji_count
 from main import get_database
 mongodb = get_database()
@@ -283,6 +284,12 @@ class administration(commands.Cog):
         await guild.ban(discord.Object(id=id), delete_message_days=7, reason="softban")
         await ctx.message.add_reaction("✅")
         await guild.unban(discord.Object(id=id), reason="softban")
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def commit(self, ctx):
+        commit = subprocess.run(['git', 'show', '-s', '--oneline'], stdout=subprocess.PIPE).stdout.decode('utf-8')[:7]
+        await ctx.send(f"I am currently running on commit {commit}.\nhttps://github.com/TechSupportCentral/TSCBot-py/commit/{commit}")
 
 def setup(bot):
     bot.add_cog(administration(bot))

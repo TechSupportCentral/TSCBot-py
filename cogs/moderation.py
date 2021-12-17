@@ -67,7 +67,7 @@ class moderation(commands.Cog):
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
         embed.add_field(name="Deleted by", value=ctx.message.author, inline=True)
         embed.add_field(name="In channel", value=ctx.message.channel.mention, inline=True)
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         await channel.send(embed=embed)
 
     @commands.command()
@@ -223,7 +223,7 @@ class moderation(commands.Cog):
         if not reason:
             reason = "No reason provided."
 
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(".")
         embed = discord.Embed(title="Warning", description=f"Use `!unwarn {message.id} <reason>` to remove this warning. Note: This is not the user's ID, rather the ID of this message.", color=discord.Color.red())
         embed.set_thumbnail(url=member.avatar_url)
@@ -287,7 +287,7 @@ class moderation(commands.Cog):
         embed.add_field(name="User ID", value=user, inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         await channel.send(embed=embed)
 
         dmbed = discord.Embed(title="Your warning has been removed.", color=discord.Color.green())
@@ -341,7 +341,7 @@ class moderation(commands.Cog):
 
         collection.update_one({"_id": id}, {"$set": {"reason": reason}})
 
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.fetch_message(int(id))
         og_embed = message.embeds[0]
         embed = discord.Embed(title=og_embed.title, description=og_embed.description, color=og_embed.color)
@@ -418,7 +418,7 @@ class moderation(commands.Cog):
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
@@ -495,7 +495,7 @@ class moderation(commands.Cog):
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
@@ -560,7 +560,7 @@ class moderation(commands.Cog):
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
@@ -636,7 +636,7 @@ class moderation(commands.Cog):
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
         embed.add_field(name="Time muted", value=fancytime, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
@@ -728,7 +728,7 @@ class moderation(commands.Cog):
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
         embed.add_field(name="Reason", value=reason, inline=False)
-        channel = self.bot.get_channel(int(channel_ids['staff_logs']))
+        channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
