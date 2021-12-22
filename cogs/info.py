@@ -55,7 +55,7 @@ class info(commands.Cog):
 
         if not arg:
             embed = discord.Embed(title="Command List", description="Commands come in categories. Here is a list of categories, run `!commands <category>` to see the commands in a certain category.", color=0x00a0a0)
-            embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+            embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
             for category in commands:
                 if not '_desc' in category:
                     embed.add_field(name=category + ':', value=commands[category + '_desc'], inline=True)
@@ -71,7 +71,7 @@ class info(commands.Cog):
                 await ctx.send("The `administration` category can only be viewed by admins.")
                 return
             embed = discord.Embed(title="Command List", description=f"Commands in the {arg} category:", color=0x00a0a0)
-            embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+            embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
             for command in commands[arg]:
                 embed.add_field(name=command + ':', value=commands[arg].get(command), inline=False)
             await ctx.send(embed=embed)

@@ -85,7 +85,7 @@ class administration(commands.Cog):
 
         await ctx.message.add_reaction("✅")
         embed = discord.Embed(title="DM Sent", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="Sent to", value=member, inline=True)
         embed.add_field(name="User ID", value=member.id, inline=True)
         embed.add_field(name="Sent by", value=ctx.message.author, inline=False)

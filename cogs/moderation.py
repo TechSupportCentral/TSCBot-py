@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 from main import get_database
 mongodb = get_database()
@@ -64,7 +64,7 @@ class moderation(commands.Cog):
 
         await ctx.channel.purge(limit=arg)
         embed=discord.Embed(title=str(arg - 1) + " Messages Deleted", color=discord.Color.red())
-        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        embed.set_thumbnail(url=ctx.message.author.display_avatar.url)
         embed.add_field(name="Deleted by", value=ctx.message.author, inline=True)
         embed.add_field(name="In channel", value=ctx.message.channel.mention, inline=True)
         channel = self.bot.get_channel(int(channel_ids['modlog']))
@@ -103,7 +103,7 @@ class moderation(commands.Cog):
 
         member = guild.get_member(id)
         embed=discord.Embed(title=member, color=0x00a0a0)
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User ID", value=id, inline=False)
         if member.name != member.display_name:
             embed.add_field(name="Nickname", value=member.display_name, inline=False)
@@ -226,7 +226,7 @@ class moderation(commands.Cog):
         channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(".")
         embed = discord.Embed(title="Warning", description=f"Use `!unwarn {message.id} <reason>` to remove this warning. Note: This is not the user's ID, rather the ID of this message.", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User warned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -282,7 +282,7 @@ class moderation(commands.Cog):
 
         member = guild.get_member(int(user))
         embed = discord.Embed(title="Warning Removed", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User unwarned", value=member, inline=True)
         embed.add_field(name="User ID", value=user, inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -413,7 +413,7 @@ class moderation(commands.Cog):
             reason = "No reason provided."
 
         embed = discord.Embed(title="Kick", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User kicked", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -490,7 +490,7 @@ class moderation(commands.Cog):
             reason = "No reason provided."
 
         embed = discord.Embed(title="Ban", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User banned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -555,7 +555,7 @@ class moderation(commands.Cog):
             reason = "No reason provided."
 
         embed = discord.Embed(title="Ban Removed", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User unbanned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -624,13 +624,12 @@ class moderation(commands.Cog):
         if not reason:
             reason = "No reason provided."
 
-        muted_role = guild.get_role(int(role_ids['muted']))
-        if muted_role in member.roles:
+        if member.timed_out:
             await ctx.send(f"{member} is already muted.")
             return
 
         embed = discord.Embed(title="Mute", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User muted", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -659,9 +658,9 @@ class moderation(commands.Cog):
             await ctx.send(f"{member} was muted for {fancytime}.")
             await ctx.message.add_reaction("✅")
 
-        await member.add_roles(muted_role)
-        await sleep(seconds)
-        if not muted_role in member.roles:
+        await member.timeout(until=datetime.now() + timedelta(seconds=seconds), reason=reason)
+        await sleep(seconds - 1)
+        if not member.timed_out:
             return
 
         dmbed2 = discord.Embed(title="You have been automatically unmuted.", color=discord.Color.green())
@@ -672,14 +671,13 @@ class moderation(commands.Cog):
             dm2_failed = True
 
         embed2 = discord.Embed(title="Mute Removed", color=discord.Color.green())
-        embed2.set_thumbnail(url=member.avatar_url)
+        embed2.set_thumbnail(url=member.display_avatar.url)
         embed2.add_field(name="User unmuted", value=member, inline=True)
         embed2.add_field(name="User ID", value=str(id), inline=True)
         embed2.add_field(name="Reason", value="Automatic unmute", inline=False)
         if dm2_failed == True:
             embed2.set_footer(text="was unable to DM user")
         await channel.send(embed=embed2)
-        await member.remove_roles(muted_role)
 
     @commands.command()
     async def unmute(self, ctx, user=None, *, reason=None):
@@ -717,13 +715,12 @@ class moderation(commands.Cog):
         if not reason:
             reason = "No reason provided."
 
-        muted_role = guild.get_role(int(role_ids['muted']))
-        if not muted_role in member.roles:
+        if not member.timed_out:
             await ctx.send(f"{member} is not muted.")
             return
 
         embed = discord.Embed(title="Mute Removed", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(name="User unmuted", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -749,7 +746,7 @@ class moderation(commands.Cog):
             await ctx.send("The member was warned successfully, but a DM was unable to be sent.")
         else:
             await ctx.message.add_reaction("✅")
-        await member.remove_roles(muted_role)
+        await member.remove_timeout(reason=reason)
 
 def setup(bot):
     bot.add_cog(moderation(bot))
