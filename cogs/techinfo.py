@@ -64,5 +64,16 @@ class techinfo(commands.Cog):
         embed.add_field(name="Step 5:", value="Install or try out linux.\nYour computer will boot to show the Linux desktop. Note that Linux is not installed on the computer, it's what is called a Live USB where you can test it out before you try it. Anything you do on the USB in this state will not be saved and doesn't affect your PC. If you wish to replace Windows with Linux, open the 'Install Linux' file on the desktop. If you want to return to Windows on the next reboot, simply restart the PC with the USB unplugged.", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def vcredist(self, ctx):
+        embed = discord.Embed(title="Visual C++ Redistributable", url="https://docs.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist", description="If you are missing any of the following DLLs, download the corresponding file(s) and install them.", color=0x00a0a0)
+        embed.add_field(name="MSVCP140.dll or MSVCR140.dll", value="[x86](https://aka.ms/vs/17/release/vc_redist.x86.exe), [x64](https://aka.ms/vs/17/release/vc_redist.x64.exe), or [ARM64](https://aka.ms/vs/17/release/vc_redist.arm64.exe) (Only install the one that pertains to your system)", inline=False)
+        embed.add_field(name="MSVCP120.dll or MSVCR120.dll", value="[x86](https://aka.ms/highdpimfc2013x86enu) and [x64](https://aka.ms/highdpimfc2013x64enu) (Install both unless using a 32 bit system)", inline=False)
+        embed.add_field(name="MSVCP110.dll or MSVCR110.dll", value="[x86](https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe) and [x64](https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe) (Install both unless using a 32 bit system)", inline=False)
+        embed.add_field(name="MSVCP100.dll or MSVCR100.dll", value="[x86](https://download.microsoft.com/download/C/6/D/C6D0FD4E-9E53-4897-9B91-836EBA2AACD3/vcredist_x86.exe) and [x64](https://download.microsoft.com/download/A/8/0/A80747C3-41BD-45DF-B505-E9710D2744E0/vcredist_x64.exe) (Install both unless using a 32 bit system)", inline=False)
+        embed.add_field(name="MSVCP90.dll or MSVCR90.dll", value="[x86](https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe) and [x64](https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe) (Install both unless using a 32 bit system)", inline=False)
+        embed.add_field(name="MSVCP80.dll or MSVCR80.dll", value="[Select the ones you need](https://www.microsoft.com/download/details.aspx?id=26347) (Install both x86 and x64 unless using a 32 bit system)", inline=False)
+        await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(techinfo(bot))
