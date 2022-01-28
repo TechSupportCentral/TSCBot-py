@@ -136,7 +136,16 @@ class listeners(commands.Cog):
                     bumptimer = True
                     await sleep(7200)
                     bumptimer = False
-                    await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}> could anybody please run `!d bump`?")
+                    await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `!d bump`?")
+            elif "until you can bump" in message.embeds[0].description:
+                for word in message.embeds[0].description:
+                    if word.isdigit():
+                        mins = word
+                await message.channel.send(f"{message.embeds[0].description.split()[0]}, I will ping you in {mins} minutes when you can bump, if nobody has bumped the server by then.")
+                await sleep(int(mins) * 60)
+                if bumptimer == False:
+                    await message.channel.send(f"{message.embeds[0].description.split()[0]}, you are now able to bump!")
+
         elif "set bump" in message.content:
             if bumptimer == False:
                 await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
