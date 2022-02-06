@@ -63,8 +63,9 @@ class info(commands.Cog):
         elif arg in commands:
             guild = ctx.message.guild
             mod_role = guild.get_role(int(role_ids['moderator']))
+            trial_role = guild.get_role(int(role_ids['trial_mod']))
             owner_role = guild.get_role(int(role_ids['owner']))
-            if arg == "moderation" and not mod_role in ctx.author.roles:
+            if arg == "moderation" and not mod_role in ctx.author.roles and not trial_role in ctx.author.roles:
                 await ctx.send("The `moderation` category can only be viewed by moderators.")
                 return
             elif arg == "administration" and not owner_role in ctx.author.roles:
