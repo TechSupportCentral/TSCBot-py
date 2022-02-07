@@ -31,9 +31,9 @@ class techinfo(commands.Cog):
     async def safemode(self, ctx):
         await ctx.send("https://support.microsoft.com/en-us/windows/start-your-pc-in-safe-mode-in-windows-10-92c27cff-db89-8644-1ce4-b3e5e56fe234")
 
-    @commands.command()
+    @commands.command(aliases=["mwb"])
     async def malwarebytes(self, ctx):
-        await ctx.send("https://www.malwarebytes.com/mwb-download/thankyou/")
+        await ctx.send("https://malwarebytes.com/mwb-download")
 
     @commands.command()
     async def windowsinstall(self, ctx):
