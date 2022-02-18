@@ -3,7 +3,6 @@ from discord.ext import commands
 import os
 import yaml
 import pymongo
-from pathlib import Path
 
 with open('config.yaml', 'r') as config_file:
     config = yaml.load(config_file, Loader=yaml.BaseLoader)
