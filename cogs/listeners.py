@@ -129,7 +129,7 @@ class listeners(commands.Cog):
                 await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download")
 
         elif message.author.id == 302050872383242240:
-            if ":thumbsup:" in message.embeds[0].description:
+            if "Bump done" in message.embeds[0].description:
                 embed = discord.Embed(title="Thank you for bumping the server!", description="Vote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884", color=0x00a0a0)
                 await message.channel.send(embed=embed)
                 if bumptimer == False:
