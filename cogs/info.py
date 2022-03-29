@@ -111,16 +111,17 @@ class info(commands.Cog):
 
         await ctx.message.delete()
         embed = discord.Embed(title="Server Rules", color=discord.Color.green())
-        embed.add_field(name="Rule 1:", value="Be respectful to our Support Team, they provide support voluntarily for free during their own time.", inline=False)
-        embed.add_field(name="Rule 2:", value="Profanity is not allowed on this server. If you send a message with profanity it will be deleted.", inline=False)
-        embed.add_field(name="Rule 3:", value="We do not tolerate any form of racism, sexism, discrimination, etc. This behavior will result in an immediate ban.", inline=False)
+        embed.add_field(name="Rule 1:", value="Be respectful to our Support Team; they provide support voluntarily for free during their own time.", inline=False)
+        embed.add_field(name="Rule 2:", value="Profanity is not allowed on this server. If you send a message containing profanity, it will be deleted.", inline=False)
+        embed.add_field(name="Rule 3:", value="We do not tolerate any form of racism, bigotry, or discrimination. This behavior will result in an immediate ban.", inline=False)
         embed.add_field(name="Rule 4:", value=f"For faster and easier help, post your issue in a support channel and ping the <@&{role_ids['support_team']}>. If you post your question in <#{channel_ids['general']}> and/or don't ping the Support Team, they will not notice it and it'll take longer to get support.", inline=False)
         embed.add_field(name="Rule 5:", value="All users must follow Discord TOS. https://discord.com/terms", inline=False)
         embed.add_field(name="Rule 6:", value="No self promotion or advertising of any kind is allowed, especially in DMs.", inline=False)
-        embed.add_field(name="Rule 7:", value="Do not leak or request any personal information. (i.e. IP Addresses, Full Names, Locations, etc.)", inline=False)
-        embed.add_field(name="Rule 8:", value="If a Support Team member is helping someone, don't try to help at the same time. If you want to help more than please apply for Support Team via our staff application forms.", inline=False)
+        embed.add_field(name="Rule 7:", value="Do not leak or request any personal information (IP Addresses, full names, locations, etc).", inline=False)
+        embed.add_field(name="Rule 8:", value="If a Support Team member is helping someone, don't try to help at the same time. If you want to help more, please apply for Support Team via our staff application forms.", inline=False)
         embed.add_field(name="Rule 9:", value=f"English is the language used for support and discussion. Make a ticket in <#{channel_ids['ticket_create']}> if you require help in another language.", inline=False)
-        embed.add_field(name="Rule 10:", value="We do not provide support for pirated, cracked, or hacked content of any kind. It is illegal and against our rules.", inline=False)
+        embed.add_field(name="Rule 10:", value="We do not provide support for pirated, cracked, or hacked content of any kind, as it is illegal. We also do not provide support with ban evasion on any platform, no matter how unfair the ban may seem.", inline=False)
+        embed.add_field(name="Rule 11:", value="Do not beg for roles. When you apply for Support Team or Moderator, we carefully consider your application based on many factors. Our decision is final, and continuing to beg for the role(s) will do the opposite of what you want, lessening the chance you'll get them in the future.", inline=False)
         await ctx.send(embed=embed)
 
 def setup(bot):
