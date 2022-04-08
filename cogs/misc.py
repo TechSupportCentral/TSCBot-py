@@ -92,10 +92,6 @@ class misc(commands.Cog):
             dm = ctx.message.author.dm_channel
         await dm.send(embed=embed)
 
-    @commands.command()
-    async def d(self, ctx):
-        return
-
     @commands.Cog.listener(name="on_message")
     async def matrix_moderation(self, message):
         if message.author.discriminator != "0000" or message.channel.id != int(channel_ids['modtalk']):
