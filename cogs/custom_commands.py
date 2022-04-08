@@ -67,7 +67,7 @@ class custom_commands(commands.Cog):
         embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
         embed.add_field(name="Command Name", value=name, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
-        channel = ctx.bot.get_channel(int(channel_ids['modlog']))
+        channel = ctx.bot.get_channel(int(channel_ids['staff_news']))
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
 
@@ -105,7 +105,7 @@ class custom_commands(commands.Cog):
         embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
         embed.add_field(name="Command Name", value=arg, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
-        channel = ctx.bot.get_channel(int(channel_ids['modlog']))
+        channel = ctx.bot.get_channel(int(channel_ids['staff_news']))
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
 
