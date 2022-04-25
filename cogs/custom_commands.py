@@ -63,8 +63,7 @@ class custom_commands(commands.Cog):
 
         embed = discord.Embed(title="Custom Command Added", color=discord.Color.green())
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
-        embed.add_field(name="Added by", value=ctx.message.author, inline=True)
-        embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
+        embed.add_field(name="Added by", value=ctx.message.author, inline=False)
         embed.add_field(name="Command Name", value=name, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
         channel = ctx.bot.get_channel(int(channel_ids['staff_news']))
@@ -101,8 +100,7 @@ class custom_commands(commands.Cog):
 
         embed = discord.Embed(title="Custom Command Removed", color=discord.Color.red())
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
-        embed.add_field(name="Removed by", value=ctx.message.author, inline=True)
-        embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
+        embed.add_field(name="Removed by", value=ctx.message.author, inline=False)
         embed.add_field(name="Command Name", value=arg, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
         channel = ctx.bot.get_channel(int(channel_ids['staff_news']))
