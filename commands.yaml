@@ -6,6 +6,7 @@ info:
     spteam-requirements: "Requirements to join the support team"
     mod-requirements: "Requirements to join the moderation team"
     rules: "Server Rules"
+    rule: "View a specific server rule"
 
 techinfo_desc: "Tutorials and Links to tech questions"
 techinfo:

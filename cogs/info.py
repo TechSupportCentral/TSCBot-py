@@ -124,5 +124,28 @@ class info(commands.Cog):
         embed.add_field(name="Rule 11:", value="Do not beg for roles. When you apply for Support Team or Moderator, we carefully consider your application based on many factors. Our decision is final, and continuing to beg for the role(s) will do the opposite of what you want, lessening the chance you'll get them in the future.", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def rule(self, ctx, rule=None):
+        with open('config.yaml', 'r') as config_file:
+            config = yaml.load(config_file, Loader=yaml.BaseLoader)
+        channel_ids = config['channel_ids']
+
+        if not rule:
+            await ctx.send("Please specify which rule you would like to see.")
+            return
+        elif not rule.isdigit():
+            await ctx.send("Please use a number to specify the rule.")
+            return
+
+        channel = self.bot.get_channel(int(channel_ids['rules']))
+        message = await channel.fetch_message(channel.last_message_id)
+
+        if int(rule) > len(message.embeds[0].fields):
+            await ctx.send("This rule does not exist.")
+            return
+
+        embed = discord.Embed(title=f"Rule {rule}", description=message.embeds[0].fields[int(rule) - 1].value, color=0x00a0a0)
+        await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(info(bot))

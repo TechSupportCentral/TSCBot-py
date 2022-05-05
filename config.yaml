@@ -17,6 +17,7 @@ role_ids:
 
 channel_ids:
     welcome: 824060103119470622
+    rules: 824045801725493258
     general_support: 824059680905101333
     software_support: 824059831513907200
     hardware_support: 824059920826499093
