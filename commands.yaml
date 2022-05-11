@@ -25,6 +25,7 @@ misc:
     alert: "Alerts the moderators"
     suggest: "Make a suggestion on how to improve the server"
     remindme: "Remind yourself of an event or a message"
+    shorten: "Shortens a link"
 
 custom-commands_desc: "Set of custom commands added by the owner without programming the bot"
 custom-commands:

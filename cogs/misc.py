@@ -92,6 +92,17 @@ class misc(commands.Cog):
             dm = ctx.message.author.dm_channel
         await dm.send(embed=embed)
 
+    @commands.command()
+    async def shorten(self, ctx, link=None):
+        if not link:
+            await ctx.send("Please specify a link to shorten.")
+            return
+
+        if re.search(r"https?:\/\/(www\.)?amazon\.[^\/]*", link) and re.search(r"\/dp\/B0[0-9A-Z]{8}\/", link):
+            amazon = re.search(r"amazon\.[^\/]*", link).group()
+            dp = re.search(r"\/dp\/B0[0-9A-Z]{8}\/", link).group()
+            await ctx.send("https://" + amazon + dp)
+
     @commands.Cog.listener(name="on_message")
     async def matrix_moderation(self, message):
         if message.author.discriminator != "0000" or message.channel.id != int(channel_ids['modtalk']):
