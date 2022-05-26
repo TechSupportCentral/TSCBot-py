@@ -98,10 +98,20 @@ class misc(commands.Cog):
             await ctx.send("Please specify a link to shorten.")
             return
 
-        if re.search(r"https?:\/\/(www\.)?amazon\.[^\/]*", link) and re.search(r"\/dp\/B0[0-9A-Z]{8}\/", link):
+        if re.search(r"https?:\/\/(www\.)?amazon\.[^\/]*", link) and re.search(r"\/dp\/B0[\dA-Z]{8}\/", link):
             amazon = re.search(r"amazon\.[^\/]*", link).group()
             dp = re.search(r"\/dp\/B0[0-9A-Z]{8}\/", link).group()
             await ctx.send("https://" + amazon + dp)
+
+        elif re.search(r"https?:\/\/(www\.)?youtube\.com", link) and re.search(r"(\?|&)v=[\d\w-]{11}", link):
+            v = re.search(r"(\?|&)v=[\d\w-]{11}", link).group()[3:]
+
+            if re.search(r"(\?|&)t=\d+", link):
+                t = "&" + re.search(r"(\?|&)t=\d+", link).group()[1:]
+            else:
+                t = ""
+
+            await ctx.send("https://youtu.be/" + v + t)
 
     @commands.Cog.listener(name="on_message")
     async def matrix_moderation(self, message):
