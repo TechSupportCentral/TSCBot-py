@@ -39,7 +39,7 @@ class techinfo(commands.Cog):
     async def windowsinstall(self, ctx):
         await ctx.send("This tutorial will lead you how to do a fresh windows installation: (All your data will be gone, back it up and use `!key` in case you need to back up your Product Key too, please save it somewhere safe and don't show us or anyone the key!)\nhttps://youtu.be/bwJ_E-I9WRs\nTo figure out which key you need to use to boot to a usb, run the command `!bootkeys`.")
 
-    @commands.command()
+    @commands.command(aliases=["bootkey"])
     async def bootkeys(self, ctx):
         embed = discord.Embed(title="", description="", color=0x00a0a0)
         embed.add_field(name="Dell, Toshiba, Huawei, Lenovo:", value="F12", inline=True)
@@ -62,6 +62,15 @@ class techinfo(commands.Cog):
         embed.add_field(name="Step 3:", value="Once everything is downloaded, use the flashing tool to flash your ISO to a USB (the usb must be 8 GB or larger).\nSelect the Linux ISO you downloaded and the USB you want to flash to, then start the flashing process.\nWhen the flashing is done, unplug the usb and plug it into the device you want to boot into Linux (if it's the same device just leave it plugged in and shut down the PC).", inline=False)
         embed.add_field(name="Step 4:", value="Boot into Linux.\nTurn on the computer and start spamming the boot menu key (figure out which one yours is with the `!bootkey` command) until the menu pops up.\nWhen the menu pops up, select the USB to boot to.", inline=False)
         embed.add_field(name="Step 5:", value="Install or try out linux.\nYour computer will boot to show the Linux desktop. Note that Linux is not installed on the computer, it's what is called a Live USB where you can test it out before you try it. Anything you do on the USB in this state will not be saved and doesn't affect your PC. If you wish to replace Windows with Linux, open the 'Install Linux' file on the desktop. If you want to return to Windows on the next reboot, simply restart the PC with the USB unplugged.", inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def androidusb(self, ctx):
+        embed = discord.Embed(title="How to flash a Linux ISO to USB on Android", color=0x00a0a0)
+        embed.add_field(name="Step 1:", value="Make sure you can actually plug your USB into the phone.\nIn a perfect world, you'll have a USB-C flash drive and a USB-C phone, so you can just plug it in. Unfortunately, most of the time it's USB type A and the phone is either Micro B or USB-C.\nIf this is the case, buy an adapter like one of these:\n[USB Micro B (most older phones)](https://amazon.com/dp/B00LN3LQKQ)\n[USB-C (most newer phones)](https://amazon.com/dp/B01GGKYXVE)", inline=False)
+        embed.add_field(name="Step 2:", value="Download EtchDroid from [Google Play](https://play.google.com/store/apps/details?id=eu.depau.etchdroid) or manually install the APK from [here](https://github.com/EtchDroid/EtchDroid/releases/download/v1.5/EtchDroid-v1.5-release.apk).", inline=False)
+        embed.add_field(name="Step 3:", value="Follow the instructions from EtchDroid's official YouTube tutorial: https://youtu.be/6gM5SoNO0Fc", inline=False)
+        embed.set_footer(text="Note: EtchDroid will not work for Windows ISOs as they don't follow the ISOHybrid standard.")
         await ctx.send(embed=embed)
 
     @commands.command()
