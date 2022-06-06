@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
+from datetime import datetime
 from pypartpicker import Scraper, get_list_links
 from main import get_database
 mongodb = get_database()
@@ -312,6 +313,23 @@ class listeners(commands.Cog):
                 embed2.add_field(name="Invite uses", value=invite_used.uses, inline=True)
         channel2 = self.bot.get_channel(int(channel_ids['member_changed']))
         await channel2.send(embed=embed2)
+
+        collection = mongodb['moderation']
+        found = False
+        for mute in collection.find({"type": "mute"}):
+            end = int(mute.get('start')) + int(mute.get('time'))
+            now = int(datetime.now().strftime("%s"))
+            if int(mute.get('user')) == member.id and end > now:
+                found = True
+        if found == True:
+            muted_role = member.guild.get_role(int(role_ids['muted']))
+            await member.add_roles(muted_role)
+
+            if member.dm_channel is None:
+                dm = await member.create_dm()
+            else:
+                dm = member.dm_channel
+            await dm.send("Nice try; you cannot escape a mute by leaving and rejoining the server.")
 
     @commands.Cog.listener()
     async def on_invite_create(self, invite):
