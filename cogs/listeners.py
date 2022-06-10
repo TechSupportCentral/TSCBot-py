@@ -44,6 +44,7 @@ class listeners(commands.Cog):
         guild = self.bot.guilds[0]
         global invites
         invites = await guild.invites()
+        print('Remember to set the bump timer.')
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -139,14 +140,15 @@ class listeners(commands.Cog):
                     bumptimer = False
                     await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `/bump`?")
 
-        elif "set bump" in message.content:
+        elif message.content.startswith("set bump"):
             if bumptimer == False:
-                await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
-                bumptimer = True
-                await sleep(7200)
-                bumptimer = False
-                embed = discord.Embed(title="Thank you for bumping the server!", description="Vote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884", color=0x00a0a0)
-                await message.channel.send(embed=embed)
+                await message.delete()
+                if "now" not in message.content:
+                    await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
+                    bumptimer = True
+                    await sleep(7200)
+                    bumptimer = False
+                await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `/bump`?")
             else:
                 await message.channel.send("The bump timer is already set.")
 
