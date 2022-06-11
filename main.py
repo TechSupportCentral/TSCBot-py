@@ -19,14 +19,14 @@ intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix=config['prefix'], intents=intents, help_command=None)
 
-for filename in os.listdir('./cogs'):
+for filename in os.listdir('cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
-        print('Cog '+filename[:-3]+' loaded')
-    
+        print(f'Cog {filename[:-3]} loaded')
+
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='TSC'))
-    print('Logged in as {}'.format(bot.user.name))
+    print('Logged in as ' + bot.user.name)
 
 bot.run(config['token'])

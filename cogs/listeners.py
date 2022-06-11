@@ -18,7 +18,7 @@ class listeners(commands.Cog):
     swears = []
     swearcol = mongodb['swears']
     for swear in swearcol.find():
-        swears.append(swear.get('swear'))
+        swears.append(swear['swear'])
 
 #    reactcol = mongodb['reaction-roles']
 #    global reacts
@@ -26,8 +26,6 @@ class listeners(commands.Cog):
 
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
-    global prefix
-    prefix = config['prefix']
     global pcpp_cookie
     pcpp_cookie = config['pcpp_cookie']
     global channel_ids
@@ -51,6 +49,8 @@ class listeners(commands.Cog):
         global bumptimer
         global swears
 #        global reacts
+        help_triggers = ["issue", "able to help", "get some help", "need help"]
+        staff_role_names = ["owner", "tsc", "moderator", "trial_mod", "support_team"]
 
         support_channels = []
         for channel in support_channel_names:
@@ -58,8 +58,9 @@ class listeners(commands.Cog):
         public_channels = []
         for channel in public_channel_names:
             public_channels.append(int(channel_ids[channel]))
-        staff_roles = [self.bot.guilds[0].get_role(int(role_ids['owner'])), self.bot.guilds[0].get_role(int(role_ids['tsc'])), self.bot.guilds[0].get_role(int(role_ids['moderator'])), self.bot.guilds[0].get_role(int(role_ids['trial_mod'])), self.bot.guilds[0].get_role(int(role_ids['support_team'])), self.bot.guilds[0].get_role(int(role_ids['partner']))]
-        help_triggers = ["issue", "able to help", "get some help", "need help"]
+        staff_roles = []
+        for role in staff_role_names:
+            staff_roles.append(self.bot.guilds[0].get_role(int(role_ids[role])))
 
         swore = ""
         for swear in swears:
@@ -78,7 +79,6 @@ class listeners(commands.Cog):
                     embed.add_field(name="Message:", value="Unable to detect message contents", inline=False)
                 channel = self.bot.get_channel(int(channel_ids['bot_dm']))
                 await channel.send(embed=embed)
-
         elif swore != "":
             await message.delete()
             if swore == "@everyone":
@@ -88,10 +88,10 @@ class listeners(commands.Cog):
                 dmbed=discord.Embed(title="@here ping", description="Please don't ping @here. If you need help, go to a support channel and ping @Support Team.", color=discord.Color.red())
                 embed=discord.Embed(title="@here ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
             elif swore == "discord.gg" or swore == "discord.com/invite":
-                dmbed=discord.Embed(title="Invite Link", description="Please don't send invite links to other servers, it is against rule 6 of our server.", color=discord.Color.red())
+                dmbed=discord.Embed(title="Invite Link", description="Please don't send invite links; it is against rule 6 of our server.", color=discord.Color.red())
                 embed=discord.Embed(title="Invite Link sent by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
             else:
-                dmbed=discord.Embed(title="Swear", description="TSC is a PG Friendly server, you cannot swear here.", color=discord.Color.red())
+                dmbed=discord.Embed(title="Swear", description="This is a PG Friendly server, you cannot swear here.", color=discord.Color.red())
                 dmbed.add_field(name="Swear Detected:", value=swore, inline=False)
                 embed=discord.Embed(title="Swear by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
                 embed.add_field(name="Swear Detected:", value=swore, inline=False)
@@ -112,45 +112,61 @@ class listeners(commands.Cog):
             embed.add_field(name="Message Deleted:", value=message.content, inline=False)
             embed.add_field(name="In channel", value=message.channel.mention, inline=False)
             embed.add_field(name="User ID", value=message.author.id, inline=False)
-            if dm_failed == True:
+            if dm_failed:
                 embed.set_footer(text="was not able to DM user")
             channel = self.bot.get_channel(int(channel_ids['filter_log']))
             await channel.send(embed=embed)
 
-        elif any(trigger in message.content.lower() for trigger in help_triggers) and not message.channel.id in support_channels and message.channel.id in public_channels:
+        elif any(trigger in message.content.lower() for trigger in help_triggers) and message.channel.id in public_channels and message.channel.id not in support_channels:
             channel = self.bot.get_channel(message.channel.id)
             await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
 
-        elif "reinstall windows" in message.content.lower() and message.channel.id in public_channels:
+        elif " virus" in message.content.lower() and message.channel.id in public_channels and "malwarebytes" not in message.content.lower() and not message.author.bot:
             channel = self.bot.get_channel(message.channel.id)
-            await channel.send("This tutorial will lead you how to do a fresh windows installation: (All your data will be gone, back it up and use `!key` in case you need to back up your Product Key too, please save it somewhere safe and don't show us or anyone the key!)\nhttps://youtu.be/bwJ_E-I9WRs\nTo figure out which key you need to use to boot to a usb, run the command `!bootkeys`.")
-
-        elif " virus" in message.content.lower() and "malwarebytes" not in message.content.lower() and message.channel.id in public_channels:
-            if not message.author.bot:
-                channel = self.bot.get_channel(message.channel.id)
-                await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download")
+            await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download")
 
         elif message.author.id == 302050872383242240:
             if ":thumbsup:" in message.embeds[0].description:
                 embed = discord.Embed(title="Thank you for bumping the server!", description="Vote for Tech Support Central on top.gg at https://top.gg/servers/824042976371277884", color=0x00a0a0)
                 await message.channel.send(embed=embed)
-                if bumptimer == False:
+                if not bumptimer:
                     bumptimer = True
                     await sleep(7200)
                     bumptimer = False
                     await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `/bump`?")
 
         elif message.content.startswith("set bump"):
-            if bumptimer == False:
+            if bumptimer:
+                await message.channel.send("The bump timer is already set.")
+            else:
                 await message.delete()
                 if "now" not in message.content:
-                    await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
+                    response = await message.channel.send("Bump timer set. Bump Reminders will ping in 2 hours.")
+                    await sleep(2)
+                    await response.delete()
+
                     bumptimer = True
-                    await sleep(7200)
+                    await sleep(7198)
                     bumptimer = False
                 await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `/bump`?")
+
+        elif "reload swears" in message.content:
+            if message.author.bot or message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
+                await message.delete()
+                swears = []
+                swearcol = mongodb['swears']
+                for swear in swearcol.find():
+                    swears.append(swear['swear'])
             else:
-                await message.channel.send("The bump timer is already set.")
+                response = await message.channel.send("I'm sorry Dave, I'm afraid I can't do that.")
+                await sleep(2)
+                await message.delete()
+                await response.delete()
+
+#        elif "reload reaction roles" in message.content:
+#            await message.delete()
+#            reactcol = mongodb['reaction-roles']
+#            reacts = reactcol.find()
 
         elif len(get_list_links(message.content)) >= 1:
             pcpp = Scraper(headers={"cookie": pcpp_cookie})
@@ -159,26 +175,11 @@ class listeners(commands.Cog):
 
             description = ""
             for part in list.parts:
-                description = description + f"**{part.type}:** {part.name} **({part.price})**\n"
-            description = description + f"\n**Estimated Wattage:** {list.wattage}\n**Price:** {list.total}"
+                description += f"**{part.type}:** {part.name} **({part.price})**\n"
+            description += f"\n**Estimated Wattage:** {list.wattage}\n**Price:** {list.total}"
 
             embed = discord.Embed(title="PCPartPicker List", url=link, description=description, color=0x00a0a0)
             await message.channel.send(embed=embed)
-
-        elif "reload swears" in message.content:
-            await message.delete()
-            swears = []
-            swearcol = mongodb['swears']
-            for swear in swearcol.find():
-                swears.append(swear.get('swear'))
-
-#        elif "reload reaction roles" in message.content:
-#            await message.delete()
-#            reactcol = mongodb['reaction-roles']
-#            reacts = reactcol.find()
-
-        elif "pong" in message.content.lower() and message.author.id == 655487743694209063:
-            await message.delete()
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -253,7 +254,7 @@ class listeners(commands.Cog):
             embed.set_author(name=before, icon_url=before.avatar_url)
             channel = self.bot.get_channel(int(channel_ids['role_changed']))
             await channel.send(embed=embed)
-        if len(before.roles) > len(after.roles):
+        elif len(before.roles) > len(after.roles):
             delta = [role for role in before.roles if role not in after.roles]
             embed = discord.Embed(title="Role Removed", description=delta[0].mention, color=discord.Color.red())
             embed.set_author(name=before, icon_url=before.avatar_url)
@@ -305,7 +306,7 @@ class listeners(commands.Cog):
         embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
         embed2.set_thumbnail(url=member.avatar_url)
         embed2.add_field(name="User ID", value=member.id, inline=False)
-        embed2.add_field(name="Account Created:", value=member.created_at.strftime("%-d %B %Y at %-H:%M"), inline=False)
+        embed2.add_field(name="Account Created:", value="<t:" + member.created_at.strftime("%s") + ">", inline=False)
         if invite_used is not None:
                 embed2.add_field(name="Invite code", value=invite_used.code, inline=False)
                 if invite.code == "2vwUBmhM8U":
@@ -319,11 +320,11 @@ class listeners(commands.Cog):
         collection = mongodb['moderation']
         found = False
         for mute in collection.find({"type": "mute"}):
-            end = int(mute.get('start')) + int(mute.get('time'))
+            end = int(mute['start']) + int(mute['time'])
             now = int(datetime.now().strftime("%s"))
-            if int(mute.get('user')) == member.id and end > now:
+            if int(mute['user']) == member.id and end > now:
                 found = True
-        if found == True:
+        if found:
             muted_role = member.guild.get_role(int(role_ids['muted']))
             await member.add_roles(muted_role)
 

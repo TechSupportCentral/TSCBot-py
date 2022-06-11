@@ -27,11 +27,11 @@ class custom_commands(commands.Cog):
                 await ctx.send(value)
 
             cmd.cog = self
-            self.__cog_commands__ = self.__cog_commands__ + (cmd,)
+            self.__cog_commands__ += (cmd,)
             self.bot.add_command(cmd)
 
         for command in collection.find():
-            await add_command(self, command.get('name'), command.get('value'))
+            await add_command(self, command['name'], command['value'])
 
     @commands.command(name="add-custom")
     @commands.has_permissions(administrator=True)
@@ -44,7 +44,7 @@ class custom_commands(commands.Cog):
                 await ctx.send(value)
 
             cmd.cog = self
-            self.__cog_commands__ = self.__cog_commands__ + (cmd,)
+            self.__cog_commands__ += (cmd,)
             self.bot.add_command(cmd)
 
         if not name:
@@ -54,7 +54,7 @@ class custom_commands(commands.Cog):
             await ctx.send("Please provide the response for when the command is run.")
             return
 
-        if self._custom_commands.get(name) or ctx.bot.get_command(name):
+        if self._custom_commands[name] or ctx.bot.get_command(name):
             await ctx.send(f"The command `{name}` already exists.")
             return
 
@@ -69,13 +69,7 @@ class custom_commands(commands.Cog):
         channel = ctx.bot.get_channel(int(channel_ids['staff_news']))
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
-
-        channel2 = ctx.bot.get_channel(int(channel_ids['custom_list']))
-        await channel2.purge(limit=1)
-        embed2 = discord.Embed(title="Custom Commands", color=0x00a0a0)
-        for command in self._custom_commands:
-            embed2.add_field(name=command, value=self._custom_commands[command], inline=False)
-        await channel2.send(embed=embed2)
+        await ctx.send(f"Please give the command a description with `!add-custom-description {name} description here`.")
 
     @commands.command(name="remove-custom")
     @commands.has_permissions(administrator=True)
@@ -84,7 +78,7 @@ class custom_commands(commands.Cog):
             await ctx.send("Please provide the name of the custom command to remove.")
             return
 
-        if not self._custom_commands.get(arg):
+        if not self._custom_commands[arg]:
             if ctx.bot.get_command(arg):
                 await ctx.send("You cannot remove a built-in command.")
                 return
@@ -107,18 +101,32 @@ class custom_commands(commands.Cog):
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
 
-        channel2 = ctx.bot.get_channel(int(channel_ids['custom_list']))
-        await channel2.purge(limit=1)
-        embed2 = discord.Embed(title="Custom Commands", color=0x00a0a0)
-        for command in self._custom_commands:
-            embed2.add_field(name=command, value=self._custom_commands[command], inline=False)
-        await channel2.send(embed=embed2)
+    @commands.command(name="add-custom-description")
+    @commands.has_permissions(administrator=True)
+    async def add_desc(self, ctx, name=None, *, desc=None):
+        if not name:
+            await ctx.send("Please provide the name of the custom command to describe.")
+            return
+        elif not desc:
+            await ctx.send(f"Please provide the description for the command `{name}`.")
+            return
+
+        if not self._custom_commands[name]:
+            if ctx.bot.get_command(name):
+                await ctx.send("You cannot add a description to a built-in command.")
+                return
+            else:
+                await ctx.send(f"The command `{name}` does not exist.")
+                return
+
+        collection.update_one({"name": name}, {"$set": {"description": desc}})
+        await ctx.message.add_reaction("✅")
 
     @commands.command(name="custom-list")
     async def custom_list(self, ctx):
         embed = discord.Embed(title="Custom Commands", color=0x00a0a0)
-        for command in self._custom_commands:
-            embed.add_field(name=command, value=self._custom_commands[command], inline=False)
+        for command in collection.find():
+            embed.add_field(name=command['name'], value=command['description'], inline=False)
         await ctx.send(embed=embed)
 
 def setup(bot):

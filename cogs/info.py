@@ -9,6 +9,13 @@ class info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    with open('config.yaml', 'r') as config_file:
+        config = yaml.load(config_file, Loader=yaml.BaseLoader)
+    global role_ids
+    role_ids = config['role_ids']
+    global channel_ids
+    channel_ids = config['channel_ids']
+
     @commands.Cog.listener()
     async def on_ready(self):
         global starttime
@@ -31,7 +38,7 @@ class info(commands.Cog):
                 seconds -= value * count
                 if value == 1:
                     name = name.rstrip('s')
-                result.append("{} {}".format(value, name))
+                result.append(value + " " + name)
         if len(result) > 1:
             result[-1] = "and " + result[-1]
         if len(result) < 3:
@@ -39,7 +46,7 @@ class info(commands.Cog):
         else:
             uptime = ', '.join(result[:3])
 
-        await ctx.send(f'I have been online for {uptime}.')
+        await ctx.send(f"I have been online for {uptime}.")
 
     @commands.command()
     async def ping(self, ctx):
@@ -49,9 +56,6 @@ class info(commands.Cog):
     async def _commands(self, ctx, arg=None):
         with open('commands.yaml', 'r') as commands_file:
             commands = yaml.load(commands_file, Loader=yaml.BaseLoader)
-        with open('config.yaml', 'r') as config_file:
-            config = yaml.load(config_file, Loader=yaml.BaseLoader)
-        role_ids = config['role_ids']
 
         if not arg:
             embed = discord.Embed(title="Command List", description="Commands come in categories. Here is a list of categories, run `!commands <category>` to see the commands in a certain category.", color=0x00a0a0)
@@ -74,14 +78,13 @@ class info(commands.Cog):
             embed = discord.Embed(title="Command List", description=f"Commands in the {arg} category:", color=0x00a0a0)
             embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
             for command in commands[arg]:
-                embed.add_field(name=command + ':', value=commands[arg].get(command), inline=False)
+                embed.add_field(name=command + ':', value=commands[arg][command], inline=False)
             await ctx.send(embed=embed)
         else:
             await ctx.send('Please send a valid category')
 
-    @commands.command(name='spteam-requirements')
+    @commands.command(name='support-team-requirements')
     async def spteam(self, ctx):
-        await ctx.message.delete()
         embed = discord.Embed(title="Support Team Requirements", color=discord.Color.green())
         embed.add_field(name="Corruption:", value="If a member of the staff team does something they shouldn't have, let the owners know.", inline=False)
         embed.add_field(name="Activity:", value="Support Team members need to be active at least once a week.", inline=False)
@@ -93,7 +96,6 @@ class info(commands.Cog):
 
     @commands.command(name='mod-requirements')
     async def modteam(self, ctx):
-        await ctx.message.delete()
         embed = discord.Embed(title="Moderator Requirements", color=discord.Color.gold())
         embed.add_field(name="Corruption:", value="If a member of the staff team does something they shouldn't have, let the owners know.", inline=False)
         embed.add_field(name="Rules:", value="You need to read the rules and know when to warn, mute, kick, and ban.", inline=False)
@@ -104,12 +106,6 @@ class info(commands.Cog):
 
     @commands.command()
     async def rules(self, ctx):
-        with open('config.yaml', 'r') as config_file:
-            config = yaml.load(config_file, Loader=yaml.BaseLoader)
-        channel_ids = config['channel_ids']
-        role_ids = config['role_ids']
-
-        await ctx.message.delete()
         embed = discord.Embed(title="Server Rules", color=discord.Color.green())
         embed.add_field(name="Rule 1:", value="Be respectful to our Support Team; they provide support voluntarily for free during their own time.", inline=False)
         embed.add_field(name="Rule 2:", value="Profanity is not allowed on this server. If you send a message containing profanity, it will be deleted.", inline=False)
@@ -126,10 +122,6 @@ class info(commands.Cog):
 
     @commands.command()
     async def rule(self, ctx, rule=None):
-        with open('config.yaml', 'r') as config_file:
-            config = yaml.load(config_file, Loader=yaml.BaseLoader)
-        channel_ids = config['channel_ids']
-
         if not rule:
             await ctx.send("Please specify which rule you would like to see.")
             return

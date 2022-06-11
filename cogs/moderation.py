@@ -22,7 +22,7 @@ async def seconds_to_fancytime(seconds, granularity):
             seconds -= value * count
             if value == 1:
                 name = name.rstrip('s')
-            result.append("{} {}".format(value, name))
+            result.append(value + " " + name)
     if len(result) > 1:
         result[-1] = "and " + result[-1]
     if len(result) < 3:
@@ -44,10 +44,10 @@ class moderation(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         async def resume_mute(self, mute):
-            id = int(mute.get('user'))
-            end = int(mute.get('start')) + int(mute.get('time'))
+            id = int(mute['user'])
+            end = int(mute['start']) + int(mute['time'])
             now = int(datetime.now().strftime("%s"))
-            fancytime = await seconds_to_fancytime(int(mute.get('time')), 4)
+            fancytime = await seconds_to_fancytime(int(mute['time']), 4)
 
             if self.bot.guilds[0].get_member(id) is None:
                 return
@@ -72,14 +72,14 @@ class moderation(commands.Cog):
             embed.add_field(name="User unmuted", value=user, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
             embed.add_field(name="Reason", value="Automatic unmute", inline=False)
-            if dm_failed == True:
+            if dm_failed:
                 embed.set_footer(text="was unable to DM user")
             await channel.send(embed=embed)
             await user.remove_roles(muted_role)
 
         collection = mongodb['moderation']
         for mute in collection.find({"type": "mute"}):
-            end = int(mute.get('start')) + int(mute.get('time'))
+            end = int(mute['start']) + int(mute['time'])
             now = int(datetime.now().strftime("%s"))
             if end > now:
                 await resume_mute(self, mute)
@@ -124,18 +124,10 @@ class moderation(commands.Cog):
 
         if not arg:
             id = ctx.message.author.id
-
-        elif "<@" in arg:
-            id = arg
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", arg):
+            id = int(re.search(r"\d{18}", arg).group())
         elif arg.isdigit():
             id = int(arg)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -168,11 +160,11 @@ class moderation(commands.Cog):
         if int(joined) - int(created) < 604800:
             embed.add_field(name="Difference between creation and join:", value=await seconds_to_fancytime(int(joined) - int(created), 2), inline=False)
 
-        mention = []
+        mentions = []
         for role in member.roles:
             if role.name != "@everyone":
-                mention.append(role.mention)
-        roles = ", ".join(mention)
+                mentions.append(role.mention)
+        roles = ", ".join(mentions)
         embed.add_field(name="Roles", value=roles, inline=False)
         await ctx.send(embed=embed)
 
@@ -188,18 +180,10 @@ class moderation(commands.Cog):
         if not arg:
             await ctx.send("Please mention a user to check the warnings of.")
             return
-
-        elif "<@" in arg:
-            id = arg
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", arg):
+            id = int(re.search(r"\d{18}", arg).group())
         elif arg.isdigit():
             id = int(arg)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -213,14 +197,14 @@ class moderation(commands.Cog):
         found = False
         number = 0
         for warning in collection.find():
-            if warning.get('user') == str(id):
+            if warning['user'] == str(id):
                 found = True
                 number = number + 1
-                description = description + f"\n`{number}`:\n**Type:** {warning.get('type')}\n**Reason:** {warning.get('reason')}\n**Moderator:** {guild.get_member(int(warning.get('moderator')))}\n**Message ID:** {warning.get('_id')}\n"
-        embed = discord.Embed(title="Warnings", description=description, color=0x00a0a0)
-        if found == False:
+                description = description + f"\n`{number}`:\n**Type:** {warning['type']}\n**Reason:** {warning['reason']}\n**Moderator:** {guild.get_member(int(warning['moderator']))}\n**Message ID:** {warning['_id']}\n"
+        if not found:
             await ctx.send("This user has no warnings.")
             return
+        embed = discord.Embed(title="Warnings", description=description, color=0x00a0a0)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -235,18 +219,10 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to warn.")
             return
-
-        elif "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -256,8 +232,8 @@ class moderation(commands.Cog):
             return
         member = guild.get_member(id)
 
-        if member.top_role.position >= ctx.message.author.top_role.position:
-            await ctx.send(f"{member} is higher than or equal to you in the role hierarchy, cannot warn.")
+        if member.top_role.position > ctx.message.author.top_role.position:
+            await ctx.send(f"{member} is higher than you in the role hierarchy, cannot warn.")
             return
         if member.bot:
             await ctx.send("You cannot warn bots.")
@@ -303,7 +279,6 @@ class moderation(commands.Cog):
         if not id:
             await ctx.send("Please mention the ID of a warn message to remove.")
             return
-
         elif not id.isdigit():
             await ctx.send("Warns have to be in the form of a Message ID.")
             return
@@ -311,11 +286,11 @@ class moderation(commands.Cog):
         collection = mongodb['moderation']
         found = False
         for warn in collection.find():
-            if warn.get('_id') == id:
+            if warn['_id'] == id:
                 found = True
-                user = warn.get('user')
-                og_reason = warn.get('reason')
-        if found == False:
+                user = warn['user']
+                og_reason = warn['reason']
+        if not found:
             await ctx.send("The warn was not found.")
             return
         collection.delete_one({"_id": id})
@@ -359,7 +334,6 @@ class moderation(commands.Cog):
         if not id:
             await ctx.send("Please mention the message ID of a warning to update the reason of.")
             return
-
         elif not id.isdigit():
             await ctx.send("Warnings have to be in the form of a Message ID.")
             return
@@ -367,12 +341,12 @@ class moderation(commands.Cog):
         collection = mongodb['moderation']
         found = False
         for warn in collection.find():
-            if warn.get('_id') == id:
+            if warn['_id'] == id:
                 found = True
-                user = warn.get('user')
-                moderator = warn.get('moderator')
-                og_reason = warn.get('reason')
-        if found == False:
+                user = warn['user']
+                moderator = warn['moderator']
+                og_reason = warn['reason']
+        if not found:
             await ctx.send("The warning was not found.")
             return
         if ctx.message.author.id != int(moderator) and guild.get_role(int(role_ids['owner'])) not in ctx.message.author.roles:
@@ -383,7 +357,6 @@ class moderation(commands.Cog):
             reason = "No reason provided."
 
         collection.update_one({"_id": id}, {"$set": {"reason": reason}})
-
         channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.fetch_message(int(id))
         og_embed = message.embeds[0]
@@ -424,18 +397,10 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to kick.")
             return
-
-        elif "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -478,10 +443,10 @@ class moderation(commands.Cog):
         except:
             dm_failed = True
 
-        if dm_failed == False:
-            await ctx.message.add_reaction("✅")
-        else:
+        if dm_failed:
             await ctx.send("The member was kicked successfully, but a DM was unable to be sent.")
+        else:
+            await ctx.message.add_reaction("✅")
         await guild.kick(member, reason=reason)
 
     @commands.command()
@@ -496,18 +461,10 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to ban.")
             return
-
-        elif "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -550,17 +507,13 @@ class moderation(commands.Cog):
             dm = await member.create_dm()
         else:
             dm = member.dm_channel
-        dm_failed = False
         try:
             await dm.send(embed=dmbed)
         except:
-            dm_failed = True
+            pass
 
         await guild.ban(discord.Object(id=id), delete_message_days=0, reason=reason)
-        if dm_failed == False:
-            await ctx.message.add_reaction("✅")
-        else:
-            await ctx.send("The member was banned successfully, but a DM was unable to be sent.")
+        await ctx.message.add_reaction("✅")
 
     @commands.command()
     async def unban(self, ctx, user=None, *, reason=None):
@@ -573,18 +526,10 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to unban.")
             return
-
-        elif "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -624,18 +569,10 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to mute.")
             return
-
-        elif "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -696,7 +633,7 @@ class moderation(commands.Cog):
         except:
             dm_failed = True
 
-        if dm_failed == True:
+        if dm_failed:
             await ctx.send(f"{member} was muted for {fancytime}. A DM was unable to be sent.")
         else:
             await ctx.send(f"{member} was muted for {fancytime}.")
@@ -719,7 +656,7 @@ class moderation(commands.Cog):
         embed2.add_field(name="User unmuted", value=member, inline=True)
         embed2.add_field(name="User ID", value=str(id), inline=True)
         embed2.add_field(name="Reason", value="Automatic unmute", inline=False)
-        if dm2_failed == True:
+        if dm2_failed:
             embed2.set_footer(text="was unable to DM user")
         await channel.send(embed=embed2)
         await member.remove_roles(muted_role)
@@ -736,18 +673,10 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to unmute.")
             return
-
-        elif "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
@@ -788,11 +717,11 @@ class moderation(commands.Cog):
         except:
             dm_failed = True
 
-        if dm_failed == True:
+        await member.remove_roles(muted_role)
+        if dm_failed:
             await ctx.send("The member was warned successfully, but a DM was unable to be sent.")
         else:
             await ctx.message.add_reaction("✅")
-        await member.remove_roles(muted_role)
 
 def setup(bot):
     bot.add_cog(moderation(bot))

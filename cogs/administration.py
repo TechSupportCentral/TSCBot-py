@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import yaml
+import re
 import subprocess
 #from emoji import emoji_count
 from main import get_database
@@ -54,13 +55,8 @@ class administration(commands.Cog):
             await ctx.send("Please specify a DM to send.")
             return
 
-        if "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
+        if re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -184,7 +180,7 @@ class administration(commands.Cog):
 
         collection = mongodb['swears']
         for swear in collection.find():
-            if swear.get('swear') == arg:
+            if swear['swear'] == arg:
                 await ctx.send(f"The swear `{arg}` already exists.")
                 return
         collection.insert_one({"swear": arg})
@@ -201,9 +197,10 @@ class administration(commands.Cog):
         collection = mongodb['swears']
         found = False
         for swear in collection.find():
-            if swear.get('swear') == arg:
+            if swear['swear'] == arg:
                 found = True
-        if found == False:
+                break
+        if not found:
             await ctx.send(f"The swear `{arg}` was not found.")
             return
         collection.delete_one({"swear": arg})
@@ -216,7 +213,7 @@ class administration(commands.Cog):
         collection = mongodb['swears']
         description = ""
         for swear in collection.find():
-            description = description + f"\n{swear.get('swear')}"
+            description += f"\n{swear['swear']}"
         embed = discord.Embed(title="Swearlist", description=description, color=0x00a0a0)
         await ctx.send(embed=embed)
 
@@ -256,18 +253,10 @@ class administration(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to softban.")
             return
-
-        elif "<@" in user:
-            id = user
-            id = id.replace("<", "")
-            id = id.replace(">", "")
-            id = id.replace("@", "")
-            id = id.replace("!", "")
-            id = int(id)
-
+        elif re.search(r"<@!?\d{18}>", user):
+            id = int(re.search(r"\d{18}", user).group())
         elif user.isdigit():
             id = int(user)
-
         else:
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
