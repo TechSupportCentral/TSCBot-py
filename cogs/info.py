@@ -38,7 +38,7 @@ class info(commands.Cog):
                 seconds -= value * count
                 if value == 1:
                     name = name.rstrip('s')
-                result.append(value + " " + name)
+                result.append(str(value) + " " + name)
         if len(result) > 1:
             result[-1] = "and " + result[-1]
         if len(result) < 3:
