@@ -342,7 +342,8 @@ class listeners(commands.Cog):
         if invite.inviter == None:
             return
         embed = discord.Embed(title="Invite Created", color=discord.Color.green())
-        embed.add_field(name="Invite Creator", value=invite.inviter, inline=False)
+        embed.add_field(name="Invite Creator", value=invite.inviter, inline=True)
+        embed.add_field(name="User ID", value=invite.inviter.id, inline=True)
         embed.add_field(name="Invite Code", value=invite.code, inline=False)
         embed.add_field(name="Invite Channel", value=invite.channel.mention, inline=False)
         inviteschannel = self.bot.get_channel(int(channel_ids['invites']))
@@ -354,7 +355,8 @@ class listeners(commands.Cog):
         invites = await invite.guild.invites()
         embed = discord.Embed(title="Invite Deleted", color=discord.Color.red())
         if invite.inviter is not None:
-            embed.add_field(name="Invite Creator", value=invite.inviter, inline=False)
+            embed.add_field(name="Invite Creator", value=invite.inviter, inline=True)
+            embed.add_field(name="User ID", value=invite.inviter.id, inline=True)
         embed.add_field(name="Invite Code", value=invite.code, inline=False)
         if invite.channel is not None:
             embed.add_field(name="Invite Channel", value=invite.channel.mention, inline=False)
