@@ -12,6 +12,7 @@ techinfo_desc: "Tutorials and links usually used by Support Team"
 techinfo:
     drivers: "Get links to download various drivers"
     bootkeys: "Get a list of keys used to get into the BIOS Boot Menu"
+    windowsusb: "Get instructions on how to install or reinstall Windows 10"
     linuxusb: "Get instructions on how to create a bootable Linux USB"
     androidusb: "Get instructions on how to flash a Linux ISO to USB on Android"
     vcredist: "Get links to various versions of the Microsoft Visual C++ Redistributable"
