@@ -16,6 +16,8 @@ techinfo:
     linuxusb: "Get instructions on how to create a bootable Linux USB"
     androidusb: "Get instructions on how to flash a Linux ISO to USB on Android"
     vcredist: "Get links to various versions of the Microsoft Visual C++ Redistributable"
+    monitor: "Show the proper location to plug in a monitor"
+    m.2: "Show the difference between SATA and NVMe M.2 SSDs using differently keyed M.2 connectors"
     others: "Many of these commands have been moved to the custom commands system.\nUse `!custom-list` to view all of the custom commands."
 
 misc_desc: "Miscellaneous commands that don't fit in other categories"

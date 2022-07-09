@@ -71,5 +71,14 @@ class techinfo(commands.Cog):
         embed.add_field(name="MSVCP80.dll or MSVCR80.dll", value="[Select the ones you need](https://www.microsoft.com/download/details.aspx?id=26347) (Install both x86 and x64 unless using a 32 bit system)", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def monitor(self, ctx):
+        await ctx.send(file=discord.File('images/monitor.jpg', 'monitor.jpg'))
+
+    @commands.command(name="m.2")
+    async def m2(self, ctx):
+        files = [discord.File('images/m.2-key-type.jpg', 'key-type.jpg'), discord.File('images/m.2-drive-type.jpg', 'drive-type.png')]
+        await ctx.send(files=files)
+
 def setup(bot):
     bot.add_cog(techinfo(bot))
