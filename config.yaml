@@ -48,6 +48,10 @@ channel_ids:
     role_deleted: 825787981435502612
     bot_dm: 853984661360869386
 
+message_ids:
+    rules: 996652911650152498
+    reaction_role_bump: 891857181757046855
+
 support_channels:
   - "general_support"
   - "software_support"

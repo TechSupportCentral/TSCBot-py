@@ -15,6 +15,8 @@ class info(commands.Cog):
     role_ids = config['role_ids']
     global channel_ids
     channel_ids = config['channel_ids']
+    global message_ids
+    message_ids = config['message_ids']
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -130,7 +132,7 @@ class info(commands.Cog):
             return
 
         channel = self.bot.get_channel(int(channel_ids['rules']))
-        message = await channel.fetch_message(channel.last_message_id)
+        message = await channel.fetch_message(int(message_ids['rules']))
 
         if int(rule) > len(message.embeds[0].fields):
             await ctx.send("This rule does not exist.")

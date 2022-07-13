@@ -36,6 +36,8 @@ class listeners(commands.Cog):
     public_channel_names = config['public_channels']
     global role_ids
     role_ids = config['role_ids']
+    global message_ids
+    message_ids = config['message_ids']
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -432,7 +434,7 @@ class listeners(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         user = guild.get_member(payload.user_id)
 
-        if payload.message_id == 891857181757046855 and str(payload.emoji) == "✅":
+        if payload.message_id == int(message_ids['reaction_role_bump']) and str(payload.emoji) == "✅":
             role = guild.get_role(int(role_ids['bump_reminders']))
 
             dmessage = f"Added the `{role.name}` role."
@@ -455,7 +457,7 @@ class listeners(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         user = guild.get_member(payload.user_id)
 
-        if payload.message_id == 891857181757046855 and str(payload.emoji) == "✅":
+        if payload.message_id == int(message_ids['reaction_role_bump']) and str(payload.emoji) == "✅":
             role = guild.get_role(int(role_ids['bump_reminders']))
 
             dmessage = f"Removed the `{role.name}` role."
