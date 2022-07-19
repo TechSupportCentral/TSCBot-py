@@ -60,6 +60,12 @@ class techinfo(commands.Cog):
         embed.set_footer(text="Note: EtchDroid will not work for Windows ISOs as they don't follow the ISOHybrid standard.")
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['windows7', 'windows8'])
+    async def legacywindows(self, ctx):
+        embed = discord.Embed(title="Legacy versions of Windows", description="Windows 7 and 8 are no longer officially supported by Microsoft.\nUsing older versions of windows puts you at risk to malware and other vulnerabilities (even if you're careful), which can easily be avoided by upgrading your operating system.", color=0x00a0a0)
+        embed.add_field(name="What can I do?", value="If your computer is good enough to run Windows 10 reliably, download the [Media Creation Tool](https://microsoft.com/en-us/software-download/windows10) and select 'Upgrade this PC now' to upgrade to Windows 10. It's not recommend to upgrade to Windows 11 at this time.\nIf your computer isn't good enough to run Windows 10 very well, it's recommended to switch to a lighter Linux distribution such as Linux Mint. Instructions are available with the `!linuxusb` command.", inline=False)
+        await ctx.send(embed=embed)
+
     @commands.command()
     async def vcredist(self, ctx):
         embed = discord.Embed(title="Visual C++ Redistributable", url="https://docs.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist", description="If you are missing any of the following DLLs, download the corresponding file(s) and install them.", color=0x00a0a0)

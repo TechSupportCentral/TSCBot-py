@@ -15,6 +15,7 @@ techinfo:
     windowsusb: "Get instructions on how to install or reinstall Windows 10"
     linuxusb: "Get instructions on how to create a bootable Linux USB"
     androidusb: "Get instructions on how to flash a Linux ISO to USB on Android"
+    legacywindows: "Explain why Windows 7 and 8 should not be used"
     vcredist: "Get links to various versions of the Microsoft Visual C++ Redistributable"
     monitor: "Show the proper location to plug in a monitor"
     m.2: "Show the difference between SATA and NVMe M.2 SSDs using differently keyed M.2 connectors"
