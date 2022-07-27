@@ -11,6 +11,7 @@ info:
 techinfo_desc: "Tutorials and links usually used by Support Team"
 techinfo:
     drivers: "Get links to download various drivers"
+    driver-managers: "Explain why third party driver managers should not be used"
     bootkeys: "Get a list of keys used to get into the BIOS Boot Menu"
     windowsusb: "Get instructions on how to install or reinstall Windows 10"
     linuxusb: "Get instructions on how to create a bootable Linux USB"

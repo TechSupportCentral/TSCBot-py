@@ -11,6 +11,14 @@ class techinfo(commands.Cog):
         embed.add_field(name="Realtek Audio Drivers:", value="https://www.realtek.com/en/downloads", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command(name="driver-managers", aliases=["driverbooster", "drivereasy", "microsoft-drivers"])
+    async def driver_managers(self, ctx):
+        embed = discord.Embed(title="Third Party Driver Managers", description="Do not use third party driver managers like Driver Booster or Driver Easy. They are usually either spyware or adware and install broken or outdated drivers which can cause many problems.", color=0x00a0a0)
+        embed.add_field(name="What should I do instead?", value="If you have a prebuilt computer, go to the manufacturer's website and download the drivers for your model. [Here](https://support.hp.com/us-en/drivers/selfservice/hp-envy-m6-aq100-x360-convertible-pc/12499188/model/13475171) is an example of an OEM driver page.\nIf you built your own computer, go to the motherboard manufacturer's page and download the drivers for your motherboard, then any other drivers from the pages of the manufacturers of the parts. For example, if you have an Asus TUF GAMING X570-PLUS WiFi with an RTX 3090, you would download your BIOS, chipset, audio, and WiFi drivers [here](https://www.asus.com/supportonly/TUF%20GAMING%20X570-PLUS%20(WI-FI)/HelpDesk_Download/) and your graphics drivers [here](https://nvidia.com/Download/driverResults.aspx/190552/).", inline=False)
+        embed.add_field(name="Graphics Drivers", value="Even if your computer is a prebuilt, you should still get your graphics drivers directly from the manufacturer of the GPU ([AMD](https://amd.com/en/support), [NVIDIA](https://nvidia.com/Download/index.aspx), [Intel](https://dsadata.intel.com/installer), etc).", inline=False)
+        embed.add_field(name="What about Windows Update?", value="Microsoft usually doesn't supply the best drivers for your hardware. In many cases they're out of date, and for graphics drivers, they're commonly less functional and will have decreased performance and support.", inline=False)
+        await ctx.send(embed=embed)
+
     @commands.command(aliases=["bootkey"])
     async def bootkeys(self, ctx):
         embed = discord.Embed(title="How to get into the boot menus of various computers:", description="Find your brand below and spam the relevant key when you start the computer up.", color=0x00a0a0)
