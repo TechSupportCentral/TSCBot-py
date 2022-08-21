@@ -62,7 +62,7 @@ class custom_commands(commands.Cog):
         await add_command(self, name, value)
 
         embed = discord.Embed(title="Custom Command Added", color=discord.Color.green())
-        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        embed.set_thumbnail(url=ctx.message.author.display_avatar)
         embed.add_field(name="Added by", value=ctx.message.author, inline=False)
         embed.add_field(name="Command Name", value=name, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
@@ -93,7 +93,7 @@ class custom_commands(commands.Cog):
         ctx.bot.remove_command(arg)
 
         embed = discord.Embed(title="Custom Command Removed", color=discord.Color.red())
-        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        embed.set_thumbnail(url=ctx.message.author.display_avatar)
         embed.add_field(name="Removed by", value=ctx.message.author, inline=False)
         embed.add_field(name="Command Name", value=arg, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
@@ -129,5 +129,5 @@ class custom_commands(commands.Cog):
             embed.add_field(name=command['name'], value=command['description'], inline=False)
         await ctx.send(embed=embed)
 
-def setup(bot):
-    bot.add_cog(custom_commands(bot))
+async def setup(bot):
+    await bot.add_cog(custom_commands(bot))

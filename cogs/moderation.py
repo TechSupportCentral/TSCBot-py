@@ -68,7 +68,7 @@ class moderation(commands.Cog):
                 dm_failed = True
 
             embed = discord.Embed(title="Mute Removed", color=discord.Color.green())
-            embed.set_thumbnail(url=user.avatar_url)
+            embed.set_thumbnail(url=user.display_avatar)
             embed.add_field(name="User unmuted", value=user, inline=True)
             embed.add_field(name="User ID", value=str(id), inline=True)
             embed.add_field(name="Reason", value="Automatic unmute", inline=False)
@@ -107,7 +107,7 @@ class moderation(commands.Cog):
 
         await ctx.channel.purge(limit=arg)
         embed=discord.Embed(title=str(arg - 1) + " Messages Deleted", color=discord.Color.red())
-        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        embed.set_thumbnail(url=ctx.message.author.display_avatar)
         embed.add_field(name="Deleted by", value=ctx.message.author, inline=True)
         embed.add_field(name="In channel", value=ctx.message.channel.mention, inline=True)
         channel = self.bot.get_channel(int(channel_ids['modlog']))
@@ -124,8 +124,8 @@ class moderation(commands.Cog):
 
         if not arg:
             id = ctx.message.author.id
-        elif re.search(r"<@!?\d{18}>", arg):
-            id = int(re.search(r"\d{18}", arg).group())
+        elif re.search(r"<@!?\d+>", arg):
+            id = int(re.search(r"\d+", arg).group())
         elif arg.isdigit():
             id = int(arg)
         else:
@@ -138,15 +138,15 @@ class moderation(commands.Cog):
 
         member = guild.get_member(id)
         embed=discord.Embed(title=member, color=0x00a0a0)
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User ID", value=id, inline=False)
         if member.name != member.display_name:
             embed.add_field(name="Nickname", value=member.display_name, inline=False)
 
         created = member.created_at.strftime("%s")
         joined = member.joined_at.strftime("%s")
-        created_delta = int(datetime.now().strftime("%s")) - int(created)
-        joined_delta = int(datetime.now().strftime("%s")) - int(joined)
+        created_delta = int(discord.utils.utcnow().strftime("%s")) - int(created)
+        joined_delta = int(discord.utils.utcnow().strftime("%s")) - int(joined)
         if created_delta < 604800:
             created_fancy = await seconds_to_fancytime(created_delta, 2)
         else:
@@ -180,8 +180,8 @@ class moderation(commands.Cog):
         if not arg:
             await ctx.send("Please mention a user to check the warnings of.")
             return
-        elif re.search(r"<@!?\d{18}>", arg):
-            id = int(re.search(r"\d{18}", arg).group())
+        elif re.search(r"<@!?\d+>", arg):
+            id = int(re.search(r"\d+", arg).group())
         elif arg.isdigit():
             id = int(arg)
         else:
@@ -219,8 +219,8 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to warn.")
             return
-        elif re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        elif re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -245,7 +245,7 @@ class moderation(commands.Cog):
         channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(".")
         embed = discord.Embed(title="Warning", description=f"Use `!unwarn {message.id} <reason>` to remove this warning. Note: This is not the user's ID, rather the ID of this message.", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User warned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -300,7 +300,7 @@ class moderation(commands.Cog):
 
         member = guild.get_member(int(user))
         embed = discord.Embed(title="Warning Removed", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User unwarned", value=member, inline=True)
         embed.add_field(name="User ID", value=user, inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -397,8 +397,8 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to kick.")
             return
-        elif re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        elif re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -421,7 +421,7 @@ class moderation(commands.Cog):
             reason = "No reason provided."
 
         embed = discord.Embed(title="Kick", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User kicked", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -461,8 +461,8 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to ban.")
             return
-        elif re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        elif re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -490,7 +490,7 @@ class moderation(commands.Cog):
             reason = "No reason provided."
 
         embed = discord.Embed(title="Ban", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User banned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -526,8 +526,8 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to unban.")
             return
-        elif re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        elif re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -543,7 +543,7 @@ class moderation(commands.Cog):
             reason = "No reason provided."
 
         embed = discord.Embed(title="Ban Removed", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User unbanned", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -569,8 +569,8 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to mute.")
             return
-        elif re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        elif re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -610,7 +610,7 @@ class moderation(commands.Cog):
             return
 
         embed = discord.Embed(title="Mute", color=discord.Color.red())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User muted", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -652,7 +652,7 @@ class moderation(commands.Cog):
             dm2_failed = True
 
         embed2 = discord.Embed(title="Mute Removed", color=discord.Color.green())
-        embed2.set_thumbnail(url=member.avatar_url)
+        embed2.set_thumbnail(url=member.display_avatar)
         embed2.add_field(name="User unmuted", value=member, inline=True)
         embed2.add_field(name="User ID", value=str(id), inline=True)
         embed2.add_field(name="Reason", value="Automatic unmute", inline=False)
@@ -673,8 +673,8 @@ class moderation(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to unmute.")
             return
-        elif re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        elif re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -695,7 +695,7 @@ class moderation(commands.Cog):
             return
 
         embed = discord.Embed(title="Mute Removed", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="User unmuted", value=member, inline=True)
         embed.add_field(name="User ID", value=str(id), inline=True)
         embed.add_field(name="Moderator", value=ctx.message.author, inline=False)
@@ -723,5 +723,5 @@ class moderation(commands.Cog):
         else:
             await ctx.message.add_reaction("✅")
 
-def setup(bot):
-    bot.add_cog(moderation(bot))
+async def setup(bot):
+    await bot.add_cog(moderation(bot))

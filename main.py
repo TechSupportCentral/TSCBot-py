@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from asyncio import run
 import os
 import yaml
 import pymongo
@@ -15,18 +16,22 @@ def get_database():
 if __name__ == "__main__":
     mongodb = get_database()
 
-intents = discord.Intents.default()
-intents.members = True
-bot = commands.Bot(command_prefix=config['prefix'], intents=intents, help_command=None)
+    intents = discord.Intents.default()
+    intents.members = True
+    intents.message_content = True
+    bot = commands.Bot(command_prefix=config['prefix'], intents=intents, help_command=None)
 
-for filename in os.listdir('cogs'):
-    if filename.endswith('.py'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
-        print(f'Cog {filename[:-3]} loaded')
+    @bot.event
+    async def on_ready():
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='TSC'))
+        print('Logged in as ' + bot.user.name)
 
-@bot.event
-async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='TSC'))
-    print('Logged in as ' + bot.user.name)
+    async def run_bot():
+        async with bot:
+            for filename in os.listdir('cogs'):
+                if filename.endswith('.py'):
+                    await bot.load_extension(f'cogs.{filename[:-3]}')
+                    print(f'Cog {filename[:-3]} loaded')
 
-bot.run(config['token'])
+            await bot.start(config['token'])
+    run(run_bot())

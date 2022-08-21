@@ -55,8 +55,8 @@ class administration(commands.Cog):
             await ctx.send("Please specify a DM to send.")
             return
 
-        if re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        if re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -81,7 +81,7 @@ class administration(commands.Cog):
 
         await ctx.message.add_reaction("✅")
         embed = discord.Embed(title="DM Sent", color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.display_avatar)
         embed.add_field(name="Sent to", value=member, inline=True)
         embed.add_field(name="User ID", value=member.id, inline=True)
         embed.add_field(name="Sent by", value=ctx.message.author, inline=False)
@@ -253,8 +253,8 @@ class administration(commands.Cog):
         if not user:
             await ctx.send("Please mention a user to softban.")
             return
-        elif re.search(r"<@!?\d{18}>", user):
-            id = int(re.search(r"\d{18}", user).group())
+        elif re.search(r"<@!?\d+>", user):
+            id = int(re.search(r"\d+", user).group())
         elif user.isdigit():
             id = int(user)
         else:
@@ -280,5 +280,5 @@ class administration(commands.Cog):
         commit = subprocess.run(['git', 'show', '-s', '--oneline'], stdout=subprocess.PIPE).stdout.decode('utf-8')[:7]
         await ctx.send(f"I am currently running on commit {commit}.\nhttps://github.com/TechSupportCentral/TSCBot-py/commit/{commit}")
 
-def setup(bot):
-    bot.add_cog(administration(bot))
+async def setup(bot):
+    await bot.add_cog(administration(bot))

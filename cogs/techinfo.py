@@ -94,5 +94,5 @@ class techinfo(commands.Cog):
         files = [discord.File('images/m.2-key-type.jpg', 'key-type.jpg'), discord.File('images/m.2-drive-type.jpg', 'drive-type.png')]
         await ctx.send(files=files)
 
-def setup(bot):
-    bot.add_cog(techinfo(bot))
+async def setup(bot):
+    await bot.add_cog(techinfo(bot))

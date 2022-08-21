@@ -93,7 +93,7 @@ class misc(commands.Cog):
             await ctx.send("Please provide a suggestion.")
             return
         embed = discord.Embed(description=f"**Suggestion:** {suggestion}", color=discord.Color.lighter_grey())
-        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
         embed.add_field(name="Status", value="Pending")
         channel = self.bot.get_channel(int(channel_ids['suggestions_list']))
         await channel.send(embed=embed)
@@ -150,5 +150,5 @@ class misc(commands.Cog):
 
             await ctx.send("https://youtu.be/" + v + t)
 
-def setup(bot):
-    bot.add_cog(misc(bot))
+async def setup(bot):
+    await bot.add_cog(misc(bot))
