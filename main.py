@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from asyncio import run
+import logging
 import os
 import yaml
 import pymongo

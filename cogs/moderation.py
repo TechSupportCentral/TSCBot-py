@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
-from datetime import datetime
+from datetime import timedelta
 import re
 from main import get_database
 mongodb = get_database()
@@ -40,49 +40,6 @@ class moderation(commands.Cog):
     role_ids = config['role_ids']
     global channel_ids
     channel_ids = config['channel_ids']
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        async def resume_mute(self, mute):
-            id = int(mute['user'])
-            end = int(mute['start']) + int(mute['time'])
-            now = int(datetime.now().strftime("%s"))
-            fancytime = await seconds_to_fancytime(int(mute['time']), 4)
-
-            if self.bot.guilds[0].get_member(id) is None:
-                return
-            user = self.bot.guilds[0].get_member(id)
-            muted_role = self.bot.guilds[0].get_role(int(role_ids['muted']))
-            channel = self.bot.get_channel(int(channel_ids['modlog']))
-
-            print(f"Resuming mute of {fancytime} for {user}")
-            await sleep(end - now)
-            if not muted_role in user.roles:
-                return
-
-            dmbed = discord.Embed(title="You have been automatically unmuted.", color=discord.Color.green())
-            dm_failed = False
-            try:
-                await user.dm_channel.send(embed=dmbed)
-            except:
-                dm_failed = True
-
-            embed = discord.Embed(title="Mute Removed", color=discord.Color.green())
-            embed.set_thumbnail(url=user.display_avatar)
-            embed.add_field(name="User unmuted", value=user, inline=True)
-            embed.add_field(name="User ID", value=str(id), inline=True)
-            embed.add_field(name="Reason", value="Automatic unmute", inline=False)
-            if dm_failed:
-                embed.set_footer(text="was unable to DM user")
-            await channel.send(embed=embed)
-            await user.remove_roles(muted_role)
-
-        collection = mongodb['moderation']
-        for mute in collection.find({"type": "mute"}):
-            end = int(mute['start']) + int(mute['time'])
-            now = int(datetime.now().strftime("%s"))
-            if end > now:
-                await resume_mute(self, mute)
 
     @commands.command()
     async def purge(self, ctx, arg=None):
@@ -600,12 +557,14 @@ class moderation(commands.Cog):
         cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', time).groups(), [0, 0, 0, 0])]
         seconds = cooltime[0]*86400 + cooltime[1]*3600 + cooltime[2]*60 + cooltime[3]
         fancytime = await seconds_to_fancytime(seconds, gran)
+        if seconds > 2419200:
+            await ctx.send("A member cannot be muted for more than 28 days.")
+            return
 
         if not reason:
             reason = "No reason provided."
 
-        muted_role = guild.get_role(int(role_ids['muted']))
-        if muted_role in member.roles:
+        if member.is_timed_out():
             await ctx.send(f"{member} is already muted.")
             return
 
@@ -620,7 +579,9 @@ class moderation(commands.Cog):
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(id), "moderator": str(ctx.message.author.id), "start": str(datetime.now().strftime("%s")), "time": str(seconds), "reason": reason})
+        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(id), "moderator": str(ctx.message.author.id), "start": str(discord.utils.utcnow().strftime("%s")), "time": str(seconds), "reason": reason})
+
+        await member.timeout(timedelta(seconds=seconds), reason=reason)
 
         dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description=f"**Reason:** {reason}", color=discord.Color.red())
         if member.dm_channel is None:
@@ -639,9 +600,8 @@ class moderation(commands.Cog):
             await ctx.send(f"{member} was muted for {fancytime}.")
             await ctx.message.add_reaction("✅")
 
-        await member.add_roles(muted_role)
-        await sleep(seconds)
-        if not muted_role in member.roles:
+        await sleep(seconds - 1)
+        if not member.is_timed_out():
             return
 
         dmbed2 = discord.Embed(title="You have been automatically unmuted.", color=discord.Color.green())
@@ -659,7 +619,6 @@ class moderation(commands.Cog):
         if dm2_failed:
             embed2.set_footer(text="was unable to DM user")
         await channel.send(embed=embed2)
-        await member.remove_roles(muted_role)
 
     @commands.command()
     async def unmute(self, ctx, user=None, *, reason=None):
@@ -689,8 +648,7 @@ class moderation(commands.Cog):
         if not reason:
             reason = "No reason provided."
 
-        muted_role = guild.get_role(int(role_ids['muted']))
-        if not muted_role in member.roles:
+        if not member.is_timed_out():
             await ctx.send(f"{member} is not muted.")
             return
 
@@ -706,6 +664,8 @@ class moderation(commands.Cog):
         collection = mongodb['moderation']
         collection.insert_one({"_id": str(message.id), "type": "unmute", "user": str(id), "moderator": str(ctx.message.author.id), "reason": reason})
 
+        await member.timeout(None, reason=reason)
+
         dmbed = discord.Embed(title="You have been unmuted.", description=f"**Reason:** {reason}", color=discord.Color.green())
         if member.dm_channel is None:
             dm = await member.create_dm()
@@ -717,7 +677,6 @@ class moderation(commands.Cog):
         except:
             dm_failed = True
 
-        await member.remove_roles(muted_role)
         if dm_failed:
             await ctx.send("The member was warned successfully, but a DM was unable to be sent.")
         else:
