@@ -3,7 +3,6 @@ import discord
 import yaml
 import re
 import subprocess
-#from emoji import emoji_count
 from main import get_database
 mongodb = get_database()
 
@@ -171,29 +170,25 @@ class administration(commands.Cog):
 
         await ctx.message.add_reaction("✅")
 
-    @commands.command(name="add-swear")
-    @commands.has_permissions(administrator=True)
-    async def add_swear(self, ctx, arg=None):
-        if not arg:
-            await ctx.send("Please provide the name of the new swear.")
-            return
-
+    @discord.app_commands.command(name="add-swear", description="Add a swear to the swearlist")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
+    @discord.app_commands.rename(arg="swear")
+    async def add_swear(self, interaction: discord.Interaction, arg: str):
         collection = mongodb['swears']
         for swear in collection.find():
             if swear['swear'] == arg:
-                await ctx.send(f"The swear `{arg}` already exists.")
+                await interaction.response.send_message(f"The swear `{arg}` already exists.", ephemeral=True)
                 return
         collection.insert_one({"swear": arg})
-        await ctx.send(f"Swear `{arg}` successfully added.")
-        await ctx.send("reload swears")
+        await interaction.response.send_message(f"Swear `{arg}` successfully added.")
+        await interaction.channel.send("reload swears")
 
-    @commands.command(name="remove-swear")
-    @commands.has_permissions(administrator=True)
-    async def remove_swear(self, ctx, arg=None):
-        if not arg:
-            await ctx.send("Please provide the name of the swear to remove.")
-            return
-
+    @discord.app_commands.command(name="remove-swear", description="Remove a swear from the swearlist")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
+    @discord.app_commands.rename(arg="swear")
+    async def remove_swear(self, interaction: discord.Interaction, arg: str):
         collection = mongodb['swears']
         found = False
         for swear in collection.find():
@@ -201,81 +196,34 @@ class administration(commands.Cog):
                 found = True
                 break
         if not found:
-            await ctx.send(f"The swear `{arg}` was not found.")
+            await interaction.response.send_message(f"The swear `{arg}` was not found.", ephemeral=True)
             return
         collection.delete_one({"swear": arg})
-        await ctx.send(f"Swear `{arg}` successfully removed.")
-        await ctx.send("reload swears")
+        await interaction.response.send_message(f"Swear `{arg}` successfully removed.")
+        await interaction.channel.send("reload swears")
 
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def swearlist(self, ctx):
+    @discord.app_commands.command(description="Get a list of the current swears")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
+    async def swearlist(self, interaction: discord.Interaction):
         collection = mongodb['swears']
         description = ""
         for swear in collection.find():
             description += f"\n{swear['swear']}"
         embed = discord.Embed(title="Swearlist", description=description, color=0x00a0a0)
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
-#    @commands.command(name="add-reaction-role")
-#    async def add_reaction_role(self, ctx, role=None, reaction=None, *, message=None):
-#        if not role:
-#            await ctx.send("Please provide the ID of the role to add.")
-#            return
-#        if not reaction:
-#            await ctx.send("Please provide the emoji to use as a reaction.")
-#            return
-#        if not message:
-#            await ctx.send("Please provide the contents of the reaction role message.")
-#            return
-#
-#        if not ctx.message.guild.get_role(int(role)):
-#            await ctx.send("Not a valid role.")
-#            return
-#
-#        if emoji_count(reaction) != 1:
-#            await ctx.send("Not a valid emoji.")
-#            return
-#
-#        channel = self.bot.get_channel(int(channel_ids['reaction_roles']))
-#        message = await channel.send(message)
-#        await message.add_reaction(reaction)
-#
-#        collection = mongodb['reaction-roles']
-#        collection.insert_one({"_id": str(message.id), "role": role, "emoji": reaction})
-#
-#        await ctx.message.add_reaction("✅")
-#        await ctx.send("reload reaction roles")
+    @discord.app_commands.command(description="Ban a user to delete all their messages, then unban them")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
+    async def softban(self, interaction: discord.Interaction, user: discord.User):
+        await interaction.guild.ban(discord.Object(id=user.id), delete_message_days=7, reason="softban")
+        await interaction.response.send_message(user + "softbanned successfully.")
+        await interaction.guild.unban(discord.Object(id=user.id), reason="softban")
 
-    @commands.command()
-    async def softban(self, ctx, user=None):
-        guild = ctx.message.guild
-        if not user:
-            await ctx.send("Please mention a user to softban.")
-            return
-        elif re.search(r"<@!?\d+>", user):
-            id = int(re.search(r"\d+", user).group())
-        elif user.isdigit():
-            id = int(user)
-        else:
-            await ctx.send("Users have to be in the form of an ID or a mention.")
-            return
-
-        if guild.get_member(id) is None:
-            member = await self.bot.fetch_user(id)
-        else:
-            member = guild.get_member(id)
-
-        if not member:
-            await ctx.send("Not a valid discord user.")
-            return
-
-        await guild.ban(discord.Object(id=id), delete_message_days=7, reason="softban")
-        await ctx.message.add_reaction("✅")
-        await guild.unban(discord.Object(id=id), reason="softban")
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
+    @commands.hybrid_command(description="See what git commit the bot is currently running on")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
     async def commit(self, ctx):
         commit = subprocess.run(['git', 'show', '-s', '--oneline'], stdout=subprocess.PIPE).stdout.decode('utf-8')[:7]
         await ctx.send(f"I am currently running on commit {commit}.\nhttps://github.com/TechSupportCentral/TSCBot-py/commit/{commit}")

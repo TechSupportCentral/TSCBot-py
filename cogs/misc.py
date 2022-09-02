@@ -74,67 +74,58 @@ class misc(commands.Cog):
         for reminder in collection.find():
             await remind(self, collection, reminder)
 
-    @commands.command()
-    async def alert(self, ctx, *, description=None):
-        if description:
-            alert = description
-        else:
-            alert = "A description was not provided."
-        embed = discord.Embed(title="Moderator Alert", description=f"[Jump to message]({ctx.message.jump_url})\n{alert}", color=discord.Color.red())
-        embed.add_field(name="Alert Author", value=ctx.message.author, inline=True)
-        embed.add_field(name="User ID", value=ctx.message.author.id, inline=True)
+    @discord.app_commands.command(description="Alert the moderators")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.describe(description="What you're alerting the moderators about")
+    async def alert(self, interaction: discord.Interaction, description: str = "A description was not provided."):
+        embed = discord.Embed(title="Moderator Alert", description=interaction.channel.mention + "\n\n" + description, color=discord.Color.red())
+        embed.add_field(name="Alert Author", value=interaction.user, inline=True)
+        embed.add_field(name="User ID", value=interaction.user.id, inline=True)
         channel = self.bot.get_channel(int(channel_ids['modlog']))
         await channel.send(f"<@&{role_ids['moderator']}> <@&{role_ids['trial_mod']}>", embed=embed)
-        await ctx.send("The moderators have been alerted.")
+        await interaction.response.send_message("The moderators have been alerted.", ephemeral=True)
 
-    @commands.command()
-    async def suggest(self, ctx, *, suggestion=None):
-        if not suggestion:
-            await ctx.send("Please provide a suggestion.")
-            return
+    @discord.app_commands.command(description="Make a suggestion on how to improve the server")
+    @discord.app_commands.guild_only()
+    async def suggest(self, interaction: discord.Interaction, suggestion: str):
         embed = discord.Embed(description=f"**Suggestion:** {suggestion}", color=discord.Color.lighter_grey())
-        embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
+        embed.set_author(name=interaction.user, icon_url=interaction.user.display_avatar)
         embed.add_field(name="Status", value="Pending")
         channel = self.bot.get_channel(int(channel_ids['suggestions_list']))
         await channel.send(embed=embed)
-        await ctx.message.add_reaction("✅")
+        await interaction.response.send_message("Thanks for your suggestion! You will be notified when the owners respond.")
 
-    @commands.command()
-    async def remindme(self, ctx, time=None, *, reminder=None):
-        if not time:
-            await ctx.send("Please specify the time you would like to be reminded in.")
-            return
-        if not reminder:
-            reminder = "No description provided."
+    @discord.app_commands.command(description="Remind yourself of something")
+    @discord.app_commands.describe(
+        time="The amount of time you'd like to be reminded in.\nSyntax is `1d2h3m4s` (example of 1 day, 2 hours, 3 minutes, and 4 seconds).",
+        reminder="What you're reminding yourself of"
+    )
+    async def remindme(self, interaction: discord.Interaction, time: str, reminder: str = "No description provided."):
         gran = 0
         for char in time:
             gran += char.isalpha()
         if gran > 4:
-            await ctx.send("The time you mentioned for me to remind you in is not in the correct format.\nIt should look something like `1d2h3m4s` (1 day, 2 hours, 3 minutes, and 4 seconds).")
+            await interaction.response.send_message("The time you requested to be reminded in is not in the correct format.\nIt should look something like `1d2h3m4s` (1 day, 2 hours, 3 minutes, and 4 seconds).", ephemeral=True)
             return
         cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', time).groups(), [0, 0, 0, 0])]
         seconds = cooltime[0]*86400 + cooltime[1]*3600 + cooltime[2]*60 + cooltime[3]
         fancytime = await seconds_to_fancytime(seconds, gran)
 
         collection = mongodb['reminders']
-        collection.insert_one({"_id": str(ctx.message.id), "text": reminder, "time": fancytime, "user": str(ctx.message.author.id), "end": str(int(datetime.now().strftime("%s")) + seconds)})
-        await ctx.send(f"I will remind you in {fancytime}.")
+        collection.insert_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id), "end": str(int(datetime.now().strftime("%s")) + seconds)})
+        await interaction.response.send_message(f"I will remind you in {fancytime}.", ephemeral=True)
         await sleep(seconds)
-        collection.delete_one({"_id": str(ctx.message.id)})
+        collection.delete_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id)})
 
-        embed = discord.Embed(title=f"Reminder from {fancytime} ago:", description=f"{reminder}\n\n[link to original message]({ctx.message.jump_url})", color=0x00a0a0)
-        if ctx.message.author.dm_channel is None:
-            dm = await ctx.message.author.create_dm()
+        embed = discord.Embed(title=f"Reminder from {fancytime} ago:", description=reminder, color=0x00a0a0)
+        if interaction.user.dm_channel is None:
+            dm = await interaction.user.create_dm()
         else:
-            dm = ctx.message.author.dm_channel
+            dm = interaction.user.dm_channel
         await dm.send(embed=embed)
 
-    @commands.command()
-    async def shorten(self, ctx, link=None):
-        if not link:
-            await ctx.send("Please specify a link to shorten.")
-            return
-
+    @commands.hybrid_command(description="Shorten a link")
+    async def shorten(self, ctx, link: str):
         if re.search(r"https?:\/\/(www\.)?amazon\.[^\/]*", link) and re.search(r"\/dp\/B0[\dA-Z]{8}\/", link):
             amazon = re.search(r"amazon\.[^\/]*", link).group()
             dp = re.search(r"\/dp\/B0[0-9A-Z]{8}\/", link).group()

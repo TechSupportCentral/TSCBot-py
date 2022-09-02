@@ -19,7 +19,7 @@ class custom_commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        async def add_command(self, name, value):
+        async def add_command(self, name, value, description):
             self._custom_commands[name] = value
 
             @commands.command(name=name)
@@ -29,14 +29,27 @@ class custom_commands(commands.Cog):
             cmd.cog = self
             self.__cog_commands__ += (cmd,)
             self.bot.add_command(cmd)
+
+            @discord.app_commands.command(name=name, description=description)
+            async def appcmd(interaction: discord.Interaction):
+                await interaction.response.send_message(value)
+
+            self.bot.tree.add_command(appcmd)
 
         for command in collection.find():
-            await add_command(self, command['name'], command['value'])
+            await add_command(self, command['name'], command['value'], command['description'])
+        await self.bot.tree.sync()
 
-    @commands.command(name="add-custom")
-    @commands.has_permissions(administrator=True)
-    async def add_custom(self, ctx, name=None, *, value=None):
-        async def add_command(self, name, value):
+    @discord.app_commands.command(name="add-custom", description="Add a new custom command")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
+    @discord.app_commands.describe(
+        name="Name of the command",
+        value="Response from the bot when the command is used",
+        description="Description of the command"
+    )
+    async def add_custom(self, interaction: discord.Interaction, name: str, value: str, description: str):
+        async def add_command(self, name, value, description):
             self._custom_commands[name] = value
 
             @commands.command(name=name)
@@ -47,82 +60,58 @@ class custom_commands(commands.Cog):
             self.__cog_commands__ += (cmd,)
             self.bot.add_command(cmd)
 
-        if not name:
-            await ctx.send("Please provide a name for the new custom command.")
-            return
-        if not value:
-            await ctx.send("Please provide the response for when the command is run.")
+            @discord.app_commands.command(name=name, description=description)
+            async def appcmd(interaction: discord.Interaction):
+                await interaction.response.send_message(value)
+
+            self.bot.tree.add_command(appcmd)
+            await self.bot.tree.sync()
+
+        if name in self._custom_commands or self.bot.get_command(name) or self.bot.tree.get_command(name):
+            await interaction.response.send_message(f"The command `{name}` already exists.", ephemeral=True)
             return
 
-        if self._custom_commands[name] or ctx.bot.get_command(name):
-            await ctx.send(f"The command `{name}` already exists.")
-            return
-
-        collection.insert_one({"name": name, "value": value})
-        await add_command(self, name, value)
+        collection.insert_one({"name": name, "value": value, "description": description})
+        await add_command(self, name, value, description)
 
         embed = discord.Embed(title="Custom Command Added", color=discord.Color.green())
-        embed.set_thumbnail(url=ctx.message.author.display_avatar)
-        embed.add_field(name="Added by", value=ctx.message.author, inline=False)
+        embed.set_thumbnail(url=interaction.user.display_avatar)
+        embed.add_field(name="Added by", value=interaction.user, inline=False)
         embed.add_field(name="Command Name", value=name, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
-        channel = ctx.bot.get_channel(int(channel_ids['staff_news']))
+        channel = self.bot.get_channel(int(channel_ids['staff_news']))
         await channel.send(embed=embed)
-        await ctx.message.add_reaction("✅")
-        await ctx.send(f"Please give the command a description with `!add-custom-description {name} description here`.")
+        await interaction.response.send_message(f"Command `{name}` added successfully.")
 
-    @commands.command(name="remove-custom")
-    @commands.has_permissions(administrator=True)
-    async def remove_custom(self, ctx, arg=None):
-        if not arg:
-            await ctx.send("Please provide the name of the custom command to remove.")
-            return
-
-        if not self._custom_commands[arg]:
-            if ctx.bot.get_command(arg):
-                await ctx.send("You cannot remove a built-in command.")
+    @discord.app_commands.command(name="remove-custom", description="Remove a custom command")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
+    async def remove_custom(self, interaction: discord.Interaction, name: str):
+        if name not in self._custom_commands:
+            if self.bot.get_command(name) or self.bot.tree.get_command(name):
+                await interaction.response.send_message("You cannot remove a built-in command.", ephemeral=True)
                 return
             else:
-                await ctx.send(f"The command `{arg}` does not exist.")
+                await interaction.response.send_message(f"The command `{name}` does not exist.", ephemeral=True)
                 return
         else:
-            value = self._custom_commands[arg]
+            value = self._custom_commands[name]
 
-        collection.delete_one({"name": arg})
-        del self._custom_commands[arg]
-        ctx.bot.remove_command(arg)
+        collection.delete_one({"name": name})
+        del self._custom_commands[name]
+        self.bot.remove_command(name)
+        self.bot.tree.remove_command(name)
 
         embed = discord.Embed(title="Custom Command Removed", color=discord.Color.red())
-        embed.set_thumbnail(url=ctx.message.author.display_avatar)
-        embed.add_field(name="Removed by", value=ctx.message.author, inline=False)
-        embed.add_field(name="Command Name", value=arg, inline=False)
+        embed.set_thumbnail(url=interaction.user.display_avatar)
+        embed.add_field(name="Removed by", value=interaction.user, inline=False)
+        embed.add_field(name="Command Name", value=name, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
-        channel = ctx.bot.get_channel(int(channel_ids['staff_news']))
+        channel = self.bot.get_channel(int(channel_ids['staff_news']))
         await channel.send(embed=embed)
-        await ctx.message.add_reaction("✅")
+        await interaction.response.send_message(f"Command `{name}` removed successfully.")
 
-    @commands.command(name="add-custom-description")
-    @commands.has_permissions(administrator=True)
-    async def add_desc(self, ctx, name=None, *, desc=None):
-        if not name:
-            await ctx.send("Please provide the name of the custom command to describe.")
-            return
-        elif not desc:
-            await ctx.send(f"Please provide the description for the command `{name}`.")
-            return
-
-        if not self._custom_commands[name]:
-            if ctx.bot.get_command(name):
-                await ctx.send("You cannot add a description to a built-in command.")
-                return
-            else:
-                await ctx.send(f"The command `{name}` does not exist.")
-                return
-
-        collection.update_one({"name": name}, {"$set": {"description": desc}})
-        await ctx.message.add_reaction("✅")
-
-    @commands.command(name="custom-list")
+    @commands.hybrid_command(name="custom-list", description="Get a list of custom commands")
     async def custom_list(self, ctx):
         embed = discord.Embed(title="Custom Commands", color=0x00a0a0)
         for command in collection.find():

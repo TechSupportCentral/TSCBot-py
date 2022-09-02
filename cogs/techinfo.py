@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 
 class techinfo(commands.Cog):
-    @commands.command()
+    @commands.hybrid_command(description="Get links to download various drivers")
     async def drivers(self, ctx):
         embed = discord.Embed(title="Drivers", description="Links to downloads for various drivers", color=0x00a0a0)
         embed.add_field(name="AMD Drivers:", value="https://amd.com/en/support", inline=False)
@@ -11,7 +11,7 @@ class techinfo(commands.Cog):
         embed.add_field(name="Realtek Audio Drivers:", value="https://www.realtek.com/en/downloads", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(name="driver-managers", aliases=["driverbooster", "drivereasy", "microsoft-drivers"])
+    @commands.hybrid_command(name="driver-managers", aliases=["driverbooster", "drivereasy", "microsoft-drivers"], description="Explain why third party driver managers should not be used")
     async def driver_managers(self, ctx):
         embed = discord.Embed(title="Third Party Driver Managers", description="Do not use third party driver managers like Driver Booster or Driver Easy. They are usually either spyware or adware and install broken or outdated drivers which can cause many problems.", color=0x00a0a0)
         embed.add_field(name="What should I do instead?", value="If you have a prebuilt computer, go to the manufacturer's website and download the drivers for your model. [Here](https://support.hp.com/us-en/drivers/selfservice/hp-envy-m6-aq100-x360-convertible-pc/12499188/model/13475171) is an example of an OEM driver page.\nIf you built your own computer, go to the motherboard manufacturer's page and download the drivers for your motherboard, then any other drivers from the pages of the manufacturers of the parts. For example, if you have an Asus TUF GAMING X570-PLUS WiFi with an RTX 3090, you would download your BIOS, chipset, audio, and WiFi drivers [here](https://www.asus.com/supportonly/TUF%20GAMING%20X570-PLUS%20(WI-FI)/HelpDesk_Download/) and your graphics drivers [here](https://nvidia.com/Download/driverResults.aspx/190552/).", inline=False)
@@ -19,7 +19,7 @@ class techinfo(commands.Cog):
         embed.add_field(name="What about Windows Update?", value="Microsoft usually doesn't supply the best drivers for your hardware. In many cases they're out of date, and for graphics drivers, they're commonly less functional and will have decreased performance and support.", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["bootkey"])
+    @commands.hybrid_command(aliases=["bootkey"], description="Get a list of keys used to get into the BIOS Boot Menu")
     async def bootkeys(self, ctx):
         embed = discord.Embed(title="How to get into the boot menus of various computers:", description="Find your brand below and spam the relevant key when you start the computer up.", color=0x00a0a0)
         embed.add_field(name="Dell, Toshiba, Huawei, Lenovo, and many others:", value="F12", inline=True)
@@ -34,7 +34,7 @@ class techinfo(commands.Cog):
         embed.add_field(name="Other common keys:", value="F2, F10, F12, Esc, or Del", inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.hybrid_command(description="Get instructions on how to install or reinstall Windows 10")
     async def windowsusb(self, ctx):
         embed = discord.Embed(title="How to install or reinstall Windows 10", color=0x00a0a0)
         embed.add_field(name="Step 1:", value="Insert a USB flash drive with at least 8 GB of capacity into a Windows computer with access to the internet.", inline=False)
@@ -49,7 +49,7 @@ class techinfo(commands.Cog):
         embed.add_field(name="Step 10:", value="Format your USB so you can use it again.\nOpen File Explorer and find your USB flash drive. Right click it and select format. Use NTFS as the filesystem and tick the Quick Format box.\nOnce the format is complete, your drive will be empty and you can use it for your own purposes again.", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.hybrid_command(description="Get instructions on how to create a bootable Linux USB")
     async def linuxusb(self, ctx):
         embed = discord.Embed(title="How to get a Linux Live USB", color=0x00a0a0)
         embed.add_field(name="Step 1:", value="Decide what distro is best for you.\nIf you're not experienced with computers, use [Linux Mint](https://linuxmint.com/download.php).\nIf you're experienced with computers but not with Linux, use [Fedora](https://getfedora.org/en/workstation/download/).", inline=False)
@@ -59,7 +59,7 @@ class techinfo(commands.Cog):
         embed.add_field(name="Step 5:", value="Install or try out linux.\nYour computer will boot to show the Linux desktop. Note that Linux is not installed on the computer; it's what is called a Live USB, where you can test it out before installation. Anything you do on the USB in this state will not be saved and doesn't affect your PC. If you wish to replace Windows with Linux, open the 'Install Linux' file on the desktop. If you want to return to Windows on the next reboot, simply restart the PC with the USB unplugged.", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.hybrid_command(description="Get instructions on how to flash a Linux ISO to USB on Android")
     async def androidusb(self, ctx):
         embed = discord.Embed(title="How to flash a Linux ISO to USB on Android", color=0x00a0a0)
         embed.add_field(name="Step 1:", value="Make sure you can actually plug your USB into the phone.\nIn a perfect world, you'll have a USB-C flash drive and a USB-C phone, so you can just plug it in. Unfortunately, most of the time it's USB type A and the phone is either Micro B or USB-C.\nIf this is the case, buy an adapter like one of these:\n[USB Micro B (most older phones)](https://amazon.com/dp/B00LN3LQKQ)\n[USB-C (most newer phones)](https://amazon.com/dp/B01GGKYXVE)", inline=False)
@@ -68,13 +68,13 @@ class techinfo(commands.Cog):
         embed.set_footer(text="Note: EtchDroid will not work for Windows ISOs as they don't follow the ISOHybrid standard.")
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['windows7', 'windows8'])
+    @commands.hybrid_command(aliases=['windows7', 'windows8'], description="Explain why Windows 7 and 8 should not be used")
     async def legacywindows(self, ctx):
         embed = discord.Embed(title="Legacy versions of Windows", description="Windows 7 and 8 are no longer officially supported by Microsoft.\nUsing older versions of windows puts you at risk to malware and other vulnerabilities (even if you're careful), which can easily be avoided by upgrading your operating system.", color=0x00a0a0)
         embed.add_field(name="What can I do?", value="If your computer is good enough to run Windows 10 reliably, download the [Media Creation Tool](https://microsoft.com/en-us/software-download/windows10) and select 'Upgrade this PC now' to upgrade to Windows 10. It's not recommend to upgrade to Windows 11 at this time.\nIf your computer isn't good enough to run Windows 10 very well, it's recommended to switch to a lighter Linux distribution such as Linux Mint. Instructions are available with the `!linuxusb` command.", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.hybrid_command(description="Get links to various versions of the Microsoft Visual C++ Redistributable")
     async def vcredist(self, ctx):
         embed = discord.Embed(title="Visual C++ Redistributable", url="https://docs.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist", description="If you are missing any of the following DLLs, download the corresponding file(s) and install them.", color=0x00a0a0)
         embed.add_field(name="MSVCP140.dll or MSVCR140.dll", value="[x86](https://aka.ms/vs/17/release/vc_redist.x86.exe), [x64](https://aka.ms/vs/17/release/vc_redist.x64.exe), or [ARM64](https://aka.ms/vs/17/release/vc_redist.arm64.exe) (Only install the one that pertains to your system)", inline=False)
@@ -85,11 +85,11 @@ class techinfo(commands.Cog):
         embed.add_field(name="MSVCP80.dll or MSVCR80.dll", value="[Select the ones you need](https://www.microsoft.com/download/details.aspx?id=26347) (Install both x86 and x64 unless using a 32 bit system)", inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.hybrid_command(description="Show the proper location to plug in a monitor")
     async def monitor(self, ctx):
         await ctx.send(file=discord.File('images/monitor.jpg', 'monitor.jpg'))
 
-    @commands.command(name="m.2")
+    @commands.hybrid_command(description="Show the difference between SATA and NVMe M.2 SSDs using differently keyed M.2 connectors")
     async def m2(self, ctx):
         files = [discord.File('images/m.2-key-type.jpg', 'key-type.jpg'), discord.File('images/m.2-drive-type.jpg', 'drive-type.png')]
         await ctx.send(files=files)
