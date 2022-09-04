@@ -22,19 +22,11 @@ class custom_commands(commands.Cog):
         async def add_command(self, name, value, description):
             self._custom_commands[name] = value
 
-            @commands.command(name=name)
-            async def cmd(self, ctx):
+            @commands.hybrid_command(name=name, description=description)
+            async def cmd(ctx):
                 await ctx.send(value)
 
-            cmd.cog = self
-            self.__cog_commands__ += (cmd,)
             self.bot.add_command(cmd)
-
-            @discord.app_commands.command(name=name, description=description)
-            async def appcmd(interaction: discord.Interaction):
-                await interaction.response.send_message(value)
-
-            self.bot.tree.add_command(appcmd)
 
         for command in collection.find():
             await add_command(self, command['name'], command['value'], command['description'])
@@ -52,19 +44,11 @@ class custom_commands(commands.Cog):
         async def add_command(self, name, value, description):
             self._custom_commands[name] = value
 
-            @commands.command(name=name)
-            async def cmd(self, ctx):
+            @commands.hybrid_command(name=name, description=description)
+            async def cmd(ctx):
                 await ctx.send(value)
 
-            cmd.cog = self
-            self.__cog_commands__ += (cmd,)
             self.bot.add_command(cmd)
-
-            @discord.app_commands.command(name=name, description=description)
-            async def appcmd(interaction: discord.Interaction):
-                await interaction.response.send_message(value)
-
-            self.bot.tree.add_command(appcmd)
             await self.bot.tree.sync()
 
         if name in self._custom_commands or self.bot.get_command(name) or self.bot.tree.get_command(name):
