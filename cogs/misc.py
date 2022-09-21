@@ -48,7 +48,7 @@ class misc(commands.Cog):
             total = reminder['time']
             id = int(reminder['user'])
             end = int(reminder['end'])
-            now = int(datetime.now().strftime("%s"))
+            now = round(datetime.now().timestamp())
 
             if self.bot.guilds[0].get_member(id) is None:
                 collection.delete_one({"_id": reminder['_id']})
@@ -112,7 +112,7 @@ class misc(commands.Cog):
         fancytime = await seconds_to_fancytime(seconds, gran)
 
         collection = mongodb['reminders']
-        collection.insert_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id), "end": str(int(datetime.now().strftime("%s")) + seconds)})
+        collection.insert_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id), "end": str(round(datetime.now().timestamp() + seconds))})
         await interaction.response.send_message(f"I will remind you in {fancytime}.", ephemeral=True)
         await sleep(seconds)
         collection.delete_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id)})

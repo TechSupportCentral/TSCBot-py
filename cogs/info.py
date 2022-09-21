@@ -30,7 +30,7 @@ class info(commands.Cog):
             ('seconds', 1),
         )
 
-        seconds = int(datetime.now().strftime("%s")) - int(starttime.strftime("%s"))
+        seconds = round(datetime.now().timestamp() - starttime.timestamp())
         result = []
         for name, count in intervals:
             value = seconds // count

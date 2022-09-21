@@ -3,6 +3,7 @@ import discord
 import yaml
 from asyncio import sleep
 from datetime import datetime
+from calendar import timegm
 import re
 from main import get_database
 mongodb = get_database()
@@ -46,7 +47,7 @@ class moderation(commands.Cog):
         async def resume_mute(self, mute):
             id = int(mute['user'])
             end = int(mute['start']) + int(mute['time'])
-            now = int(datetime.now().strftime("%s"))
+            now = round(datetime.now().timestamp())
             fancytime = await seconds_to_fancytime(int(mute['time']), 4)
 
             if self.bot.guilds[0].get_member(id) is None:
@@ -80,7 +81,7 @@ class moderation(commands.Cog):
         collection = mongodb['moderation']
         for mute in collection.find({"type": "mute"}):
             end = int(mute['start']) + int(mute['time'])
-            now = int(datetime.now().strftime("%s"))
+            now = datetime.now().timestamp()
             if end > now:
                 await resume_mute(self, mute)
 
@@ -114,10 +115,10 @@ class moderation(commands.Cog):
         if user.name != user.display_name:
             embed.add_field(name="Nickname", value=user.display_name, inline=False)
 
-        created = user.created_at.strftime("%s")
-        joined = user.joined_at.strftime("%s")
-        created_delta = int(discord.utils.utcnow().strftime("%s")) - int(created)
-        joined_delta = int(discord.utils.utcnow().strftime("%s")) - int(joined)
+        created = timegm(user.created_at.timetuple())
+        joined = timegm(user.joined_at.timetuple())
+        created_delta = timegm(discord.utils.utcnow().timetuple()) - created
+        joined_delta = timegm(discord.utils.utcnow().timetuple()) - joined
         if created_delta < 604800:
             created_fancy = await seconds_to_fancytime(created_delta, 2)
         else:
@@ -128,8 +129,8 @@ class moderation(commands.Cog):
             joined_fancy = await seconds_to_fancytime(joined_delta, 1)
         embed.add_field(name="Account Created:", value=f"<t:{created}> ({created_fancy} ago)", inline=True)
         embed.add_field(name="Joined Server:", value=f"<t:{joined}> ({joined_fancy} ago)", inline=True)
-        if int(joined) - int(created) < 604800:
-            embed.add_field(name="Difference between creation and join:", value=await seconds_to_fancytime(int(joined) - int(created), 2), inline=False)
+        if joined - created < 604800:
+            embed.add_field(name="Difference between creation and join:", value=await seconds_to_fancytime(joined - created, 2), inline=False)
 
         mentions = []
         for role in user.roles:
@@ -279,7 +280,10 @@ class moderation(commands.Cog):
         embed.set_footer(text=og_embed.footer.text)
         await message.edit(embed=embed)
 
-        member = guild.get_member(int(user))
+        member = interaction.guild.get_member(int(user))
+        if member is None:
+            await interaction.response.send_message("The reason was updated successfully, but the user is no longer in the server and thus could not be notified.")
+            return
         dmbed = discord.Embed(title="Your warning has been updated.", color=0x00a0a0)
         dmbed.add_field(name="Original reason", value=og_reason, inline=False)
         dmbed.add_field(name="New reason", value=reason, inline=False)
@@ -430,7 +434,7 @@ class moderation(commands.Cog):
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(user.id), "moderator": str(interaction.user.id), "start": str(datetime.now().strftime("%s")), "time": str(seconds), "reason": reason})
+        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(user.id), "moderator": str(interaction.user.id), "start": datetime.now().strftime("%s"), "time": str(seconds), "reason": reason})
 
         dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description="**Reason:** " + reason, color=discord.Color.red())
         if user.dm_channel is None:

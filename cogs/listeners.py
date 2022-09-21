@@ -3,6 +3,7 @@ import discord
 import yaml
 from asyncio import sleep
 from datetime import datetime
+from calendar import timegm
 from pypartpicker import Scraper, get_list_links
 from main import get_database
 mongodb = get_database()
@@ -308,7 +309,7 @@ class listeners(commands.Cog):
         embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
         embed2.set_thumbnail(url=member.display_avatar)
         embed2.add_field(name="User ID", value=member.id, inline=False)
-        embed2.add_field(name="Account Created:", value="<t:" + member.created_at.strftime("%s") + ">", inline=False)
+        embed2.add_field(name="Account Created:", value=f"<t:{timegm(member.created_at.timetuple())}>", inline=False)
         if invite_used is not None:
                 embed2.add_field(name="Invite code", value=invite_used.code, inline=False)
                 if invite.code == "2vwUBmhM8U":
@@ -323,7 +324,7 @@ class listeners(commands.Cog):
         found = False
         for mute in collection.find({"type": "mute"}):
             end = int(mute['start']) + int(mute['time'])
-            now = int(datetime.now().strftime("%s"))
+            now = datetime.now().timestamp()
             if int(mute['user']) == member.id and end > now:
                 found = True
         if found:
