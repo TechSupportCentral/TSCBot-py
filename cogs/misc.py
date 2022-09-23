@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
-from datetime import datetime
+from time import time
 import re
 from main import get_database
 mongodb = get_database()
@@ -47,8 +47,9 @@ class misc(commands.Cog):
             text = reminder['text']
             total = reminder['time']
             id = int(reminder['user'])
-            end = int(reminder['end'])
-            now = round(datetime.now().timestamp())
+            start = int(reminder['start'])
+            end = start + int(reminder['seconds'])
+            now = time()
 
             if self.bot.guilds[0].get_member(id) is None:
                 collection.delete_one({"_id": reminder['_id']})
@@ -58,10 +59,10 @@ class misc(commands.Cog):
             if end > now:
                 print(f"Resuming reminder of {total} from {user}")
                 await sleep(end - now)
-                embed = discord.Embed(title=f"Reminder from {total} ago:", description=text, color=0x00a0a0)
+                embed = discord.Embed(title=f"Reminder from <t:{start}:F> ({total} ago):", description=text, color=0x00a0a0)
             else:
                 print(f"Sending belated reminder of {total} from {user}")
-                embed = discord.Embed(title="Belated reminder", description=f"Sorry, it looks like the bot was offline when you were supposed to get your reminder (should've lasted {total}).\n\nHere was the reminder:\n{text}", color=0x00a0a0)
+                embed = discord.Embed(title="Belated reminder", description=f"Sorry, it looks like the bot was offline when you were supposed to get your reminder from <t:{start}:F> (should've lasted {total}).\n\nHere was the reminder:\n{text}", color=0x00a0a0)
             collection.delete_one({"_id": reminder['_id']})
 
             if user.dm_channel is None:
@@ -112,12 +113,12 @@ class misc(commands.Cog):
         fancytime = await seconds_to_fancytime(seconds, gran)
 
         collection = mongodb['reminders']
-        collection.insert_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id), "end": str(round(datetime.now().timestamp() + seconds))})
-        await interaction.response.send_message(f"I will remind you in {fancytime}.", ephemeral=True)
+        collection.insert_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id), "start": str(round(time())), "seconds": str(seconds)})
+        await interaction.response.send_message(f"I will remind you in {fancytime} (<t:{round(time() + seconds)}:F>).", ephemeral=True)
         await sleep(seconds)
         collection.delete_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id)})
 
-        embed = discord.Embed(title=f"Reminder from {fancytime} ago:", description=reminder, color=0x00a0a0)
+        embed = discord.Embed(title=f"Reminder from <t:{round(time() - seconds)}:F> ({fancytime} ago):", description=reminder, color=0x00a0a0)
         if interaction.user.dm_channel is None:
             dm = await interaction.user.create_dm()
         else:

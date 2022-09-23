@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
-from datetime import datetime
+from time import time
 from calendar import timegm
 import re
 from main import get_database
@@ -47,7 +47,7 @@ class moderation(commands.Cog):
         async def resume_mute(self, mute):
             id = int(mute['user'])
             end = int(mute['start']) + int(mute['time'])
-            now = round(datetime.now().timestamp())
+            now = time()
             fancytime = await seconds_to_fancytime(int(mute['time']), 4)
 
             if self.bot.guilds[0].get_member(id) is None:
@@ -81,7 +81,7 @@ class moderation(commands.Cog):
         collection = mongodb['moderation']
         for mute in collection.find({"type": "mute"}):
             end = int(mute['start']) + int(mute['time'])
-            now = datetime.now().timestamp()
+            now = time()
             if end > now:
                 await resume_mute(self, mute)
 
@@ -117,8 +117,8 @@ class moderation(commands.Cog):
 
         created = timegm(user.created_at.timetuple())
         joined = timegm(user.joined_at.timetuple())
-        created_delta = timegm(discord.utils.utcnow().timetuple()) - created
-        joined_delta = timegm(discord.utils.utcnow().timetuple()) - joined
+        created_delta = round(time() - created)
+        joined_delta = round(time() - joined)
         if created_delta < 604800:
             created_fancy = await seconds_to_fancytime(created_delta, 2)
         else:
@@ -434,7 +434,7 @@ class moderation(commands.Cog):
         message = await channel.send(embed=embed)
 
         collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(user.id), "moderator": str(interaction.user.id), "start": datetime.now().strftime("%s"), "time": str(seconds), "reason": reason})
+        collection.insert_one({"_id": str(message.id), "type": "mute", "user": str(user.id), "moderator": str(interaction.user.id), "start": str(round(time())), "time": str(seconds), "reason": reason})
 
         dmbed = discord.Embed(title=f"You have been muted for {fancytime}.", description="**Reason:** " + reason, color=discord.Color.red())
         if user.dm_channel is None:

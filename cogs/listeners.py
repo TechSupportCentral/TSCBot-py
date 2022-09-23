@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 import yaml
 from asyncio import sleep
-from datetime import datetime
+from time import time
 from calendar import timegm
 from pypartpicker import Scraper, get_list_links
 from main import get_database
@@ -324,7 +324,7 @@ class listeners(commands.Cog):
         found = False
         for mute in collection.find({"type": "mute"}):
             end = int(mute['start']) + int(mute['time'])
-            now = datetime.now().timestamp()
+            now = time()
             if int(mute['user']) == member.id and end > now:
                 found = True
         if found:

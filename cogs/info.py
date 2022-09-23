@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 import yaml
-from datetime import datetime
+from time import time
 
 class info(commands.Cog):
     def __init__(self, bot):
@@ -19,7 +19,7 @@ class info(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         global starttime
-        starttime = datetime.now()
+        starttime = time()
 
     @commands.hybrid_command(description="See how long the bot has been online")
     async def uptime(self, ctx):
@@ -30,7 +30,7 @@ class info(commands.Cog):
             ('seconds', 1),
         )
 
-        seconds = round(datetime.now().timestamp() - starttime.timestamp())
+        seconds = round(time() - starttime)
         result = []
         for name, count in intervals:
             value = seconds // count
