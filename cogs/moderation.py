@@ -387,8 +387,10 @@ class moderation(commands.Cog):
         channel = self.bot.get_channel(int(channel_ids['modlog']))
         message = await channel.send(embed=embed)
 
-        collection = mongodb['moderation']
-        collection.insert_one({"_id": str(message.id), "type": "unban", "user": str(user.id), "moderator": str(interaction.user.id), "reason": reason})
+        mod_collection = mongodb['moderation']
+        mod_collection.insert_one({"_id": str(message.id), "type": "unban", "user": str(user.id), "moderator": str(interaction.user.id), "reason": reason})
+        app_collection = mongodb['applications']
+        app_collection.update_one({"id": str(user.id), "type": "appeal"}, {"$set": {"accepted": "yes"}})
 
         await interaction.guild.unban(discord.Object(id=user.id), reason=reason)
         await interaction.response.send_message("The user was unbanned successfully.")

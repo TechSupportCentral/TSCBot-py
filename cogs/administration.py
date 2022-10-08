@@ -12,6 +12,8 @@ class administration(commands.Cog):
 
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
+    global role_ids
+    role_ids = config['role_ids']
     global channel_ids
     channel_ids = config['channel_ids']
 
@@ -169,6 +171,36 @@ class administration(commands.Cog):
             return
 
         await ctx.message.add_reaction("✅")
+
+    @discord.app_commands.command(name="accept-application", description="Accept a staff application")
+    @discord.app_commands.guild_only()
+    @discord.app_commands.default_permissions()
+    @discord.app_commands.describe(
+        user="User who submitted the application",
+        type="Type of application (support_team or moderator)"
+    )
+    async def accept_application(self, interaction: discord.Interaction, user: discord.Member, type: str):
+        match type:
+            case "moderator":
+                role = "trial_mod"
+            case "support_team":
+                role = type
+            case _:
+                await interaction.response.send_message(f"`{type}` is not a valid application type. Valid types are `support_team` or `moderator`.", ephemeral=True)
+                return
+
+        collection = mongodb['applications']
+        found = False
+        for app in collection.find({"id": str(user.id)}):
+            if app['type'] == type:
+                found = True
+        if not found:
+            await interaction.response.send_message(f"`{type}` application for {user} not found.", ephemeral=True)
+            return
+
+        collection.update_one({"id": str(user.id), "type": type}, {"$set": {"accepted": "yes"}})
+        await user.add_roles(user.guild.get_role(int(role_ids[role])))
+        await interaction.response.send_message("Application accepted.")
 
     @discord.app_commands.command(name="add-swear", description="Add a swear to the swearlist")
     @discord.app_commands.guild_only()
