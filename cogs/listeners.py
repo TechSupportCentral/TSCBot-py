@@ -122,7 +122,9 @@ class listeners(commands.Cog):
 
         elif any(trigger in message.content.lower() for trigger in help_triggers) and message.channel.id in public_channels and message.channel.id not in support_channels:
             channel = self.bot.get_channel(message.channel.id)
-            await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
+            notice = await channel.send(f"If you're looking for help please go to a support channel like <#{channel_ids['general_support']}> and ping the <@&{role_ids['support_team']}>.", allowed_mentions=discord.AllowedMentions(roles=False))
+            await sleep(10)
+            await notice.delete()
 
         elif " virus" in message.content.lower() and message.channel.id in public_channels and "malwarebytes" not in message.content.lower() and not message.author.bot:
             channel = self.bot.get_channel(message.channel.id)
