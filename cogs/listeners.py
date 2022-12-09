@@ -128,7 +128,9 @@ class listeners(commands.Cog):
 
         elif " virus" in message.content.lower() and message.channel.id in public_channels and "malwarebytes" not in message.content.lower() and not message.author.bot:
             channel = self.bot.get_channel(message.channel.id)
-            await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download")
+            notice = await channel.send("We suggest you to check for viruses and suspicious processes with Malwarebytes: https://malwarebytes.com/mwb-download")
+            await sleep(10)
+            await notice.delete()
 
         elif message.author.id == 302050872383242240:
             if ":thumbsup:" in message.embeds[0].description:
