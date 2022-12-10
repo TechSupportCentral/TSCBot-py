@@ -125,6 +125,19 @@ class misc(commands.Cog):
             dm = interaction.user.dm_channel
         await dm.send(embed=embed)
 
+    @discord.app_commands.command(name="create-ticket", description="Open a ticket")
+    async def create_ticket(self, interaction: discord.Interaction, title: str):
+        channel = self.bot.get_channel(int(channel_ids['ticket_create']))
+        mod_role = self.bot.guilds[0].get_role(int(role_ids['moderator']))
+
+        thread = await channel.create_thread(name=title, invitable=False)
+        await thread.add_user(interaction.user)
+        for mod in mod_role.members:
+            await thread.add_user(mod)
+
+        await thread.send(f"{interaction.user.mention}, your ticket has been created. Please explain your rationale and wait for a {mod_role.mention} to respond.")
+        await interaction.response.send_message(f"Your ticket {thread.mention} was created successfully.", ephemeral=True)
+
     @commands.hybrid_command(description="Shorten a link")
     async def shorten(self, ctx, link: str):
         if re.search(r"https?:\/\/(www\.)?amazon\.[^\/]*", link) and re.search(r"\/dp\/B0[\dA-Z]{8}\/", link):

@@ -21,10 +21,6 @@ class listeners(commands.Cog):
     for swear in swearcol.find():
         swears.append(swear['swear'])
 
-#    reactcol = mongodb['reaction-roles']
-#    global reacts
-#    reacts = reactcol.find()
-
     with open('config.yaml', 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.BaseLoader)
     global pcpp_cookie
@@ -51,7 +47,6 @@ class listeners(commands.Cog):
     async def on_message(self, message):
         global bumptimer
         global swears
-#        global reacts
         help_triggers = ["issue", "able to help", "get some help", "need help"]
         staff_role_names = ["owner", "tsc", "moderator", "trial_mod", "support_team"]
 
@@ -67,7 +62,7 @@ class listeners(commands.Cog):
 
         swore = ""
         for swear in swears:
-            if swear in message.content.lower() and not any(role in message.author.roles for role in staff_roles) and not message.channel.name.startswith("ticket"):
+            if swear in message.content.lower() and not any(role in message.author.roles for role in staff_roles) and not isinstance(message.channel, discord.Thread):
                 swore = swear
 
         if isinstance(message.channel, discord.channel.DMChannel):
@@ -170,11 +165,6 @@ class listeners(commands.Cog):
                 await message.delete()
                 await response.delete()
 
-#        elif "reload reaction roles" in message.content:
-#            await message.delete()
-#            reactcol = mongodb['reaction-roles']
-#            reacts = reactcol.find()
-
         elif len(get_list_links(message.content)) >= 1:
             pcpp = Scraper(headers={"cookie": pcpp_cookie})
             link = get_list_links(message.content)[0]
@@ -190,12 +180,7 @@ class listeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-#        global reacts
         channel = self.bot.get_channel(int(channel_ids['message_deleted']))
-#        if message.id in reacts:
-#            reactcol = mongodb['reaction-roles']
-#            reactcol.delete_one({"_id": str(message.id)})
-#            reacts = reactcol.find()
         if message.content.startswith("reload") or message.author.bot or message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
             return
         embed = discord.Embed(title="Message Deleted", description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
@@ -380,60 +365,6 @@ class listeners(commands.Cog):
         channel = self.bot.get_channel(int(channel_ids['member_changed']))
         await channel.send(embed=embed)
 
-#    @commands.Cog.listener()
-#    async def on_raw_reaction_add(self, payload):
-#        guild = self.bot.get_guild(payload.guild_id)
-#        user = guild.get_member(payload.user_id)
-#        role = ""
-#        for message in reacts:
-#            if payload.message_id == int(message.get('_id')) and str(payload.emoji) == message.get('emoji'):
-#                role = message.get('role')
-#
-#        if role != "":
-#            role = guild.get_role(int(role))
-#
-#            dmessage = f"Added the `{role.name}` role."
-#            try:
-#                await user.add_roles(role)
-#            except:
-#                dmessage = f"Failed to add the `{role.name}` role. Open a ticket and inform the owners."
-#
-#            if user.dm_channel is None:
-#                dm = await user.create_dm()
-#            else:
-#                dm = user.dm_channel
-#            try:
-#                await dm.send(dmessage)
-#            except:
-#                return
-#
-#    @commands.Cog.listener()
-#    async def on_raw_reaction_remove(self, payload):
-#        guild = self.bot.get_guild(payload.guild_id)
-#        user = guild.get_member(payload.user_id)
-#        role = ""
-#        for message in reacts:
-#            if payload.message_id == int(message.get('_id')) and str(payload.emoji) == message.get('emoji'):
-#                role = message.get('role')
-#
-#        if role != "":
-#            role = guild.get_role(int(role))
-#
-#            dmessage = f"Removed the `{role.name}` role."
-#            try:
-#                await user.remove_roles(role)
-#            except:
-#                dmessage = f"Failed to remove the `{role.name}` role. Open a ticket and inform the owners."
-#
-#            if user.dm_channel is None:
-#                dm = await user.create_dm()
-#            else:
-#                dm = user.dm_channel
-#            try:
-#                await dm.send(dmessage)
-#            except:
-#                return
-
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         guild = self.bot.get_guild(payload.guild_id)
@@ -456,6 +387,23 @@ class listeners(commands.Cog):
                 await dm.send(dmessage)
             except:
                 return
+
+        elif payload.message_id == int(message_ids['ticket_create']) and str(payload.emoji) == "🎟️":
+            channel = guild.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            mod_role = guild.get_role(int(role_ids['moderator']))
+            if user.nick is None:
+                username = user.name
+            else:
+                username = user.nick
+
+            thread = await channel.create_thread(name=f"Ticket for {username}", invitable=False)
+            await thread.add_user(user)
+            for mod in mod_role.members:
+                await thread.add_user(mod)
+
+            await thread.send(f"{user.mention}, your ticket has been created. Please explain your rationale and wait for a {mod_role.mention} to respond.")
+            await message.remove_reaction("🎟️", user)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):

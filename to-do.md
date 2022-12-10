@@ -5,6 +5,3 @@
       current mute implementation is that users can still open and use
       tickets while muted, but that wouldn't work here until Discord
       allows timeout exceptions for certain channels.
-* Tickets
-    * Waiting for Discord to come to their senses and make private threads not
-      require level 2 boosting

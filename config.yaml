@@ -51,6 +51,7 @@ channel_ids:
 message_ids:
     rules: 996652911650152498
     reaction_role_bump: 891857181757046855
+    ticket_create: 987994746746196008
 
 support_channels:
   - "general_support"
