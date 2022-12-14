@@ -97,18 +97,19 @@ class misc(commands.Cog):
         await interaction.response.send_message("Thanks for your suggestion! You will be notified when the owners respond.")
 
     @discord.app_commands.command(description="Remind yourself of something")
+    @discord.app_commands.rename(total="time")
     @discord.app_commands.describe(
-        time="The amount of time you'd like to be reminded in.\nSyntax is `1d2h3m4s` (example of 1 day, 2 hours, 3 minutes, and 4 seconds).",
+        total="The amount of time you'd like to be reminded in.\nSyntax is `1d2h3m4s` (example of 1 day, 2 hours, 3 minutes, and 4 seconds).",
         reminder="What you're reminding yourself of"
     )
-    async def remindme(self, interaction: discord.Interaction, time: str, reminder: str = "No description provided."):
+    async def remindme(self, interaction: discord.Interaction, total: str, reminder: str = "No description provided."):
         gran = 0
-        for char in time:
+        for char in total:
             gran += char.isalpha()
         if gran > 4:
             await interaction.response.send_message("The time you requested to be reminded in is not in the correct format.\nIt should look something like `1d2h3m4s` (1 day, 2 hours, 3 minutes, and 4 seconds).", ephemeral=True)
             return
-        cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', time).groups(), [0, 0, 0, 0])]
+        cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', total).groups(), [0, 0, 0, 0])]
         seconds = cooltime[0]*86400 + cooltime[1]*3600 + cooltime[2]*60 + cooltime[3]
         fancytime = await seconds_to_fancytime(seconds, gran)
 

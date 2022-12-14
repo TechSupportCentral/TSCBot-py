@@ -397,12 +397,13 @@ class moderation(commands.Cog):
 
     @discord.app_commands.command(description="Stop a user from sending messages or joining VCs")
     @discord.app_commands.guild_only()
+    @discord.app_commands.rename(mutetime="time")
     @discord.app_commands.describe(
         user="User to mute",
-        time="Time to mute user for.\nSyntax is `1d2h3m4s` (example of 1 day, 2 hours, 3 minutes, and 4 seconds).",
+        mutetime="Time to mute user for.\nSyntax is `1d2h3m4s` (example of 1 day, 2 hours, 3 minutes, and 4 seconds).",
         reason="Reason for muting user"
     )
-    async def mute(self, interaction: discord.Interaction, user: discord.Member, time: str = "12h", reason: str = "No reason provided."):
+    async def mute(self, interaction: discord.Interaction, user: discord.Member, mutetime: str = "12h", reason: str = "No reason provided."):
         if user.top_role.position >= interaction.user.top_role.position:
             await interaction.response.send_message(f"{user} is higher than or equal to you in the role hierarchy, cannot mute.", ephemeral=True)
             return
@@ -411,12 +412,12 @@ class moderation(commands.Cog):
             return
 
         gran = 0
-        for char in time:
+        for char in mutetime:
             gran += char.isalpha()
         if gran > 4:
             await interaction.response.send_message("Please mention the time to mute in a format like `1d2h3m4s` (1 day, 2 hours, 3 minutes, 4 seconds).", ephemeral=True)
             return
-        cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', time).groups(), [0, 0, 0, 0])]
+        cooltime = [int(a[ :-1]) if a else b for a,b in zip(re.search('(\d+d)?(\d+h)?(\d+m)?(\d+s)?', mutetime).groups(), [0, 0, 0, 0])]
         seconds = cooltime[0]*86400 + cooltime[1]*3600 + cooltime[2]*60 + cooltime[3]
         fancytime = await seconds_to_fancytime(seconds, gran)
 
