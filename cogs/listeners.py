@@ -48,7 +48,7 @@ class listeners(commands.Cog):
         global bumptimer
         global swears
         help_triggers = ["issue", "able to help", "get some help", "need help"]
-        staff_role_names = ["owner", "tsc", "moderator", "trial_mod", "support_team"]
+        owner_role = self.bot.guilds[0].get_role(int(role_ids['owner']))
 
         support_channels = []
         for channel in support_channel_names:
@@ -56,13 +56,10 @@ class listeners(commands.Cog):
         public_channels = []
         for channel in public_channel_names:
             public_channels.append(int(channel_ids[channel]))
-        staff_roles = []
-        for role in staff_role_names:
-            staff_roles.append(self.bot.guilds[0].get_role(int(role_ids[role])))
 
         swore = ""
         for swear in swears:
-            if swear in message.content.lower() and not any(role in message.author.roles for role in staff_roles) and not isinstance(message.channel, discord.Thread):
+            if swear in message.content.lower() and message.channel.id in public_channels and not owner_role in message.author.roles and not isinstance(message.channel, discord.Thread):
                 swore = swear
 
         if isinstance(message.channel, discord.channel.DMChannel):
@@ -153,7 +150,7 @@ class listeners(commands.Cog):
                 await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `/bump`?")
 
         elif "reload swears" in message.content:
-            if message.author.bot or message.guild.get_role(int(role_ids['owner'])) in message.author.roles:
+            if message.author.bot or owner_role in message.author.roles:
                 await message.delete()
                 swears = []
                 swearcol = mongodb['swears']
