@@ -59,27 +59,27 @@ class listeners(commands.Cog):
 
         swore = ""
         for swear in swears:
-            if swear in message.content.lower() and message.channel.id in public_channels and not owner_role in message.author.roles and not isinstance(message.channel, discord.Thread):
+            if swear in message.content.lower():
                 swore = swear
 
-        if isinstance(message.channel, discord.channel.DMChannel):
-            if not message.author.bot:
-                embed = discord.Embed(title="DM Received", color=discord.Color.red())
-                embed.set_thumbnail(url=message.author.display_avatar)
-                embed.add_field(name="Message Author", value=message.author, inline=True)
-                embed.add_field(name="User ID", value=message.author.id, inline=True)
-                if message.content:
-                    embed.add_field(name="Message:", value=message.content, inline=False)
-                else:
-                    embed.add_field(name="Message:", value="Unable to detect message contents", inline=False)
-                channel = self.bot.get_channel(int(channel_ids['bot_dm']))
-                await channel.send(embed=embed)
-        elif swore != "":
+        if isinstance(message.channel, discord.DMChannel) and not message.author.bot:
+            embed = discord.Embed(title="DM Received", color=discord.Color.red())
+            embed.set_thumbnail(url=message.author.display_avatar)
+            embed.add_field(name="Message Author", value=message.author, inline=True)
+            embed.add_field(name="User ID", value=message.author.id, inline=True)
+            if message.content:
+                embed.add_field(name="Message:", value=message.content, inline=False)
+            else:
+                embed.add_field(name="Message:", value="Unable to detect message contents", inline=False)
+            channel = self.bot.get_channel(int(channel_ids['bot_dm']))
+            await channel.send(embed=embed)
+        elif swore != "" and message.channel.id in public_channels and not owner_role in message.author.roles and not isinstance(message.channel, discord.Thread):
             await message.delete()
+
             if swore == "@everyone":
                 dmbed=discord.Embed(title="@everyone ping", description="Please don't ping @everyone. If you need help, go to a support channel and ping @Support Team.", color=discord.Color.red())
                 embed=discord.Embed(title="@everyone ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
-            if swore == "@here":
+            elif swore == "@here":
                 dmbed=discord.Embed(title="@here ping", description="Please don't ping @here. If you need help, go to a support channel and ping @Support Team.", color=discord.Color.red())
                 embed=discord.Embed(title="@here ping by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
             elif swore == "discord.gg" or swore == "discord.com/invite":
@@ -91,15 +91,11 @@ class listeners(commands.Cog):
                 embed=discord.Embed(title="Swear by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
                 embed.add_field(name="Swear Detected:", value=swore, inline=False)
 
-            if message.author.dm_channel is None:
-                dm = await message.author.create_dm()
-            else:
-                dm = message.author.dm_channel
             dmbed.set_thumbnail(url=message.author.display_avatar)
             dmbed.add_field(name="Message Deleted:", value=message.content, inline=False)
             dm_failed = False
             try:
-                await dm.send(embed=dmbed)
+                await message.author.send(embed=dmbed)
             except:
                 dm_failed = True
 
@@ -132,7 +128,7 @@ class listeners(commands.Cog):
                     bumptimer = True
                     await sleep(7200)
                     bumptimer = False
-                    await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `/bump`?")
+                    await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could someone please run `/bump`?")
 
         elif message.content.startswith("set bump"):
             if bumptimer:
@@ -147,7 +143,7 @@ class listeners(commands.Cog):
                     bumptimer = True
                     await sleep(7198)
                     bumptimer = False
-                await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could anybody please run `/bump`?")
+                await message.channel.send(f"Time to bump the server!\n<@&{role_ids['bump_reminders']}>, could someone please run `/bump`?")
 
         elif "reload swears" in message.content:
             if message.author.bot or owner_role in message.author.roles:
@@ -164,16 +160,17 @@ class listeners(commands.Cog):
 
         elif len(get_list_links(message.content)) >= 1:
             pcpp = Scraper(headers={"cookie": pcpp_cookie})
-            link = get_list_links(message.content)[0]
-            list = pcpp.fetch_list(link)
 
-            description = ""
-            for part in list.parts:
-                description += f"**{part.type}:** {part.name} **({part.price})**\n"
-            description += f"\n**Estimated Wattage:** {list.wattage}\n**Price:** {list.total}"
+            for link in get_list_links(message.content):
+                list = pcpp.fetch_list(link)
 
-            embed = discord.Embed(title="PCPartPicker List", url=link, description=description, color=0x00a0a0)
-            await message.channel.send(embed=embed)
+                description = ""
+                for part in list.parts:
+                    description += f"**{part.type}:** {part.name} **({part.price})**\n"
+                description += f"\n**Estimated Wattage:** {list.wattage}\n**Price:** {list.total}"
+
+                embed = discord.Embed(title="PCPartPicker List", url=link, description=description, color=0x00a0a0)
+                await message.channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -251,26 +248,6 @@ class listeners(commands.Cog):
             await channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_guild_channel_create(self, channel):
-        embed = discord.Embed(title="Channel Created", color=discord.Color.green())
-        embed.add_field(name="Channel", value=channel.mention, inline=True)
-        embed.add_field(name="Channel Name", value=channel.name, inline=True)
-        logchannel = self.bot.get_channel(int(channel_ids['channel_created']))
-        await logchannel.send(embed=embed)
-
-    @commands.Cog.listener()
-    async def on_guild_channel_delete(self, channel):
-        embed = discord.Embed(title="Channel Deleted", description=f"Channel name: `{channel.name}`", color=discord.Color.red())
-        logchannel = self.bot.get_channel(int(channel_ids['channel_deleted']))
-        await logchannel.send(embed=embed)
-
-    @commands.Cog.listener()
-    async def on_guild_role_delete(self, role):
-        embed = discord.Embed(title="Role Deleted", description=f"Role name: `{role.name}`", color=discord.Color.red())
-        channel = self.bot.get_channel(int(channel_ids['role_deleted']))
-        await channel.send(embed=embed)
-
-    @commands.Cog.listener()
     async def on_member_join(self, member):
         global invites
 
@@ -298,7 +275,7 @@ class listeners(commands.Cog):
         embed2.add_field(name="Account Created:", value=f"<t:{timegm(member.created_at.timetuple())}>", inline=False)
         if invite_used is not None:
                 embed2.add_field(name="Invite code", value=invite_used.code, inline=False)
-                if invite.code == "2vwUBmhM8U":
+                if invite_used.code == "2vwUBmhM8U":
                     embed2.add_field(name="Invite maker", value="top.gg", inline=True)
                 else:
                     embed2.add_field(name="Invite maker", value=invite_used.inviter, inline=True)
@@ -375,15 +352,7 @@ class listeners(commands.Cog):
                 await user.add_roles(role)
             except:
                 dmessage = f"Failed to add the `{role.name}` role. Open a ticket and inform the owners."
-
-            if user.dm_channel is None:
-                dm = await user.create_dm()
-            else:
-                dm = user.dm_channel
-            try:
-                await dm.send(dmessage)
-            except:
-                return
+            await user.send(dmessage)
 
         elif payload.message_id == int(message_ids['ticket_create']) and str(payload.emoji) == "🎟️":
             channel = guild.get_channel(payload.channel_id)
@@ -415,15 +384,7 @@ class listeners(commands.Cog):
                 await user.remove_roles(role)
             except:
                 dmessage = f"Failed to remove the `{role.name}` role. Open a ticket and inform the owners."
-
-            if user.dm_channel is None:
-                dm = await user.create_dm()
-            else:
-                dm = user.dm_channel
-            try:
-                await dm.send(dmessage)
-            except:
-                return
+            await user.send(dmessage)
 
 async def setup(bot):
     await bot.add_cog(listeners(bot))

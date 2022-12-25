@@ -64,18 +64,15 @@ class administration(commands.Cog):
             await ctx.send("Users have to be in the form of an ID or a mention.")
             return
         guild = ctx.message.guild
-        if guild.get_member(id) is None:
+
+        member = guild.get_member(id)
+        if member is None:
             await ctx.send("User is not in the server.")
             return
-        member = guild.get_member(id)
 
-        if member.dm_channel is None:
-            dm = await member.create_dm()
-        else:
-            dm = member.dm_channel
         dmbed = discord.Embed(title="Message from the owners of TSC", description=message, color=0x00a0a0)
         try:
-            await dm.send(embed=dmbed)
+            await member.send(embed=dmbed)
         except:
             await ctx.send("Failed to DM the user")
             return
@@ -119,12 +116,8 @@ class administration(commands.Cog):
         dmbed.add_field(name="Reason:", value=reason)
 
         member = ctx.message.guild.get_member_named(message.embeds[0].author.name)
-        if member.dm_channel is None:
-            dm = await member.create_dm()
-        else:
-            dm = member.dm_channel
         try:
-            await dm.send(embed=dmbed)
+            await member.send(embed=dmbed)
         except:
             await ctx.send("The suggestion was accepted successfully but the the user was unable to be DMed.")
             return
@@ -160,12 +153,8 @@ class administration(commands.Cog):
         dmbed.add_field(name="Reason:", value=reason)
 
         member = ctx.message.guild.get_member_named(message.embeds[0].author.name)
-        if member.dm_channel is None:
-            dm = await member.create_dm()
-        else:
-            dm = member.dm_channel
         try:
-            await dm.send(embed=dmbed)
+            await member.send(embed=dmbed)
         except:
             await ctx.send("The suggestion was declined successfully but the the user was unable to be DMed.")
             return

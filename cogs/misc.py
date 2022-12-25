@@ -65,11 +65,7 @@ class misc(commands.Cog):
                 embed = discord.Embed(title="Belated reminder", description=f"Sorry, it looks like the bot was offline when you were supposed to get your reminder from <t:{start}:F> (should've lasted {total}).\n\nHere was the reminder:\n{text}", color=0x00a0a0)
             collection.delete_one({"_id": reminder['_id']})
 
-            if user.dm_channel is None:
-                dm = await user.create_dm()
-            else:
-                dm = user.dm_channel
-            await dm.send(embed=embed)
+            await user.send(embed=embed)
 
         collection = mongodb['reminders']
         for reminder in collection.find():
@@ -120,11 +116,7 @@ class misc(commands.Cog):
         collection.delete_one({"text": reminder, "time": fancytime, "user": str(interaction.user.id)})
 
         embed = discord.Embed(title=f"Reminder from <t:{round(time() - seconds)}:F> ({fancytime} ago):", description=reminder, color=0x00a0a0)
-        if interaction.user.dm_channel is None:
-            dm = await interaction.user.create_dm()
-        else:
-            dm = interaction.user.dm_channel
-        await dm.send(embed=embed)
+        await interaction.user.send(embed=embed)
 
     @discord.app_commands.command(name="create-ticket", description="Open a ticket")
     async def create_ticket(self, interaction: discord.Interaction, title: str):

@@ -43,9 +43,6 @@ channel_ids:
     message_edit: 825774068313358346
     message_deleted: 825774127661973545
     role_changed: 825785679220703243
-    channel_deleted: 825786991450259466
-    channel_created: 825787041664073739
-    role_deleted: 825787981435502612
     bot_dm: 853984661360869386
 
 message_ids:
