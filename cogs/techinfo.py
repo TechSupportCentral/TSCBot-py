@@ -89,6 +89,10 @@ class techinfo(commands.Cog):
     async def monitor(self, ctx):
         await ctx.send(file=discord.File('images/monitor.jpg', 'monitor.jpg'))
 
+    @commands.hybrid_command(description="Show the difference between various display connectors")
+    async def videoports(self, ctx):
+        await ctx.send(file=discord.File('images/video-ports.png', 'video-ports.png'))
+
     @commands.hybrid_command(description="Show the difference between SATA and NVMe M.2 SSDs using differently keyed M.2 connectors")
     async def m2(self, ctx):
         files = [discord.File('images/m.2-key-type.jpg', 'key-type.jpg'), discord.File('images/m.2-drive-type.jpg', 'drive-type.png')]
