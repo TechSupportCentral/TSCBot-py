@@ -486,5 +486,30 @@ class moderation(commands.Cog):
         else:
             await interaction.response.send_message("The user was unmuted successfully.")
 
+    @discord.app_commands.command(description="Get information about an invite link")
+    @discord.app_commands.guild_only()
+    async def inviteinfo(self, interaction: discord.Interaction, code: str):
+        try:
+            invite = await self.bot.fetch_invite("http://discord.gg/" + code)
+        except:
+            await interaction.response.send_message("Not a valid invite code.", ephemeral=True)
+            return
+
+        if invite.guild.description is None:
+            description = None
+        else:
+            description = "`" + invite.guild.description + "`"
+        embed = discord.Embed(title="Invite to " + invite.guild.name, description=description, color=0x00a0a0)
+        embed.add_field(name="All Members", value=invite.approximate_member_count, inline=True)
+        embed.add_field(name="Online Members", value=invite.approximate_presence_count, inline=True)
+        embed.add_field(name="Invite Creator", value=invite.inviter, inline=False)
+        embed.add_field(name="Server ID", value=invite.guild.id, inline=False)
+        if invite.uses is not None:
+            embed.add_field(name="Invite Uses", value=invite.uses, inline=True)
+        embed.add_field(name="Invite URL", value=invite.url, inline=True)
+        embed.set_thumbnail(url=invite.guild.icon.url)
+
+        await interaction.response.send_message(embed=embed)
+
 async def setup(bot):
     await bot.add_cog(moderation(bot))
