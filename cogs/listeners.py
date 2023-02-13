@@ -159,7 +159,7 @@ class listeners(commands.Cog):
                 await response.delete()
 
         elif len(get_list_links(message.content)) >= 1:
-            pcpp = Scraper(headers={"cookie": pcpp_cookie})
+            pcpp = Scraper(headers={"cookie": pcpp_cookie, "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0"})
 
             for link in get_list_links(message.content):
                 list = pcpp.fetch_list(link)
