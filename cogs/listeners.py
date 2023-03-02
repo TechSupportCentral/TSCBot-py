@@ -69,6 +69,39 @@ class listeners(commands.Cog):
             embed.add_field(name="User ID", value=message.author.id, inline=True)
             if message.content:
                 embed.add_field(name="Message:", value=message.content, inline=False)
+                if len(message.attachments) >= 1:
+                    value = ""
+                    for file in message.attachments:
+                        value += file.url + "\n"
+                    embed.add_field(name="Attachments:", value=value, inline=False)
+            elif len(message.attachments) >= 1:
+                if "image" in message.attachments[0].content_type:
+                    if len(message.attachments) == 1:
+                        if message.attachments[0].description is None:
+                            value = ""
+                        else:
+                            value = message.attachments[0].description
+                        embed.add_field(name="Image:", value=value, inline=False)
+                        embed.set_image(url=message.attachments[0].url)
+                    else:
+                        value = ""
+                        for image in message.attachments:
+                            value += image.url + "\n"
+                        embed.add_field(name="Images:", value=value, inline=False)
+                else:
+                    value = ""
+                    for file in message.attachments:
+                        value += file.url + "\n"
+                    embed.add_field(name="Files:", value=value, inline=False)
+            elif len(message.stickers) >= 1:
+                if len(message.stickers) == 1:
+                    embed.add_field(name="Sticker:", value=message.stickers[0].name, inline=False)
+                    embed.set_image(url=message.stickers[0].url)
+                else:
+                    value = ""
+                    for sticker in message.stickers:
+                        value += sticker.url + "\n"
+                    embed.add_field(name="Stickers:", value=value, inline=False)
             else:
                 embed.add_field(name="Message:", value="Unable to detect message contents", inline=False)
             channel = self.bot.get_channel(int(channel_ids['bot_dm']))
