@@ -85,7 +85,7 @@ class info(commands.Cog):
         embed.add_field(name="Rule 7:", value="Do not leak or request any personal information (IP Addresses, full names, locations, etc).", inline=False)
         embed.add_field(name="Rule 8:", value="If a Support Team member is helping someone, don't try to help at the same time. If you want to help more, please apply for Support Team via our staff application forms.", inline=False)
         embed.add_field(name="Rule 9:", value=f"English is the language used for support and discussion. Make a ticket in <#{channel_ids['ticket_create']}> if you require help in another language.", inline=False)
-        embed.add_field(name="Rule 10:", value="We do not provide support for pirated, cracked, or hacked content of any kind, as it is illegal. We also do not provide support with ban evasion on any platform, no matter how unfair the ban may seem.", inline=False)
+        embed.add_field(name="Rule 10:", value="We do not provide support for pirated, cracked, or hacked content of any kind , we as well do not support accesing stolen devices as it is illegal. We also do not provide support with ban evasion on any platform, no matter how unfair the ban may seem.", inline=False)
         embed.add_field(name="Rule 11:", value="Do not beg for roles. When you apply for Support Team or Moderator, we carefully consider your application based on many factors. Our decision is final, and continuing to beg for the role(s) will do the opposite of what you want, lessening the chance you'll get them in the future.", inline=False)
         await ctx.send(embed=embed)
 
