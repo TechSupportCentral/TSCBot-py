@@ -2,3 +2,4 @@ discord.py ~= 2.0
 PyYAML ~= 6.0
 pymongo ~= 4.0
 pypartpicker ~= 1.9
+ levelling ~= 0.1.4
