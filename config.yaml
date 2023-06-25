@@ -46,7 +46,7 @@ channel_ids:
     bot_dm: 853984661360869386
 
 message_ids:
-    rules: 996652911650152498
+    rules: 1101583162951352320
     reaction_role_bump: 891857181757046855
     ticket_create: 987994746746196008
 

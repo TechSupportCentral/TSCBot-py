@@ -60,7 +60,7 @@ class custom_commands(commands.Cog):
 
         embed = discord.Embed(title="Custom Command Added", color=discord.Color.green())
         embed.set_thumbnail(url=interaction.user.display_avatar)
-        embed.add_field(name="Added by", value=interaction.user, inline=False)
+        embed.add_field(name="Added by", value=interaction.user.global_name, inline=False)
         embed.add_field(name="Command Name", value=name, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_news']))
@@ -88,7 +88,7 @@ class custom_commands(commands.Cog):
 
         embed = discord.Embed(title="Custom Command Removed", color=discord.Color.red())
         embed.set_thumbnail(url=interaction.user.display_avatar)
-        embed.add_field(name="Removed by", value=interaction.user, inline=False)
+        embed.add_field(name="Removed by", value=interaction.user.global_name, inline=False)
         embed.add_field(name="Command Name", value=name, inline=False)
         embed.add_field(name="Command Response", value=value, inline=False)
         channel = self.bot.get_channel(int(channel_ids['staff_news']))

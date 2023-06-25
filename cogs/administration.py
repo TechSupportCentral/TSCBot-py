@@ -80,9 +80,9 @@ class administration(commands.Cog):
         await ctx.message.add_reaction("✅")
         embed = discord.Embed(title="DM Sent", color=discord.Color.green())
         embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="Sent to", value=member, inline=True)
+        embed.add_field(name="Sent to", value=member.name, inline=True)
         embed.add_field(name="User ID", value=member.id, inline=True)
-        embed.add_field(name="Sent by", value=ctx.message.author, inline=False)
+        embed.add_field(name="Sent by", value=ctx.message.author.global_name, inline=False)
         embed.add_field(name="Message:", value=message, inline=False)
         channel = self.bot.get_channel(int(channel_ids['bot_dm']))
         await channel.send(embed=embed)
@@ -239,7 +239,7 @@ class administration(commands.Cog):
     @discord.app_commands.default_permissions()
     async def softban(self, interaction: discord.Interaction, user: discord.User):
         await interaction.guild.ban(discord.Object(id=user.id), delete_message_days=7, reason="softban")
-        await interaction.response.send_message(user + "softbanned successfully.")
+        await interaction.response.send_message(user.name + "softbanned successfully.")
         await interaction.guild.unban(discord.Object(id=user.id), reason="softban")
 
     @commands.hybrid_command(description="See what git commit the bot is currently running on")

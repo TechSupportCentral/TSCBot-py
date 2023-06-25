@@ -65,7 +65,7 @@ class listeners(commands.Cog):
         if isinstance(message.channel, discord.DMChannel) and not message.author.bot:
             embed = discord.Embed(title="DM Received", color=discord.Color.red())
             embed.set_thumbnail(url=message.author.display_avatar)
-            embed.add_field(name="Message Author", value=message.author, inline=True)
+            embed.add_field(name="Message Author", value=message.author.name, inline=True)
             embed.add_field(name="User ID", value=message.author.id, inline=True)
             if message.content:
                 embed.add_field(name="Message:", value=message.content, inline=False)
@@ -121,7 +121,7 @@ class listeners(commands.Cog):
             else:
                 dmbed=discord.Embed(title="Swear", description="This is a PG Friendly server, you cannot swear here.", color=discord.Color.red())
                 dmbed.add_field(name="Swear Detected:", value=swore, inline=False)
-                embed=discord.Embed(title="Swear by " + str(message.author), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
+                embed=discord.Embed(title="Swear by " + str(message.author.name), description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
                 embed.add_field(name="Swear Detected:", value=swore, inline=False)
 
             dmbed.set_thumbnail(url=message.author.display_avatar)
@@ -213,7 +213,7 @@ class listeners(commands.Cog):
         embed = discord.Embed(title="Message Deleted", description=f"[Jump to message]({message.jump_url})", color=discord.Color.red())
         embed.set_thumbnail(url=message.author.display_avatar)
         embed.add_field(name="In channel", value=message.channel.mention, inline=False)
-        embed.add_field(name="Message Author", value=message.author, inline=True)
+        embed.add_field(name="Message Author", value=message.author.name, inline=True)
         embed.add_field(name="User ID", value=message.author.id, inline=True)
         if message.content:
             embed.add_field(name="Message Deleted:", value=message.content, inline=False)
@@ -228,7 +228,7 @@ class listeners(commands.Cog):
         embed = discord.Embed(title="Message Edited", description=f"[Jump to message]({before.jump_url})", color=0x00a0a0)
         embed.set_thumbnail(url=before.author.display_avatar)
         embed.add_field(name="In channel", value=before.channel.mention, inline=False)
-        embed.add_field(name="Message Author", value=before.author, inline=True)
+        embed.add_field(name="Message Author", value=before.author.name, inline=True)
         embed.add_field(name="User ID", value=before.author.id, inline=True)
         if before.content:
             embed.add_field(name="Original Message:", value=before.content, inline=False)
@@ -245,7 +245,7 @@ class listeners(commands.Cog):
     async def on_member_update(self, before, after):
         if before.nick != after.nick:
             embed = discord.Embed(title="Nickname changed/added", color=0x00a0a0)
-            embed.set_author(name=before, icon_url=before.display_avatar)
+            embed.set_author(name=before.name, icon_url=before.display_avatar)
             embed.add_field(name="Old Nickname:", value=before.nick, inline=True)
             embed.add_field(name="New Nickname:", value=after.nick, inline=True)
             embed.add_field(name="User ID:", value=before.id, inline=False)
@@ -259,24 +259,24 @@ class listeners(commands.Cog):
 
             if role.id == int(role_ids['support_team']):
                 aembed = discord.Embed(title="New Support Team Member", description=f"Welcome {before.mention} to the Support Team!", color=role.color)
-                aembed.set_author(name=before)
+                aembed.set_author(name=before.global_name)
                 aembed.set_thumbnail(url=before.display_avatar)
                 achannel = self.bot.get_channel(int(channel_ids['new_staff']))
                 await achannel.send(embed=aembed)
             if role.id == int(role_ids['trial_mod']) or role.id == int(role_ids['moderator']):
                 aembed = discord.Embed(title=f"New {role.name}", description=f"Welcome {before.mention} to the Moderation Team!", color=role.color)
-                aembed.set_author(name=before)
+                aembed.set_author(name=before.global_name)
                 aembed.set_thumbnail(url=before.display_avatar)
                 achannel = self.bot.get_channel(int(channel_ids['new_staff']))
                 await achannel.send(embed=aembed)
             embed = discord.Embed(title="Role Added", description=role.mention, color=discord.Color.green())
-            embed.set_author(name=before, icon_url=before.display_avatar)
+            embed.set_author(name=before.name, icon_url=before.display_avatar)
             channel = self.bot.get_channel(int(channel_ids['role_changed']))
             await channel.send(embed=embed)
         elif len(before.roles) > len(after.roles):
             delta = [role for role in before.roles if role not in after.roles]
             embed = discord.Embed(title="Role Removed", description=delta[0].mention, color=discord.Color.red())
-            embed.set_author(name=before, icon_url=before.display_avatar)
+            embed.set_author(name=before.name, icon_url=before.display_avatar)
             channel = self.bot.get_channel(int(channel_ids['role_changed']))
             await channel.send(embed=embed)
 
@@ -286,7 +286,7 @@ class listeners(commands.Cog):
 
         await member.add_roles(member.guild.get_role(int(role_ids['og'])))
 
-        embed1 = discord.Embed(title="Member Joined", description=f"{member} has joined Tech Support Central!", color=discord.Color.green())
+        embed1 = discord.Embed(title="Member Joined", description=f"{member.global_name} has joined Tech Support Central!", color=discord.Color.green())
         embed1.set_thumbnail(url=member.display_avatar)
         channel1 = self.bot.get_channel(int(channel_ids['welcome']))
         await channel1.send(embed=embed1)
@@ -302,7 +302,7 @@ class listeners(commands.Cog):
                 invite_used = invite
                 invites = afterinvites
 
-        embed2 = discord.Embed(title="Member Joined", description=member, color=discord.Color.green())
+        embed2 = discord.Embed(title="Member Joined", description=member.name, color=discord.Color.green())
         embed2.set_thumbnail(url=member.display_avatar)
         embed2.add_field(name="User ID", value=member.id, inline=False)
         embed2.add_field(name="Account Created:", value=f"<t:{timegm(member.created_at.timetuple())}>", inline=False)
@@ -341,7 +341,7 @@ class listeners(commands.Cog):
         if invite.inviter == None:
             return
         embed = discord.Embed(title="Invite Created", color=discord.Color.green())
-        embed.add_field(name="Invite Creator", value=invite.inviter, inline=True)
+        embed.add_field(name="Invite Creator", value=invite.inviter.name, inline=True)
         embed.add_field(name="User ID", value=invite.inviter.id, inline=True)
         embed.add_field(name="Invite Code", value=invite.code, inline=False)
         embed.add_field(name="Invite Channel", value=invite.channel.mention, inline=False)
@@ -354,7 +354,7 @@ class listeners(commands.Cog):
         invites = await invite.guild.invites()
         embed = discord.Embed(title="Invite Deleted", color=discord.Color.red())
         if invite.inviter is not None:
-            embed.add_field(name="Invite Creator", value=invite.inviter, inline=True)
+            embed.add_field(name="Invite Creator", value=invite.inviter.name, inline=True)
             embed.add_field(name="User ID", value=invite.inviter.id, inline=True)
         embed.add_field(name="Invite Code", value=invite.code, inline=False)
         if invite.channel is not None:
@@ -366,7 +366,7 @@ class listeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        embed = discord.Embed(title="Member Left", description=f"{member} has left Tech Support Central.", color=discord.Color.red())
+        embed = discord.Embed(title="Member Left", description=f"{member.name} has left Tech Support Central.", color=discord.Color.red())
         embed.set_thumbnail(url=member.display_avatar)
         embed.set_footer(text=f"User ID: {member.id}")
         channel = self.bot.get_channel(int(channel_ids['member_changed']))
@@ -391,12 +391,8 @@ class listeners(commands.Cog):
             channel = guild.get_channel(payload.channel_id)
             message = await channel.fetch_message(payload.message_id)
             mod_role = guild.get_role(int(role_ids['moderator']))
-            if user.nick is None:
-                username = user.name
-            else:
-                username = user.nick
 
-            thread = await channel.create_thread(name=f"Ticket for {username}", invitable=False)
+            thread = await channel.create_thread(name=f"Ticket for {user.display_name}", invitable=False)
             await thread.add_user(user)
             for mod in mod_role.members:
                 await thread.add_user(mod)

@@ -76,7 +76,7 @@ class misc(commands.Cog):
     @discord.app_commands.describe(description="What you're alerting the moderators about")
     async def alert(self, interaction: discord.Interaction, description: str = "A description was not provided."):
         embed = discord.Embed(title="Moderator Alert", description=interaction.channel.mention + "\n\n" + description, color=discord.Color.red())
-        embed.add_field(name="Alert Author", value=interaction.user, inline=True)
+        embed.add_field(name="Alert Author", value=interaction.user.name, inline=True)
         embed.add_field(name="User ID", value=interaction.user.id, inline=True)
         channel = self.bot.get_channel(int(channel_ids['modlog']))
         await channel.send(f"<@&{role_ids['moderator']}> <@&{role_ids['trial_mod']}>", embed=embed)
@@ -86,7 +86,7 @@ class misc(commands.Cog):
     @discord.app_commands.guild_only()
     async def suggest(self, interaction: discord.Interaction, suggestion: str):
         embed = discord.Embed(description=f"**Suggestion:** {suggestion}", color=discord.Color.lighter_grey())
-        embed.set_author(name=interaction.user, icon_url=interaction.user.display_avatar)
+        embed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar)
         embed.add_field(name="Status", value="Pending")
         channel = self.bot.get_channel(int(channel_ids['suggestions_list']))
         await channel.send(embed=embed)
