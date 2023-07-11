@@ -49,6 +49,30 @@ class techinfo(commands.Cog):
         embed.add_field(name="Step 10:", value="Format your USB so you can use it again.\nOpen File Explorer and find your USB flash drive. Right click it and select format. Use NTFS as the filesystem and tick the Quick Format box.\nOnce the format is complete, your drive will be empty and you can use it for your own purposes again.", inline=False)
         await ctx.send(embed=embed)
 
+    @commands.hybrid_command(description="Get instructions on how to create a bootable Windows USB on macOS 11+")
+    async def macwinusb(self, ctx):
+        embed = discord.Embed(title="How to create bootable Windows 10 install media on macOS 11+", description="**Note:** Since Apple removed Boot Camp Assistant from macOS 11 Big Sur and later, this process has become significantly more difficult. If you have access to a computer running Windows or Linux, use that machine to create the install media instead. If you have a Mac running OS X 10.15 Mojave or earlier, follow the instructions given by `/osxwinusb`.", color=0x00a0a0)
+        embed.add_field(name="Step 1:", value="Plug in a USB flash drive with at least 8 GB of capacity, that you don't mind erasing.", inline=False)
+        embed.add_field(name="Step 2:", value="Go to https://microsoft.com/en-us/software-download/windows10ISO and download a Windows 10 ISO.", inline=False)
+        embed.add_field(name="Step 3:", value="Open Disk Utility, found in the Utilities folder under Applications.\nSelect your USB drive under External in the left column and click Erase in the top bar.\nChoose a name for the drive; for this guide, `WIN10USB` will be used. Set the format as 'MS-DOS (FAT)' and the partition scheme as 'GUID Partition Map'. Click erase.", inline=False)
+        embed.add_field(name="Step 4:", value="Find the ISO file in Finder and double click to mount it.\nOpen Terminal, also found in the Utilities folder, and run the command `ls /Volumes`. CCCOMA_X64FRE_EN-US_DV9 and WIN10USB should both be listed.", inline=False)
+        embed.add_field(name="Step 5:", value="Use the terminal to install the [brew](https://brew.sh) package manager if it isn't installed already.\nOnce brew is installed, run the command `brew install wimlib`.", inline=False)
+        embed.add_field(name="Step 6:", value="Run the command `rsync -av --exclude=sources/install.wim /Volumes/CCCOMA_X64FRE_EN-US_DV9/ /Volumes/WIN10USB/` to copy the Windows installation files to the USB drive.", inline=False)
+        embed.add_field(name="Step 7:", value="Run the command `wimlib-imagex split /Volumes/CCCOMA_X64FRE_EN-US_DV9/sources/install.wim /Volumes/WIN10USB/sources/install.swm 3500` to split install.wim into chunks small enough to fit into a FAT32 partition.", inline=False)
+        embed.add_field(name="Step 8:", value="Eject the drive by dragging it into the trash can or right clicking and selecting eject.\nYou are finally done! To install Windows onto another computer, run the `/windowsusb` command and follow the instructions from step 5.", inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(description="Get instructions on how to create a bootable Windows USB on Mac OS X")
+    async def osxwinusb(self, ctx):
+        embed = discord.Embed(title="How to create bootable Windows 10 install media on Mac OS X", description="**Note:** This will only work on OS X 10.15 Mojave or earlier. If you're using macOS 11 Big Sur or later, you need to follow the instructions given by `/macwinusb` instead.", color=0x00a0a0)
+        embed.add_field(name="Step 1:", value="Plug in a USB flash drive with at least 8 GB of capacity, that you don't mind erasing.", inline=False)
+        embed.add_field(name="Step 2:", value="Go to https://microsoft.com/en-us/software-download/windows10ISO and download a Windows 10 ISO.", inline=False)
+        embed.add_field(name="Step 3:", value="Open the Boot Camp Assistant application. It should be located in the Utilities folder under Applications.\nAt the introduction step, click continue.\nAt the 'Select Tasks' screen, make sure only the 'Create a Windows 10 or later install disk' box is checked ([picture](https://discussions.apple.com/content/attachment/87d23c1b-a4b5-4549-b58a-6c57e8d5e926)). Click continue.", inline=False)
+        embed.add_field(name="Step 4:", value="In the next screen, choose the ISO file that you downloaded previously and select the correct USB drive to flash it to. Make sure the correct drive is selected, because this process will wipe its contents. Click continue.", inline=False)
+        embed.add_field(name="Step 5:", value="If Boot Camp Assistant asks for your password, enter it. This gives the application permission to wipe your USB and put the Windows installer on it. The process of flashing the drive will take some time. When it's done, eject the drive by dragging it into the trash can or right clicking and selecting eject.", inline=False)
+        embed.add_field(name="Step 6:", value="Congratulations, you now have bootable Windows 10 install media! To install Windows onto another (or the same) computer, run the `/windowsusb` command and follow the instructions from step 5.", inline=False)
+        await ctx.send(embed=embed)
+
     @commands.hybrid_command(description="Get instructions on how to create a bootable Linux USB")
     async def linuxusb(self, ctx):
         embed = discord.Embed(title="How to get a Linux Live USB", color=0x00a0a0)

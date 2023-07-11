@@ -286,7 +286,11 @@ class listeners(commands.Cog):
 
         await member.add_roles(member.guild.get_role(int(role_ids['og'])))
 
-        embed1 = discord.Embed(title="Member Joined", description=f"{member.global_name} has joined Tech Support Central!", color=discord.Color.green())
+        if member.discriminator == "0":
+            username = member.global_name
+        else:
+            username = member
+        embed1 = discord.Embed(title="Member Joined", description=f"{username} has joined Tech Support Central!", color=discord.Color.green())
         embed1.set_thumbnail(url=member.display_avatar)
         channel1 = self.bot.get_channel(int(channel_ids['welcome']))
         await channel1.send(embed=embed1)
