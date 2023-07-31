@@ -92,6 +92,16 @@ class techinfo(commands.Cog):
         embed.set_footer(text="Note: EtchDroid will not work for Windows ISOs as they don't follow the ISOHybrid standard.")
         await ctx.send(embed=embed)
 
+    @commands.hybrid_command(description="Get instructions on how to run the system file checker in Windows 10/11")
+    async def windowsrepair(self, ctx):
+        embed = discord.Embed(title="How to repair Windows 10/11", description="System File Checker is a utility in Windows that checks for problems with files on your computer.", color=0x00a0a0)
+        embed.add_field(name="Step 1:", value="Make sure you've installed the latest updates for Windows, and then restart your machine.", inline=False)
+        embed.add_field(name="Step 2:", value="In the search box on the taskbar, type command prompt, and right-click or press and hold Command Prompt (Desktop app) from the list of results. Select Run as administrator, and then select Yes.", inline=False)
+        embed.add_field(name="Step 3:", value="Type `DISM.exe /Online /Cleanup-image /Restorehealth`, and then press Enter.\n**Note:** This step may take a few minutes to start and complete.", inline=False)
+        embed.add_field(name="Step 4:", value="After you see a message that says **The operation completed successfully**, type `sfc /scannow` and press Enter.", inline=False)
+        embed.add_field(name="Step 5:", value="After you see a message that says **Verification 100% complete**, type `exit` and press Enter.", inline=False)
+        await ctx.send(embed=embed)
+
     @commands.hybrid_command(aliases=['windows7', 'windows8'], description="Explain why Windows 7 and 8 should not be used")
     async def legacywindows(self, ctx):
         embed = discord.Embed(title="Legacy versions of Windows", description="Windows 7 and 8 are no longer officially supported by Microsoft.\nUsing older versions of windows puts you at risk to malware and other vulnerabilities (even if you're careful), which can easily be avoided by upgrading your operating system.", color=0x00a0a0)
