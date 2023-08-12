@@ -337,7 +337,7 @@ class moderation(commands.Cog):
                 return
 
             dmbed = discord.Embed(title="You have been banned.", description=f"**Reason:** " + reason, color=discord.Color.red())
-            dmbed.set_footer(text="You can appeal your ban at https://www.techsupportcentral.cf/appeal.php")
+            dmbed.set_footer(text="You can appeal your ban at https://www.techsupportcentral.org/appeal.php")
 
             try:
                 await user.send(embed=dmbed)
