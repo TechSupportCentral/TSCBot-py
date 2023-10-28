@@ -31,7 +31,7 @@ class techinfo(commands.Cog):
         embed.add_field(name="MSI:", value="F11", inline=True)
         embed.add_field(name="Samsung:", value="Esc, F12, or F2", inline=True)
         embed.add_field(name="Sony:", value="Esc, F10, or F11", inline=True)
-        embed.add_field(name="Other common keys:", value="F2, F10, F12, Esc, or Del", inline=True)
+        embed.add_field(name="Other common keys:", value="F2, F10, F12, Esc, Del, or Enter", inline=True)
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(description="Get instructions on how to install or reinstall Windows 10")
