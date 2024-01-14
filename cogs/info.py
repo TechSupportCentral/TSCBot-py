@@ -85,8 +85,9 @@ class info(commands.Cog):
         embed.add_field(name="Rule 7:", value="Do not leak or request any personal information (IP Addresses, full names, locations, etc).", inline=False)
         embed.add_field(name="Rule 8:", value="If a Support Team member is helping someone, don't try to help at the same time. If you want to help more, please apply for Support Team via our staff application forms.", inline=False)
         embed.add_field(name="Rule 9:", value=f"English is the language used for support and discussion. Make a ticket in <#{channel_ids['ticket_create']}> if you require help in another language.", inline=False)
-        embed.add_field(name="Rule 10:", value="We will not help you do something that is against the law. For example, we do not provide support for pirated, cracked, or hacked content, ban evasion on any platform (however unfair the ban), or bypassing a phone's lock (which probably isn't possible anyway).", inline=False)
+        embed.add_field(name="Rule 10:", value="We will not help you do something that is against the law. For example, we do not provide support for pirated, cracked, or hacked content, ban evasion on any platform (however unfair the ban), or bypassing a phone's iCloud/Google account lock (which probably isn't possible anyway).", inline=False)
         embed.add_field(name="Rule 11:", value="Do not beg for roles. When you apply for Support Team or Moderator, we carefully consider your application based on many factors. Our decision is final, and continuing to beg for the role(s) will do the opposite of what you want, lessening the chance you'll get them in the future.", inline=False)
+        embed.add_field(name="Rule 12:", value=f"Do not post the same message in multiple channels. Find the best support channel for your question and post it to only that channel. When in doubt, use <#{channel_ids['general_support']}>.", inline=False)
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(description="Look at a specific server rule")
