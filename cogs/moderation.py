@@ -327,13 +327,21 @@ class moderation(commands.Cog):
 
     @discord.app_commands.command(description="Ban a user from the server")
     @discord.app_commands.guild_only()
-    async def ban(self, interaction: discord.Interaction, user: discord.User, reason: str = "No reason provided."):
+    @discord.app_commands.describe(
+        user="User to ban",
+        reason="Reason for the ban",
+        purge="Delete all messages sent by the user for this many days"
+    )
+    async def ban(self, interaction: discord.Interaction, user: discord.User, reason: str = "No reason provided.", purge: int = 0):
         if interaction.guild.get_member(user.id) is not None:
             if user.top_role.position >= interaction.user.top_role.position:
                 await interaction.response.send_message(f"{user.global_name} is higher than or equal to you in the role hierarchy, cannot ban.", ephemeral=True)
                 return
             if user.bot and interaction.guild.get_role(int(role_ids['owner'])) not in interaction.user.roles:
                 await interaction.response.send_message("You do not have permission to ban bots.", ephemeral=True)
+                return
+            if purge < 0 or purge > 7:
+                await interaction.response.send_message("Cannot delete messages further than 7 days old.", ephemeral=True)
                 return
 
             dmbed = discord.Embed(title="You have been banned.", description=f"**Reason:** " + reason, color=discord.Color.red())
@@ -356,7 +364,7 @@ class moderation(commands.Cog):
         collection = mongodb['moderation']
         collection.insert_one({"_id": str(message.id), "type": "ban", "user": str(user.id), "moderator": str(interaction.user.id), "reason": reason})
 
-        await interaction.guild.ban(discord.Object(id=user.id), delete_message_days=0, reason=reason)
+        await interaction.guild.ban(discord.Object(id=user.id), delete_message_days=purge, reason=reason)
         await interaction.response.send_message("The user was banned successfully.")
 
     @discord.app_commands.command(description="Unban a user from the server")
