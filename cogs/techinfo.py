@@ -4,11 +4,10 @@ import discord
 class techinfo(commands.Cog):
     @commands.hybrid_command(description="Get links to download various drivers")
     async def drivers(self, ctx):
-        embed = discord.Embed(title="Drivers", description="Links to downloads for various drivers", color=0x00a0a0)
-        embed.add_field(name="AMD Drivers:", value="https://amd.com/en/support", inline=False)
-        embed.add_field(name="nVidia Drivers:", value="https://nvidia.com/Download/index.aspx", inline=False)
+        embed = discord.Embed(title="Drivers", description="Download links for various drivers", color=0x00a0a0)
         embed.add_field(name="Intel Driver & Support Assistant:", value="https://dsadata.intel.com/installer", inline=False)
-        embed.add_field(name="Realtek Audio Drivers:", value="https://www.realtek.com/en/downloads", inline=False)
+        embed.add_field(name="AMD Drivers:", value="https://amd.com/en/support", inline=False)
+        embed.add_field(name="NVIDIA Drivers:", value="https://nvidia.com/Download/index.aspx", inline=False)
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="driver-managers", aliases=["driverbooster", "drivereasy", "microsoft-drivers"], description="Explain why third party driver managers should not be used")
