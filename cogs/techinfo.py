@@ -104,7 +104,7 @@ class techinfo(commands.Cog):
     @commands.hybrid_command(aliases=['windows7', 'windows8'], description="Explain why Windows 7 and 8 should not be used")
     async def legacywindows(self, ctx):
         embed = discord.Embed(title="Legacy versions of Windows", description="Windows 7 and 8 are no longer officially supported by Microsoft, while [Windows 10 reaches end of support on October 14, 2025](https://www.microsoft.com/en-us/windows/end-of-support).\nUsing older versions of windows puts you at risk to malware and other vulnerabilities (even if you're careful), which can easily be avoided by upgrading your operating system.", color=0x00a0a0)
-        embed.add_field(name="What can I do?", value="If your computer is good enough to run Windows 11 reliably, download the [Windows 11 Installation Assistant](https://www.microsoft.com/en-us/software-download/windows11).\nIf your computer isn't good enough to run Windows 11 very well, it's recommended to switch to a lighter Linux distribution such as [Lubuntu](https://lubuntu.me/). Instructions are available with the `/linuxusb` command.", inline=False)
+        embed.add_field(name="What can I do?", value="If your computer is good enough to run Windows 11 reliably, download the [Windows 11 Installation Assistant](https://www.microsoft.com/en-us/software-download/windows11).\nIf your computer isn't good enough to run Windows 11 very well, it's recommended to switch to a lighter Linux distribution such as [Debian](https://www.debian.org/) [LXQt](https://lxqt-project.org/). Instructions are available with the `/linuxusb` command.", inline=False)
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(description="Get links to various versions of the Microsoft Visual C++ Redistributable")
